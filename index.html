@@ -729,7 +729,6 @@ HTML
             document.getElementById('discount-applied').innerText = discountAppliedText;
             document.getElementById('bill-owner-discount').innerText = formatNum(ownerDiscount) + "k";
 
-            // HIỂN THỊ NƯỚC: Cho phép nhập số lượng tính vào sân cuối giờ
             let drinksFeeBill = 0; 
             let drinksFeeTotal = 0; 
             let drinksNotesHtml = [];
@@ -760,7 +759,6 @@ HTML
             document.getElementById('drinks-fee-display').innerText = formatNum(drinksFeeBill) + "k";
             document.getElementById('drinks-list-note').innerHTML = drinksNotesHtml.length > 0 ? drinksNotesHtml.join("") : "<span class='text-[9px] text-slate-400 font-mono italic'>Chưa gọi món nào</span>";
 
-            // HIỂN THỊ PHỤ KIỆN: Cho phép nhập số lượng tính vào sân cuối giờ
             let gearFeeBill = 0; 
             let gearFeeTotal = 0; 
             let gearNotesHtml = [];
@@ -791,7 +789,6 @@ HTML
             document.getElementById('gear-fee-display').innerText = formatNum(gearFeeBill) + "k";
             document.getElementById('gear-list-note').innerHTML = gearNotesHtml.length > 0 ? gearNotesHtml.join("") : "<span class='text-[9px] text-slate-400 font-mono italic'>Chưa gọi phụ kiện</span>";
 
-            // Tổng thanh toán của bill cuối giờ
             let totalPayment = courtFeeDisplay + drinksFeeBill + gearFeeBill - ownerDiscount;
             if (totalPayment < 0) totalPayment = 0;
             totalPayment = Math.round(totalPayment * 10) / 10;
@@ -1054,20 +1051,6 @@ HTML
                 document.getElementById('modal-drinks-section').style.display = "none";
             }
 
-            const gearContainer = document.getElementById('modal-gear-list');
-            gearContainer.innerHTML = "";
-            if (item.details && item.details.gear && item.details.gear.length > 0) {
-                document.getElementById('modal-gear-section').style.display = "block";
-                item.details.gear.forEach(g => {
-                    let bQty = g.hasOwnProperty('billQty') ? g.billQty : g.qty;
-                    let pNow = g.qty - bQty;
-                    let textStatus = `(Vào sân: ${bQty}${pNow > 0 ? `, Trả liền: ${pNow}` : ''})`;
-                    gearContainer.innerHTML += `<div class="flex justify-between"><span>• ${g.name} <b class="text-slate-400">x${g.qty}</b> <span class="text-[10px] text-blue-600">${textStatus}</span></span><span>${formatNum(g.price * g.qty)}k</span></div>`;
-                });
-            } else {
-                document.getElementById('modal-gear-section').style.display = "none";
-            }
-
             const modal = document.getElementById('bill-detail-modal');
             modal.classList.remove('opacity-0', 'pointer-events-none');
         }
@@ -1151,6 +1134,7 @@ HTML
             }
         }
 
+        /* FIX: HÀM THÊM MÓN MỚI CHUẨN ĐỊNH DẠNG SỐ (NUMBER) VÀ ĐỒNG BỘ */
         function addNewProductToInventory() {
             const name = document.getElementById('inv-add-name').value.trim();
             const type = document.getElementById('inv-add-type').value;
@@ -1162,21 +1146,45 @@ HTML
                 alert("⚠️ Vui lòng nhập tên món hàng muốn thêm!");
                 return;
             }
+            if (qty < 0 || cost < 0 || price < 0) {
+                alert("⚠️ Giá trị số lượng hoặc đơn giá bán không được nhỏ hơn 0!");
+                return;
+            }
 
             const uniqueId = 'prod_' + Date.now();
-            const newItem = { id: uniqueId, name, type, qty, cost, price };
+            
+            // Ép dữ liệu chuẩn kiểu Number trước khi đưa vào Object
+            const newItem = { 
+                id: uniqueId, 
+                name: name, 
+                type: type, 
+                qty: Number(qty), 
+                cost: Number(cost), 
+                price: Number(price) 
+            };
+
+            // Đọc lại từ bộ nhớ đệm trước khi push để tránh ghi đè lỗi dữ liệu đang chạy
+            if (localStorage.getItem('pab_inventory')) {
+                globalInventory = JSON.parse(localStorage.getItem('pab_inventory'));
+            }
 
             globalInventory.push(newItem);
             localStorage.setItem('pab_inventory', JSON.stringify(globalInventory));
 
+            // Reset rỗng form nhập liệu
             document.getElementById('inv-add-name').value = "";
             document.getElementById('inv-add-qty').value = "";
             document.getElementById('inv-add-cost').value = "";
             document.getElementById('inv-add-price').value = "";
 
+            // Đồng bộ dữ liệu kho hàng xuống trạng thái sân hiện hành
             syncCourtsWithInventory();
-            loadCourtState(currentCourt);
+            
+            // Ép hệ thống vẽ lại bảng quản lý kho và danh mục menu chọn đồ uống / phụ kiện
             renderInventoryTable();
+            loadCourtState(currentCourt);
+            
+            alert(`🎉 Đã thêm thành công món [${name}] vào hệ thống kho bãi Phúc An!`);
         }
 
         function deleteInventoryItem(id) {

@@ -20,7 +20,7 @@ HTML
                 <span class="text-2xl">🏸</span>
                 <div>
                     <h1 class="text-base sm:text-lg font-black tracking-tight text-teal-400">PHÚC AN BADMINTON</h1>
-                    <p class="text-[10px] text-slate-300 font-semibold">Hệ thống tính tiền & Quản lý kho bãi chuyên nghiệp v2.6</p>
+                    <p class="text-[10px] text-slate-300 font-semibold">Hệ thống tính tiền & Quản lý kho bãi chuyên nghiệp v2.7</p>
                 </div>
             </div>
             <div class="flex bg-slate-950/40 p-1 rounded-xl border border-teal-500/20 w-full sm:w-auto gap-1">
@@ -569,7 +569,7 @@ HTML
             PRICING[type].forEach(slot => {
                 const btn = document.createElement('button');
                 btn.className = "bg-teal-600/10 hover:bg-teal-600/20 active:bg-teal-600/30 border border-teal-600/30 text-teal-950 font-black rounded-lg py-1 px-1.5 text-[11px] transition text-center";
-                btn.innerHTML = `⏱️ ${slot.start}-${slot.end}<br><span class="text-teal-700 font-bold text-[9px]">(${slot.price}k/h)</span>`;
+                btn.innerHTML = `⏱️ ${slot.start}-${slot.end}<br><span class="text-teal-700 font-bold text-[9px]">(${slot.price}k)</span>`;
                 btn.onclick = () => {
                     document.getElementById('start-time').value = slot.start;
                     document.getElementById('end-time').value = slot.end;
@@ -666,7 +666,6 @@ HTML
             const court = courtsData[currentCourt];
             if (!court) return;
 
-            // Đọc lại dữ liệu từ form màn hình vào biến tạm thời trước khi tính
             if (currentCourt !== 'quick') {
                 court.customerName = document.getElementById('customer-name').value;
                 court.dayType = document.getElementById('day-type').value;
@@ -678,7 +677,6 @@ HTML
                 court.bankUnits = parseFloat(document.getElementById('bank-units').value) || 0;
             }
 
-            // 1. Đồng bộ số lượng hiển thị menu & khóa nút (+) nếu hết hàng tồn
             globalInventory.forEach(prod => {
                 const el = document.getElementById(`qty-view-${prod.id}`);
                 if (el) el.innerText = court.items[prod.id] || 0;
@@ -698,7 +696,6 @@ HTML
                 }
             });
 
-            // 2. Tính tiền giỏ hàng vãng lai
             if (currentCourt === 'quick') {
                 let totalQuickFee = 0;
                 let listHtml = "";
@@ -717,7 +714,6 @@ HTML
                 return;
             }
 
-            // 3. Tính tiền hóa đơn sân chơi chính xác
             const timeCalc = calculateCourtFee(court.dayType, court.startTime, court.endTime);
             const displayMinutes = timeCalc.minutes;
             let originalCourtFee = timeCalc.fee;
@@ -853,9 +849,9 @@ HTML
                 dayType: "N/A",
                 timeRange: "Không thuê sân",
                 courtFee: 0,
-                serviceFee: serviceTotal,
-                totalBill: serviceTotal,
-                profitGoods: profitGoods,
+                serviceFee: Math.round(serviceTotal * 100) / 100,
+                totalBill: Math.round(serviceTotal * 100) / 100,
+                profitGoods: Math.round(profitGoods * 100) / 100,
                 cashReceived: qCash,
                 bankReceived: qBank,
                 rawDetails: {
@@ -927,6 +923,7 @@ HTML
 
             let profitGoods = (drinksFee + gearFee) - totalCostGoods;
 
+            // SỬA LỖI LỊCH SỬ: Chuẩn hóa bo tròn số thập phân trước khi lưu trữ
             const billRecord = {
                 id: 'PAB-' + Date.now(),
                 date: new Date().toLocaleDateString('sv-SE'),
@@ -935,10 +932,10 @@ HTML
                 customerName: court.customerName.trim() || "Khách lẻ",
                 dayType: court.dayType,
                 timeRange: `${court.startTime || '00:00'} - ${court.endTime || '00:00'} (${timeCalc.minutes} ph)`,
-                courtFee: finalCourtFee,
-                serviceFee: drinksFee + gearFee,
-                totalBill: finalTotal,
-                profitGoods: profitGoods,
+                courtFee: Math.round(finalCourtFee * 100) / 100,
+                serviceFee: Math.round((drinksFee + gearFee) * 100) / 100,
+                totalBill: Math.round(finalTotal * 100) / 100,
+                profitGoods: Math.round(profitGoods * 100) / 100,
                 cashReceived: court.cashUnits,
                 bankReceived: court.bankUnits,
                 rawDetails: JSON.parse(JSON.stringify(court))
@@ -1000,9 +997,17 @@ HTML
             const filteredBills = paymentHistory.filter(bill => bill.date === filterDate);
             
             filteredBills.forEach(bill => {
-                dayTotal += bill.totalBill;
-                dayCash += (bill.cashReceived || 0);
-                dayBank += (bill.bankReceived || 0);
+                // SỬA LỖI LỊCH SỬ: Đảm bảo chuyển đổi chuỗi lưu trữ thành Số thực để tránh lỗi tính toán cộng chuỗi
+                const cFee = parseFloat(bill.courtFee) || 0;
+                const sFee = parseFloat(bill.serviceFee) || 0;
+                const tBill = parseFloat(bill.totalBill) || 0;
+                const pGoods = parseFloat(bill.profitGoods) || 0;
+                const cRec = parseFloat(bill.cashReceived) || 0;
+                const bRec = parseFloat(bill.bankReceived) || 0;
+
+                dayTotal += tBill;
+                dayCash += cRec;
+                dayBank += bRec;
 
                 const tr = document.createElement('tr');
                 tr.className = "border-b border-slate-800/50 hover:bg-slate-900/40 transition cursor-pointer";
@@ -1011,12 +1016,12 @@ HTML
                     <td class="p-2 font-black ${bill.courtNum === 'Lẻ' ? 'text-amber-400' : 'text-teal-400'}">${bill.courtNum === 'Lẻ' ? 'Mua lẻ' : 'Sân ' + bill.courtNum}</td>
                     <td class="p-2 font-sans font-bold text-white max-w-[120px] truncate">${bill.customerName}</td>
                     <td class="p-2 text-slate-300 text-[10px]">${bill.timeRange}</td>
-                    <td class="p-2 text-right font-bold text-slate-300">${formatNum(bill.courtFee)}k</td>
-                    <td class="p-2 text-right font-bold text-amber-400">${formatNum(bill.serviceFee)}k</td>
-                    <td class="p-2 text-right font-black text-emerald-400">${formatNum(bill.totalBill)}k</td>
-                    <td class="p-2 text-right font-black text-yellow-400">${formatNum(bill.profitGoods)}k</td>
-                    <td class="p-2 text-left pl-4 font-bold text-amber-400">${formatNum(bill.cashReceived || 0)}k</td>
-                    <td class="p-2 text-left pl-4 font-bold text-sky-400">${formatNum(bill.bankReceived || 0)}k</td>
+                    <td class="p-2 text-right font-bold text-slate-300">${formatNum(cFee)}k</td>
+                    <td class="p-2 text-right font-bold text-amber-400">${formatNum(sFee)}k</td>
+                    <td class="p-2 text-right font-black text-emerald-400">${formatNum(tBill)}k</td>
+                    <td class="p-2 text-right font-black text-yellow-400">${formatNum(pGoods)}k</td>
+                    <td class="p-2 text-left pl-4 font-bold text-amber-400">${formatNum(cRec)}k</td>
+                    <td class="p-2 text-left pl-4 font-bold text-sky-400">${formatNum(bRec)}k</td>
                     <td class="p-2 text-center">
                         <button onclick="deleteBill('${bill.id}', event)" class="text-red-400 hover:text-red-500 font-sans text-xs px-1">✕</button>
                     </td>

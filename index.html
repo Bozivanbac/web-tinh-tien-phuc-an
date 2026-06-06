@@ -20,7 +20,7 @@ HTML
                 <span class="text-2xl">🏸</span>
                 <div>
                     <h1 class="text-base sm:text-lg font-black tracking-tight text-teal-400">PHÚC AN BADMINTON</h1>
-                    <p class="text-[10px] text-slate-300 font-semibold">Hệ thống tính tiền & Quản lý kho bãi chuyên nghiệp v2.5</p>
+                    <p class="text-[10px] text-slate-300 font-semibold">Hệ thống tính tiền & Quản lý kho bãi chuyên nghiệp v2.6</p>
                 </div>
             </div>
             <div class="flex bg-slate-950/40 p-1 rounded-xl border border-teal-500/20 w-full sm:w-auto gap-1">
@@ -71,11 +71,11 @@ HTML
                     <div class="grid grid-cols-2 gap-2">
                         <div>
                             <label class="block text-[11px] font-black text-slate-500 mb-1">⏰ Giờ vào sân</label>
-                            <input id="start-time" type="time" oninput="calculateAll()" onchange="calculateAll()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-2 py-1 text-xs font-mono font-bold text-slate-800 focus:outline-teal-500">
+                            <input id="start-time" type="time" oninput="calculateAll()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-2 py-1 text-xs font-mono font-bold text-slate-800 focus:outline-teal-500">
                         </div>
                         <div>
                             <label class="block text-[11px] font-black text-slate-500 mb-1">🏁 Giờ ra sân</label>
-                            <input id="end-time" type="time" oninput="calculateAll()" onchange="calculateAll()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-2 py-1 text-xs font-mono font-bold text-slate-800 focus:outline-teal-500">
+                            <input id="end-time" type="time" oninput="calculateAll()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-2 py-1 text-xs font-mono font-bold text-slate-800 focus:outline-teal-500">
                         </div>
                     </div>
                     <div>
@@ -421,6 +421,7 @@ HTML
         let expensesData = []; 
 
         function formatNum(num) {
+            if (isNaN(num) || num === null || num === undefined) return "0";
             return Number(Math.round(num * 100) / 100).toLocaleString('vi-VN');
         }
 
@@ -610,7 +611,6 @@ HTML
 
             if (!prod) return;
 
-            // Chặn bấm cộng (+) nếu số lượng đặt đã đạt tối đa tồn kho
             if (delta > 0 && currentQty >= prod.qty) {
                 alert(`⚠️ Không thể thêm! Mặt hàng [${prod.name}] trong kho chỉ còn tối đa ${prod.qty} món.`);
                 return;
@@ -666,12 +666,23 @@ HTML
             const court = courtsData[currentCourt];
             if (!court) return;
 
-            // 1. Đồng bộ số lượng hiển thị lên các thẻ menu và khóa nút (+) nếu hết hàng tồn
+            // Đọc lại dữ liệu từ form màn hình vào biến tạm thời trước khi tính
+            if (currentCourt !== 'quick') {
+                court.customerName = document.getElementById('customer-name').value;
+                court.dayType = document.getElementById('day-type').value;
+                court.startTime = document.getElementById('start-time').value;
+                court.endTime = document.getElementById('end-time').value;
+                court.discountType = document.getElementById('discount-select').value;
+                court.ownerDiscount = parseFloat(document.getElementById('owner-discount').value) || 0;
+                court.cashUnits = parseFloat(document.getElementById('cash-units').value) || 0;
+                court.bankUnits = parseFloat(document.getElementById('bank-units').value) || 0;
+            }
+
+            // 1. Đồng bộ số lượng hiển thị menu & khóa nút (+) nếu hết hàng tồn
             globalInventory.forEach(prod => {
                 const el = document.getElementById(`qty-view-${prod.id}`);
                 if (el) el.innerText = court.items[prod.id] || 0;
 
-                // Kiểm tra trạng thái tồn kho để khóa/mở nút cộng
                 const btnPlus = document.getElementById(`btn-plus-${prod.id}`);
                 if (btnPlus) {
                     const orderedQty = court.items[prod.id] || 0;
@@ -706,7 +717,7 @@ HTML
                 return;
             }
 
-            // 3. Tính tiền hóa đơn sân chơi
+            // 3. Tính tiền hóa đơn sân chơi chính xác
             const timeCalc = calculateCourtFee(court.dayType, court.startTime, court.endTime);
             const displayMinutes = timeCalc.minutes;
             let originalCourtFee = timeCalc.fee;
@@ -776,6 +787,10 @@ HTML
 
         function resetCurrentCourt() {
             courtsData[currentCourt] = getEmptyCourtObject();
+            document.getElementById('customer-name').value = "";
+            document.getElementById('start-time').value = "";
+            document.getElementById('end-time').value = "";
+            document.getElementById('discount-select').value = "none";
             document.getElementById('owner-discount').value = "";
             document.getElementById('cash-units').value = "";
             document.getElementById('bank-units').value = "";
@@ -804,7 +819,6 @@ HTML
             let gearFee = 0;
             let totalCostGoods = 0;
 
-            // Vòng lặp kiểm tra bảo vệ cuối cùng trước khi chốt đơn
             for (let prodId in court.items) {
                 const qty = court.items[prodId];
                 const prod = globalInventory.find(p => p.id === prodId);
@@ -816,7 +830,6 @@ HTML
                 }
             }
 
-            // Tiến hành trừ kho và tính tiền
             for (let prodId in court.items) {
                 const qty = court.items[prodId];
                 const prod = globalInventory.find(p => p.id === prodId);
@@ -880,7 +893,6 @@ HTML
                 return;
             }
 
-            // Kiểm tra tồn kho của sân trước khi xuất đơn
             for (let prodId in court.items) {
                 const qty = court.items[prodId];
                 const prod = globalInventory.find(p => p.id === prodId);
@@ -940,6 +952,10 @@ HTML
             triggerToast("🎉 Thanh toán & xuất đơn trừ kho thành công!");
 
             courtsData[currentCourt] = getEmptyCourtObject();
+            document.getElementById('customer-name').value = "";
+            document.getElementById('start-time').value = "";
+            document.getElementById('end-time').value = "";
+            document.getElementById('discount-select').value = "none";
             document.getElementById('owner-discount').value = "";
             document.getElementById('cash-units').value = "";
             document.getElementById('bank-units').value = "";
@@ -1140,7 +1156,7 @@ HTML
             globalInventory[index].qty = newQty;
             localStorage.setItem('pab_inventory', JSON.stringify(globalInventory));
             renderMenuDichVu();
-            calculateAll(); // Cập nhật lại giao diện nút bấm ngay khi sửa kho lẻ
+            calculateAll(); 
         }
 
         function addNewProductToInventory() {
@@ -1217,7 +1233,7 @@ HTML
             }
 
             document.getElementById('modal-services-fee').innerText = `${formatNum(bill.serviceFee)}k`;
-            document.getElementById('modal-discount-fee').innerText = `-\$${formatNum(raw ? raw.ownerDiscount : 0)}k`;
+            document.getElementById('modal-discount-fee').innerText = `-${formatNum(raw ? raw.ownerDiscount : 0)}k`;
             document.getElementById('modal-total-fee').innerText = `${formatNum(bill.totalBill)}k`;
             document.getElementById('modal-profit-fee').innerText = `${formatNum(bill.profitGoods)}k`;
             document.getElementById('modal-cash-fee').innerText = `${formatNum(bill.cashReceived || 0)}k`;

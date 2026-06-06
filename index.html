@@ -1227,12 +1227,12 @@ HTML
                 alert("❌ Mật khẩu không chính xác!");
             }
         }
-  <script type="module">
-  // 1. Import thư viện
+<script type="module">
+  // 1. Import (đã có)
   import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
   import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
 
-  // 2. Cấu hình (Chỉ để 1 lần duy nhất)
+  // 2. Cấu hình & Khởi tạo (Chỉ làm 1 lần)
   const firebaseConfig = {
     apiKey: "AIzaSyCyTMT3up3FRXjokd2RAwjfQ5SY2JR3y9U",
     authDomain: "hethongtinhtoan.firebaseapp.com",
@@ -1242,30 +1242,42 @@ HTML
     appId: "1:34844367712:web:dfa74b9cfccc1c25ac1c05",
     measurementId: "G-QZYLTS7MFH"
   };
-
-  // 3. Khởi tạo
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
 
-  // 4. Đưa các hàm xử lý của bạn vào đây (SỬA LẠI HÀM CŨ)
+  // 3. Định nghĩa hàm Tải dữ liệu
+  async function loadDataAndRender() {
+      try {
+          const snapshot = await get(child(ref(db), 'pab_inventory'));
+          if (snapshot.exists()) {
+              globalInventory = snapshot.val();
+          } else {
+              globalInventory = [];
+          }
+          renderInventoryTable();
+          syncCourtsWithInventory();
+          loadCourtState(currentCourt);
+      } catch (error) {
+          console.error("Lỗi khi tải từ Firebase:", error);
+      }
+  }
+
+  // 4. Định nghĩa hàm Xóa
   window.deleteInventoryItem = function(id) {
-     const item = globalInventory.find(i => i.id === id);
-     if (!item) return;
-
-     const pass = prompt(`Vui lòng nhập MẬT KHẨU hệ thống để gỡ bỏ món [${item.name}]`);
-     if (pass === SECURITY_PASSWORD) {
-        globalInventory = globalInventory.filter(i => i.id !== id);
-        
-        // --- CHỖ NÀY LÀ QUAN TRỌNG NHẤT ---
-        // Thay vì localStorage.setItem, ta dùng Firebase:
-        set(ref(db, 'pab_inventory'), globalInventory);
-        // ----------------------------------
-
-        syncCourtsWithInventory();
-        loadCourtState(currentCourt);
-        renderInventoryTable();
-     } else if (pass !== null) {
-        alert("❌ Mật khẩu không chính xác!");
-     }
+      const item = globalInventory.find(i => i.id === id);
+      if (!item) return;
+      const pass = prompt(`Vui lòng nhập MẬT KHẨU hệ thống để gỡ bỏ món [${item.name}]`);
+      if (pass === SECURITY_PASSWORD) {
+          globalInventory = globalInventory.filter(i => i.id !== id);
+          set(ref(db, 'pab_inventory'), globalInventory); // Lưu lên Firebase
+          syncCourtsWithInventory();
+          loadCourtState(currentCourt);
+          renderInventoryTable();
+      } else if (pass !== null) {
+          alert("❌ Mật khẩu không chính xác!");
+      }
   };
+
+  // 5. Gọi hàm tải dữ liệu cuối cùng
+  loadDataAndRender();
 </script>

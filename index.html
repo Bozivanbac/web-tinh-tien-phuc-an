@@ -1,0 +1,1200 @@
+HTML
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Hệ Thống Quản Lý Sân Cầu Lông - Phúc An Badminton</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            -webkit-tap-highlight-color: transparent;
+        }
+        .smooth-scroll {
+            -webkit-overflow-scrolling: touch;
+        }
+        input, select, button {
+            min-height: 40px;
+        }
+        .bg-app-logo {
+            background-image: url('z7835472702869_4f11e81072e2902ae0e7d1547ac59cf9.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+    </style>
+</head>
+<body class="bg-app-logo min-h-screen p-1 sm:p-4 relative" onload="initSystem()">
+    
+    <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-md pointer-events-none z-0"></div>
+
+    <div id="toast-success" class="fixed top-5 left-1/2 -translate-x-1/2 bg-emerald-600 text-white font-black px-6 py-3 rounded-xl shadow-2xl z-50 transition-all duration-300 transform scale-90 opacity-0 pointer-events-none flex items-center gap-2">
+        <span>🎉</span> THANH TOÁN THÀNH CÔNG & ĐÃ LƯU ĐƠN!
+    </div>
+
+    <div class="max-w-7xl mx-auto space-y-3 relative z-10">
+        
+        <div class="bg-teal-950/80 backdrop-blur-lg p-3 sm:p-4 rounded-xl text-white flex flex-col justify-between items-center gap-2 shadow-2xl border border-teal-500/30">
+            <div class="text-center w-full">
+                <h1 class="text-xl sm:text-3xl font-black tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-teal-200 to-white">PHÚC AN BADMINTON</h1>
+                <p class="text-teal-300 text-[10px] sm:text-xs mt-0.5 font-medium tracking-widest uppercase font-mono">Hệ thống đồng bộ mệnh giá rút gọn (1 = 1k | 1000 = 1tr)</p>
+            </div>
+            <div class="flex w-full bg-teal-900/60 p-1 rounded-xl border border-teal-600/40 gap-1 shadow-inner">
+                <button id="btn-court-1" onclick="switchCourt(1)" class="flex-1 py-1.5 rounded-lg font-black text-xs sm:text-sm transition shadow-md bg-gradient-to-r from-teal-500 to-teal-600 text-white border border-teal-400/30">
+                    🏟️ SÂN 1
+                </button>
+                <button id="btn-court-2" onclick="switchCourt(2)" class="flex-1 py-1.5 rounded-lg font-black text-xs sm:text-sm transition text-teal-200 hover:bg-teal-800/50">
+                    🏟️ SÂN 2
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-white/90 backdrop-blur-md rounded-xl shadow-2xl overflow-hidden border border-white/50 grid grid-cols-1 lg:grid-cols-12">
+            
+            <div class="lg:col-span-7 xl:col-span-8 p-3 sm:p-4 space-y-3 border-b lg:border-b-0 lg:border-r border-slate-200/80">
+                
+                <div class="bg-slate-100/70 p-2.5 rounded-xl border border-slate-200 grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <div class="sm:col-span-2">
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-0.5 tracking-wider">👤 Tên Khách Hàng</label>
+                        <input type="text" id="customer-name" placeholder="Nhập tên khách..." class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg font-semibold text-slate-800 shadow-sm focus:outline-teal-600 text-xs shadow-inner" oninput="calculateAll()">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-0.5 tracking-wider">📅 Loại Ngày</label>
+                        <select id="day-type" class="w-full px-2 py-1.5 bg-white border border-slate-300 rounded-lg font-semibold text-slate-800 shadow-sm text-xs focus:outline-teal-600" onchange="onDayTypeChange()">
+                            <option value="weekday">Thứ 2 đến Thứ 6</option>
+                            <option value="weekend">Thứ 7 & Chủ Nhật</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="bg-teal-50/80 p-2.5 rounded-xl border border-teal-200 shadow-sm space-y-2">
+                    <span class="block text-[10px] font-black text-teal-900 uppercase tracking-wider">⏱️ CHỌN NHANH KHUNG GIỜ GIÁ:</span>
+                    <div id="shortcut-container" class="grid grid-cols-1 sm:grid-cols-3 gap-1.5"></div>
+
+                    <div class="grid grid-cols-2 gap-2 pt-1.5 border-t border-teal-200/40">
+                        <div>
+                            <label class="block text-[10px] font-bold text-teal-900/70 mb-0.5">⏰ Giờ vào:</label>
+                            <input type="time" id="start-time" value="00:00" class="w-full p-1.5 bg-white border border-teal-300 rounded-lg font-black text-slate-800 text-center text-sm focus:outline-teal-600 shadow-inner" onchange="calculateAll()">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-teal-900/70 mb-0.5">⏰ Giờ trả:</label>
+                            <input type="time" id="end-time" value="00:00" class="w-full p-1.5 bg-white border border-teal-300 rounded-lg font-black text-slate-800 text-center text-sm focus:outline-teal-600 shadow-inner" onchange="calculateAll()">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-100/70 p-2.5 rounded-xl border border-slate-200 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-0.5 tracking-wider">🎁 Chương Trình Ưu Đãi</label>
+                        <select id="discount-select" class="w-full px-2 py-1.5 bg-white border border-slate-300 rounded-lg font-semibold text-slate-800 shadow-sm text-xs focus:outline-teal-600" onchange="calculateAll()">
+                            <option value="none">Khách thường (Gốc)</option>
+                            <option value="student">Học sinh, Sinh viên (39k/h)</option>
+                            <option value="fixed">Khách đặt cố định (-15%)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-red-500 uppercase mb-0.5 tracking-wider">💰 Bớt thêm tiền mặt (đơn vị: 1 = 1k)</label>
+                        <input type="number" id="owner-discount" placeholder="Ví dụ: 10 (=10k)" class="w-full px-2.5 py-1.5 bg-white border border-red-200 rounded-lg font-bold text-red-600 shadow-sm text-xs focus:outline-red-500 shadow-inner" oninput="calculateAll()" min="0">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
+                        <h3 class="text-[10px] font-black text-amber-800 border-b pb-1 mb-2 uppercase tracking-wider">🥤 Nước Uống & Đồ Ăn</h3>
+                        <div id="menu-drinks" class="grid grid-cols-2 sm:grid-cols-3 gap-1.5"></div>
+                    </div>
+                    <div class="bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
+                        <h3 class="text-[10px] font-black text-blue-800 border-b pb-1 mb-2 uppercase tracking-wider">🏸 Phụ Kiện Cầu Lông</h3>
+                        <div id="menu-gear" class="grid grid-cols-2 sm:grid-cols-3 gap-1.5"></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="lg:col-span-5 xl:col-span-4 bg-slate-50/90 p-3 sm:p-4 flex flex-col justify-between border-t lg:border-t-0 border-slate-200">
+                <div>
+                    <h2 class="text-xs font-bold text-slate-800 border-b border-slate-300 pb-2 mb-2.5 uppercase tracking-wider flex justify-between items-center">
+                        <span>📋 Đơn Tính Sân <span id="bill-court-title" class="text-teal-700 font-black">1</span></span>
+                        <span id="live-status" class="text-[9px] text-teal-700 font-bold bg-teal-50 px-1.5 py-0.5 rounded border border-teal-200">Sẵn Sàng</span>
+                    </h2>
+                    
+                    <div class="space-y-1.5">
+                        <div class="bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
+                            <span class="block text-[8px] font-bold text-slate-400 uppercase tracking-wide">Khách hàng</span>
+                            <span id="bill-customer-name" class="text-xs font-black text-slate-800 truncate block">Khách lẻ</span>
+                            <span id="bill-time-range" class="text-xs text-teal-700 font-black block mt-0.5">00:00 → 00:00 (0 phút)</span>
+                        </div>
+
+                        <div class="bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm flex justify-between items-center text-[11px] text-slate-600">
+                            <span class="font-medium">1. Tiền Sân (Gốc):</span>
+                            <span id="court-fee-original" class="line-through text-slate-400">0k</span>
+                        </div>
+
+                        <div class="bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm flex justify-between items-center text-[11px] font-bold text-slate-700">
+                            <span>👉 Tiền Sân Phải Trả:</span>
+                            <span id="court-fee-display" class="text-teal-700 font-extrabold text-sm sm:text-base">0k</span>
+                        </div>
+
+                        <div class="bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm space-y-1">
+                            <div class="flex justify-between items-center text-[11px] font-bold text-slate-700">
+                                <span>2. Nước & Đồ Ăn (Tính vào sân):</span>
+                                <span id="drinks-fee-display" class="text-amber-700 font-extrabold">0k</span>
+                            </div>
+                            <div id="drinks-list-note" class="text-[11px] text-slate-600 pl-1 max-h-32 overflow-y-auto smooth-scroll space-y-1 pt-1 font-sans"></div>
+                        </div>
+
+                        <div class="bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm space-y-1">
+                            <div class="flex justify-between items-center text-[11px] font-bold text-slate-700">
+                                <span>3. Phụ Kiện (Tính vào sân):</span>
+                                <span id="gear-fee-display" class="text-blue-700 font-extrabold">0k</span>
+                            </div>
+                            <div id="gear-list-note" class="text-[11px] text-slate-600 pl-1 max-h-32 overflow-y-auto smooth-scroll space-y-1 pt-1 font-sans"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="border-t border-dashed border-slate-300 pt-2.5 mt-3 space-y-2.5">
+                    <div class="flex justify-between items-center bg-teal-50 p-1.5 rounded-lg text-[10px] text-teal-800 font-bold">
+                        <span>Ưu đãi:</span>
+                        <span id="discount-applied" class="text-teal-700">Không</span>
+                    </div>
+                    <div class="flex justify-between items-center bg-red-50 p-1.5 rounded-lg text-[10px] text-red-800 font-bold">
+                        <span>Bớt thêm:</span>
+                        <span id="bill-owner-discount" class="text-red-700">0k</span>
+                    </div>
+                    <div class="flex justify-between items-center pt-0.5 px-1">
+                        <span class="text-xs font-black text-slate-800">TỔNG CUỐI GIỜ (TRẢ SAU):</span>
+                        <span id="total-fee" class="text-lg sm:text-2xl font-black text-red-600 font-mono">0k</span>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-1.5 pt-0.5">
+                        <button onclick="resetCurrentCourt()" class="bg-slate-200 active:bg-slate-300 text-slate-700 font-bold rounded-lg text-[11px] transition">
+                            Xóa trống
+                        </button>
+                        <button onclick="saveAndCheckout()" class="col-span-2 bg-gradient-to-r from-emerald-600 to-teal-600 active:from-emerald-700 text-white font-black rounded-lg text-[11px] tracking-wider shadow-md transition flex items-center justify-center border border-emerald-500/20">
+                            💵 THANH TOÁN ĐƠN
+                        </button>
+                    </div>
+
+                    <div class="bg-slate-200 p-2 rounded-xl border border-slate-300 space-y-1.5 mt-1 shadow-inner">
+                        <span class="block text-[9px] font-black text-slate-700 uppercase tracking-wide">💳 GHI CHÚ CHUYỂN KHOẢN (Đơn vị: 1 = 1k):</span>
+                        <div>
+                            <input type="number" id="bank-units" placeholder="Ví dụ nhập: 150 (=150k)" min="0" class="w-full px-2 py-1 bg-white border border-slate-300 rounded-md font-bold text-teal-700 text-xs focus:outline-teal-600 shadow-inner" oninput="calculateAll()">
+                        </div>
+                        <div class="text-[9px] font-semibold text-slate-500 px-0.5 font-mono">
+                            Khách thực nhận chuyển: <b id="text-bank-real" class="text-teal-700">0k</b>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="bg-slate-950/90 backdrop-blur-md text-white rounded-xl p-3 sm:p-4 shadow-2xl space-y-3 border border-slate-800">
+            <div class="flex border-b border-slate-800 gap-2">
+                <button id="tab-btn-history" onclick="switchTab('history')" class="px-4 py-2 text-xs sm:text-sm font-black border-b-2 border-teal-400 text-teal-400 transition">
+                    📊 LỊCH SỬ DOANH THU (RÚT GỌN K)
+                </button>
+                <button id="tab-btn-inventory" onclick="switchTab('inventory')" class="px-4 py-2 text-xs sm:text-sm font-black text-slate-400 hover:text-white transition">
+                    📦 QUẢN LÝ KHO HÀNG
+                </button>
+            </div>
+
+            <div id="tab-content-history" class="space-y-3">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-1">
+                    <p class="text-[9px] text-slate-400 italic font-medium">*Tất cả dữ liệu báo cáo tài chính hiển thị dưới dạng mệnh giá k (Ví dụ: 100 = 100k, 1000 = 1tr).</p>
+                    <div class="flex items-center gap-1.5 bg-slate-900 p-1.5 rounded-lg border border-slate-700/60 shadow-inner">
+                        <span class="text-[10px] font-bold text-slate-400">Ngày xem:</span>
+                        <input type="date" id="filter-date" class="bg-transparent text-[11px] font-black text-white focus:outline-none" onchange="renderHistory()">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 md:grid-cols-5 font-mono">
+                    <div class="bg-slate-900/60 p-2 rounded-lg border border-slate-800/80 shadow-md">
+                        <span class="text-[8px] uppercase font-bold text-slate-400 block">Doanh Thu Ngày</span>
+                        <span id="stat-day-total" class="text-xs sm:text-sm font-black text-emerald-400 block">0k</span>
+                    </div>
+                    <div class="bg-slate-900/60 p-2 rounded-lg border border-slate-800/80 shadow-md">
+                        <span class="text-[8px] uppercase font-bold text-slate-400 block">Chuyển Khoản Nhận</span>
+                        <span id="stat-day-bank" class="text-xs sm:text-sm font-black text-sky-400 block">0k</span>
+                    </div>
+                    <div class="bg-slate-900/60 p-2 rounded-lg border border-slate-800/80 shadow-md bg-gradient-to-br from-slate-900 to-red-950/40">
+                        <span class="text-[8px] uppercase font-bold text-red-400 block">TỔNG CHI TRONG NGÀY</span>
+                        <span id="stat-day-expense" class="text-xs sm:text-sm font-black text-red-400 block">0k</span>
+                    </div>
+                    <div class="bg-slate-900/60 p-2 rounded-lg border border-slate-800/80 shadow-md bg-gradient-to-br from-slate-900 to-emerald-950/40">
+                        <span class="text-[8px] uppercase font-bold text-emerald-300 block">THỰC THU (SAU CHI)</span>
+                        <span id="stat-day-net" class="text-xs sm:text-sm font-black text-orange-400 block">0k</span>
+                    </div>
+                    <div class="bg-slate-900/60 p-2 rounded-lg border border-slate-800/80 shadow-md bg-gradient-to-br from-slate-900 to-teal-950/40">
+                        <span class="text-[8px] uppercase font-bold text-teal-300 block">THÁNG GỘP TỔNG</span>
+                        <span id="stat-month-total" class="text-xs sm:text-sm font-black text-yellow-400 block">0k</span>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto smooth-scroll rounded-xl border border-slate-800/60 bg-slate-900/40">
+                    <table class="w-full text-left text-[11px] border-collapse min-w-[700px] font-mono">
+                        <thead>
+                            <tr class="bg-slate-900/80 text-slate-300 border-b border-slate-800">
+                                <th class="p-2 w-14">Giờ</th>
+                                <th class="p-2 w-16">Vị trí</th>
+                                <th class="p-2 font-sans">Khách Hàng</th>
+                                <th class="p-2">Khung Giờ</th>
+                                <th class="p-2 text-right">Tiền Sân</th>
+                                <th class="p-2 text-right">Dịch vụ</th>
+                                <th class="p-2 text-right">Tổng đơn</th>
+                                <th class="p-2 text-right text-yellow-400">Lời Hàng</th>
+                                <th class="p-2 text-left pl-4">Đã CK</th>
+                                <th class="p-2 text-center w-12 font-sans">Xóa</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-tbody" class="divide-y divide-slate-800/60 text-slate-300"></tbody>
+                    </table>
+                </div>
+
+                <div class="bg-slate-900 p-3 rounded-xl border border-slate-800/80 space-y-2 mt-2">
+                    <span class="block text-[10px] font-black text-red-400 uppercase tracking-wider">💸 MỤC GHI CHÚ CHI TIỀN PHÁT SINH (TRỪ TRỰC TIẾP VÀO THỰC THU NGÀY):</span>
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-2 items-end">
+                        <div class="sm:col-span-2">
+                            <label class="block text-[9px] font-bold text-slate-400 mb-0.5">Lý do chi / Nội dung chi:</label>
+                            <input type="text" id="exp-add-reason" placeholder="Ví dụ: Mua thêm đá viên, Chổi quét sân, Tiền điện nước..." class="w-full p-1.5 bg-slate-950 border border-slate-700 rounded text-xs focus:outline-red-500 text-white">
+                        </div>
+                        <div>
+                            <label class="block text-[9px] font-bold text-slate-400 mb-0.5">Số tiền chi (k) (Ví dụ: 50 = 50k):</label>
+                            <input type="number" id="exp-add-amount" placeholder="Ví dụ: 50" min="0" class="w-full p-1.5 bg-slate-950 border border-slate-700 rounded text-xs focus:outline-red-500 text-white">
+                        </div>
+                        <div>
+                            <button onclick="addNewExpense()" class="w-full bg-red-700 active:bg-red-800 text-white font-bold py-1.5 px-3 rounded text-xs transition whitespace-nowrap min-h-[40px]">Thêm khoản chi</button>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-2 text-[11px] font-sans text-slate-300">
+                        <span class="font-bold text-red-400 block mb-1">Danh sách khoản chi hôm nay:</span>
+                        <div id="expense-list-container" class="space-y-1 max-h-32 overflow-y-auto smooth-scroll font-mono"></div>
+                    </div>
+                </div>
+                
+                <div class="text-right pt-2">
+                    <button onclick="clearAllHistory()" class="text-[9px] text-red-400/80 font-bold uppercase tracking-wider underline hover:text-red-400">
+                        ⚠️ Xóa sạch toàn bộ lịch sử hệ thống
+                    </button>
+                </div>
+            </div>
+
+            <div id="tab-content-inventory" class="hidden space-y-3">
+                <div class="bg-slate-900 p-3 rounded-xl border border-slate-800/80 space-y-2">
+                    <span class="block text-[10px] font-black text-teal-400 uppercase tracking-wider">➕ THÊM SẢN PHẨM MỚI (ĐƠN VỊ GIÁ: 1 = 1k):</span>
+                    <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 items-end">
+                        <div>
+                            <label class="block text-[9px] font-bold text-slate-400 mb-0.5">Tên sản phẩm:</label>
+                            <input type="text" id="inv-add-name" placeholder="Ví dụ: Sting đỏ" class="w-full p-1.5 bg-slate-950 border border-slate-700 rounded text-xs focus:outline-teal-500 text-white">
+                        </div>
+                        <div>
+                            <label class="block text-[9px] font-bold text-slate-400 mb-0.5">Loại nhóm:</label>
+                            <select id="inv-add-type" class="w-full p-1.5 bg-slate-950 border border-slate-700 rounded text-xs focus:outline-teal-500 text-white">
+                                <option value="drinks">🥤 Nước uống & Đồ ăn</option>
+                                <option value="gear">🏸 Phụ kiện cầu lông</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[9px] font-bold text-slate-400 mb-0.5">Số lượng nhập:</label>
+                            <input type="number" id="inv-add-qty" placeholder="24" min="0" class="w-full p-1.5 bg-slate-950 border border-slate-700 rounded text-xs focus:outline-teal-500 text-white">
+                        </div>
+                        <div>
+                            <label class="block text-[9px] font-bold text-slate-400 mb-0.5">Giá vốn nhập (k):</label>
+                            <input type="number" id="inv-add-cost" placeholder="Ví dụ: 6 (=6k)" min="0" class="w-full p-1.5 bg-slate-950 border border-slate-700 rounded text-xs focus:outline-teal-500 text-white">
+                        </div>
+                        <div class="col-span-2 sm:col-span-1">
+                            <label class="block text-[9px] font-bold text-slate-400 mb-0.5">Giá bán ra (k):</label>
+                            <div class="flex gap-1">
+                                <input type="number" id="inv-add-price" placeholder="Ví dụ: 12 (=12k)" min="0" class="w-full p-1.5 bg-slate-950 border border-slate-700 rounded text-xs focus:outline-teal-500 text-white flex-1">
+                                <button onclick="addNewProductToInventory()" class="bg-teal-600 active:bg-teal-700 text-white font-bold px-3 rounded text-xs transition whitespace-nowrap">Thêm</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto smooth-scroll rounded-xl border border-slate-800/60 bg-slate-900/40">
+                    <table class="w-full text-left text-[11px] border-collapse min-w-[650px] font-mono">
+                        <thead>
+                            <tr class="bg-slate-900/80 text-slate-300 border-b border-slate-800">
+                                <th class="p-2 font-sans">Nhóm</th>
+                                <th class="p-2 font-sans">Tên Mặt Hàng</th>
+                                <th class="p-2 text-center w-28 font-sans">Tồn Kho</th>
+                                <th class="p-2 text-right w-28">Giá Vốn (k)</th>
+                                <th class="p-2 text-right w-28">Giá Bán (k)</th>
+                                <th class="p-2 text-right font-sans">Mức Lời/Món (k)</th>
+                                <th class="p-2 text-center w-16 font-sans">Xóa</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventory-tbody" class="divide-y divide-slate-800/60 text-slate-300"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="bill-detail-modal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-3 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-white text-slate-800 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl border border-slate-200 flex flex-col max-h-[90vh]">
+            <div class="bg-teal-950 text-white p-4 flex justify-between items-center">
+                <div>
+                    <h3 class="font-black text-sm tracking-wide uppercase text-teal-300">🧾 CHI TIẾT HÓA ĐƠN RÚT GỌN</h3>
+                    <p id="modal-title-sub" class="text-[10px] text-slate-300 font-mono mt-0.5">Sân X — 00:00</p>
+                </div>
+                <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-teal-900/60 flex items-center justify-center font-black text-white text-sm hover:bg-teal-800 transition">✕</button>
+            </div>
+            
+            <div class="p-4 space-y-3 overflow-y-auto smooth-scroll text-xs font-mono">
+                <div class="grid grid-cols-2 gap-y-1.5 border-b border-slate-100 pb-3 font-sans">
+                    <span class="text-slate-400 font-bold">Khách hàng:</span>
+                    <span id="modal-customer" class="text-right font-black text-slate-900">—</span>
+                    
+                    <span class="text-slate-400 font-bold">Thời gian chơi:</span>
+                    <span id="modal-range" class="text-right font-bold text-teal-700">—</span>
+                    
+                    <span class="text-slate-400 font-bold">Hình thức ngày:</span>
+                    <span id="modal-daytype" class="text-right font-semibold">—</span>
+                </div>
+
+                <div class="space-y-1">
+                    <div class="flex justify-between items-center font-bold text-slate-700 py-1">
+                        <span>🏟️ Tiền thuê sân:</span>
+                        <span id="modal-court-fee" class="text-slate-900">0k</span>
+                    </div>
+                </div>
+
+                <div id="modal-drinks-section" class="space-y-1 pt-1.5 border-t border-slate-100">
+                    <span class="block text-[10px] font-black text-amber-700 uppercase tracking-wider font-sans">🥤 Nước uống & Đồ ăn:</span>
+                    <div id="modal-drinks-list" class="pl-2 space-y-1 text-slate-600 font-medium"></div>
+                </div>
+
+                <div id="modal-gear-section" class="space-y-1 pt-1.5 border-t border-slate-100">
+                    <span class="block text-[10px] font-black text-blue-700 uppercase tracking-wider font-sans">🏸 Phụ kiện sử dụng:</span>
+                    <div id="modal-gear-list" class="pl-2 space-y-1 text-slate-600 font-medium"></div>
+                </div>
+
+                <div class="pt-3 border-t border-dashed border-slate-200 space-y-1.5">
+                    <div class="flex justify-between text-[11px] font-bold text-slate-500 font-sans">
+                        <span>Tiền dịch vụ kèm theo:</span>
+                        <span id="modal-services-fee">0k</span>
+                    </div>
+                    <div id="modal-discount-row" class="flex justify-between text-[11px] font-bold text-red-600 font-sans">
+                        <span>Khấu trừ / Bớt tiền mặt:</span>
+                        <span id="modal-discount-fee">-0k</span>
+                    </div>
+                    <div class="flex justify-between items-center pt-2 border-t border-slate-200 font-sans">
+                        <span class="font-black text-sm text-slate-900">TỔNG THỰC THU:</span>
+                        <span id="modal-total-fee" class="text-xl font-black text-red-600 font-mono">0k</span>
+                    </div>
+                    <div class="flex justify-between text-[11px] font-bold text-emerald-600 bg-emerald-50 p-1.5 rounded border border-emerald-100 font-sans">
+                        <span>Tiền lời hàng đơn này:</span>
+                        <span id="modal-profit-fee" class="font-mono">0k</span>
+                    </div>
+                    <div class="flex justify-between text-[10px] font-bold text-sky-600 bg-sky-50 p-1.5 rounded border border-sky-100 mt-1 font-sans">
+                        <span>Số tiền khách chuyển khoản:</span>
+                        <span id="modal-bank-fee" class="font-mono">0k</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-slate-50 p-3 text-center border-t border-slate-100">
+                <button onclick="closeModal()" class="w-full bg-slate-800 text-white font-bold py-2 rounded-xl text-xs hover:bg-slate-700 transition">ĐÓNG CỬA SỔ</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SECURITY_PASSWORD = 'PhucAn2026$';
+
+        const initialInventory = [
+            { id: 'tra_da', name: 'Trà đá', type: 'drinks', qty: 100, cost: 2, price: 10 },
+            { id: 'nuoc_suoi', name: 'Nước suối', type: 'drinks', qty: 50, cost: 3, price: 8 },
+            { id: 'revive', name: 'Revive', type: 'drinks', qty: 60, cost: 6, price: 10 },
+            { id: 'c2', name: 'Trà C2', type: 'drinks', qty: 40, cost: 5.5, price: 10 },
+            { id: 'o_long', name: 'Trà Ô Long', type: 'drinks', qty: 40, cost: 5.5, price: 10 },
+            { id: 'cam_vat', name: 'Cam vắt', type: 'drinks', qty: 30, cost: 5, price: 15 },
+            { id: 'ca_phe', name: 'Cà phê', type: 'drinks', qty: 30, cost: 4, price: 15 },
+            { id: 'mi_trung', name: 'Mì trứng', type: 'drinks', qty: 25, cost: 6, price: 15 },
+            
+            { id: 'cau_vina', name: 'Cầu Vina1', type: 'gear', qty: 50, cost: 22, price: 30 },
+            { id: 'cau_bm', name: 'Cầu B.Minh', type: 'gear', qty: 50, cost: 23, price: 30 },
+            { id: 'ong_cau', name: 'Ống Cầu(12q)', type: 'gear', qty: 10, cost: 310, price: 360 },
+            { id: 'quan_can', name: 'Quấn cán', type: 'gear', qty: 80, cost: 5, price: 12 },
+            { id: 'vo_dai', name: 'Vớ dài', type: 'gear', qty: 20, cost: 30, price: 50 },
+            { id: 'vo_ngan', name: 'Vớ ngắn', type: 'gear', qty: 20, cost: 24, price: 40 },
+            { id: 'bang_keo', name: 'Băng keo', type: 'gear', qty: 30, cost: 4, price: 10 },
+            { id: 'bang_tay', name: 'Băng tay', type: 'gear', qty: 15, cost: 25, price: 45 }
+        ];
+
+        let globalInventory = [];
+        let currentCourt = 1;
+        let courtsData = {};
+        let paymentHistory = [];
+        let expensesData = []; 
+
+        function formatNum(num) {
+            return Number(Math.round(num * 100) / 100).toLocaleString('vi-VN');
+        }
+
+        function initSystem() {
+            const todayStr = new Date().toLocaleDateString('sv-SE');
+            document.getElementById('filter-date').value = todayStr;
+
+            if (localStorage.getItem('pab_inventory')) {
+                globalInventory = JSON.parse(localStorage.getItem('pab_inventory'));
+            } else {
+                globalInventory = JSON.parse(JSON.stringify(initialInventory));
+                localStorage.setItem('pab_inventory', JSON.stringify(globalInventory));
+            }
+
+            if (localStorage.getItem('pab_paymentHistory')) {
+                paymentHistory = JSON.parse(localStorage.getItem('pab_paymentHistory'));
+            }
+
+            if (localStorage.getItem('pab_expensesData')) {
+                expensesData = JSON.parse(localStorage.getItem('pab_expensesData'));
+            }
+
+            if (localStorage.getItem('pab_courtsData')) {
+                courtsData = JSON.parse(localStorage.getItem('pab_courtsData'));
+            } else {
+                resetAllCourtsDataStructure();
+            }
+
+            syncCourtsWithInventory();
+            loadCourtState(currentCourt);
+            renderHistory();
+            renderInventoryTable();
+        }
+
+        function resetAllCourtsDataStructure() {
+            courtsData = {
+                1: { customer: "", dayType: "weekday", discount: "none", ownerDiscount: 0, start: "00:00", end: "00:00", bankUnits: 0, drinks: [], gear: [], calculated: {} },
+                2: { customer: "", dayType: "weekday", discount: "none", ownerDiscount: 0, start: "00:00", end: "00:00", bankUnits: 0, drinks: [], gear: [], calculated: {} }
+            };
+            localStorage.setItem('pab_courtsData', JSON.stringify(courtsData));
+        }
+
+        function syncCourtsWithInventory() {
+            [1, 2].forEach(courtNum => {
+                const currentDrinksSelected = courtsData[courtNum].drinks || [];
+                const currentGearSelected = courtsData[courtNum].gear || [];
+
+                courtsData[courtNum].drinks = globalInventory.filter(i => i.type === 'drinks').map(invItem => {
+                    const match = currentDrinksSelected.find(d => d.id === invItem.id);
+                    return { 
+                        id: invItem.id, 
+                        name: invItem.name, 
+                        price: invItem.price, 
+                        qty: match ? match.qty : 0,
+                        billQty: match && match.hasOwnProperty('billQty') ? match.billQty : (match ? match.qty : 0)
+                    };
+                });
+
+                courtsData[courtNum].gear = globalInventory.filter(i => i.type === 'gear').map(invItem => {
+                    const match = currentGearSelected.find(g => g.id === invItem.id);
+                    return { 
+                        id: invItem.id, 
+                        name: invItem.name, 
+                        price: invItem.price, 
+                        qty: match ? match.qty : 0,
+                        billQty: match && match.hasOwnProperty('billQty') ? match.billQty : (match ? match.qty : 0)
+                    };
+                });
+            });
+            localStorage.setItem('pab_courtsData', JSON.stringify(courtsData));
+        }
+
+        function switchTab(tab) {
+            const tabHistoryBtn = document.getElementById('tab-btn-history');
+            const tabInvBtn = document.getElementById('tab-btn-inventory');
+            const contentHistory = document.getElementById('tab-content-history');
+            const contentInv = document.getElementById('tab-content-inventory');
+
+            if (tab === 'history') {
+                tabHistoryBtn.className = "px-4 py-2 text-xs sm:text-sm font-black border-b-2 border-teal-400 text-teal-400 transition";
+                tabInvBtn.className = "px-4 py-2 text-xs sm:text-sm font-black text-slate-400 hover:text-white transition";
+                contentHistory.classList.remove('hidden');
+                contentInv.classList.add('hidden');
+                renderHistory();
+            } else {
+                tabHistoryBtn.className = "px-4 py-2 text-xs sm:text-sm font-black text-slate-400 hover:text-white transition";
+                tabInvBtn.className = "px-4 py-2 text-xs sm:text-sm font-black border-b-2 border-teal-400 text-teal-400 transition";
+                contentHistory.classList.add('hidden');
+                contentInv.classList.remove('hidden');
+                renderInventoryTable();
+            }
+        }
+
+        function switchCourt(courtNum) {
+            saveCourtState(currentCourt);
+            currentCourt = courtNum;
+            
+            [1, 2].forEach(num => {
+                const btn = document.getElementById(`btn-court-${num}`);
+                if (num === courtNum) {
+                    btn.className = "flex-1 py-1.5 rounded-lg font-black text-xs sm:text-sm transition shadow-md bg-gradient-to-r from-teal-500 to-teal-600 text-white border border-teal-400/30";
+                } else {
+                    btn.className = "flex-1 py-1.5 rounded-lg font-black text-xs sm:text-sm transition text-teal-200 hover:bg-teal-800/50";
+                }
+            });
+
+            loadCourtState(courtNum);
+        }
+
+        function saveCourtState(courtNum) {
+            courtsData[courtNum].customer = document.getElementById('customer-name').value;
+            courtsData[courtNum].dayType = document.getElementById('day-type').value;
+            courtsData[courtNum].discount = document.getElementById('discount-select').value;
+            courtsData[courtNum].ownerDiscount = parseFloat(document.getElementById('owner-discount').value) || 0;
+            courtsData[courtNum].start = document.getElementById('start-time').value || "00:00";
+            courtsData[courtNum].end = document.getElementById('end-time').value || "00:00";
+            courtsData[courtNum].bankUnits = parseFloat(document.getElementById('bank-units').value) || 0;
+
+            localStorage.setItem('pab_courtsData', JSON.stringify(courtsData));
+        }
+
+        function loadCourtState(courtNum) {
+            syncCourtsWithInventory();
+            const data = courtsData[courtNum];
+            document.getElementById('bill-court-title').innerText = courtNum;
+            document.getElementById('customer-name').value = data.customer;
+            document.getElementById('day-type').value = data.dayType;
+            document.getElementById('discount-select').value = data.discount;
+            document.getElementById('owner-discount').value = data.ownerDiscount > 0 ? data.ownerDiscount : "";
+            document.getElementById('start-time').value = data.start;
+            document.getElementById('end-time').value = data.end;
+            document.getElementById('bank-units').value = data.bankUnits > 0 ? data.bankUnits : "";
+
+            updateShortcutButtons(data.dayType);
+            renderMenu('menu-drinks', data.drinks, 'drinks');
+            renderMenu('menu-gear', data.gear, 'gear');
+
+            calculateAll();
+        }
+
+        function updateShortcutButtons(dayType) {
+            const container = document.getElementById('shortcut-container');
+            container.innerHTML = "";
+
+            if (dayType === 'weekday') {
+                const shortcuts = [
+                    { label: "☀️ Sáng: 5h-9h (70k)", start: "05:00", end: "09:00" },
+                    { label: "🌤️ Trưa: 9h-16h (60k)", start: "09:00", end: "16:00" },
+                    { label: "🌙 Tối: 16h-22h (70k)", start: "16:00", end: "22:00" }
+                ];
+                shortcuts.forEach(sc => {
+                    container.innerHTML += `<button onclick="setQuickTime('${sc.start}', '${sc.end}')" class="bg-white border border-teal-600 text-teal-900 font-bold py-1 px-1 rounded-lg text-[10px] shadow-sm transition active:scale-95 text-center min-h-[32px]">${sc.label}</button>`;
+                });
+            } else {
+                container.innerHTML = `
+                    <button onclick="setQuickTime('05:00', '22:00')" class="col-span-1 sm:col-span-3 bg-white border border-orange-500 text-orange-950 font-bold py-1.5 px-2 rounded-lg text-[10px] shadow-sm transition active:scale-95 text-center min-h-[32px]">
+                        🎯 Suốt cả ngày: 5h - 22h (Đồng giá 70k)
+                    </button>
+                `;
+            }
+        }
+
+        function onDayTypeChange() {
+            const dt = document.getElementById('day-type').value;
+            updateShortcutButtons(dt);
+            calculateAll();
+        }
+
+        function setQuickTime(start, end) {
+            document.getElementById('start-time').value = start;
+            document.getElementById('end-time').value = end;
+            calculateAll();
+        }
+
+        function renderMenu(containerId, items, type) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = ""; 
+            
+            items.forEach((item, index) => {
+                const invItem = globalInventory.find(i => i.id === item.id) || { qty: 0 };
+                const div = document.createElement('div');
+                div.className = "flex flex-col justify-between bg-slate-50 p-1 rounded border border-slate-200 text-center gap-1 shadow-sm font-mono";
+                
+                div.innerHTML = `
+                    <div class="block leading-tight font-sans pt-1">
+                        <span class="font-bold text-slate-800 block truncate text-[10px]">${item.name}</span>
+                        <span class="text-[9px] text-teal-600 font-black font-mono">${formatNum(item.price)}k <span class="text-slate-400 font-normal font-sans">(Kho: ${invItem.qty})</span></span>
+                    </div>
+                    <div class="flex items-center justify-between bg-white rounded border border-slate-200 p-0.5 mt-0.5 overflow-hidden">
+                        <button onclick="updateQty('${type}', ${index}, -1)" class="flex-1 h-5 bg-slate-100 active:bg-slate-200 rounded-l font-black text-slate-600 text-center flex items-center justify-center text-xs px-1 font-sans">-</button>
+                        <span class="w-5 text-center text-[10px] font-black shrink-0 ${item.qty > 0 ? 'text-teal-600' : 'text-slate-400'}">${item.qty}</span>
+                        <button onclick="updateQty('${type}', ${index}, 1)" class="flex-1 h-5 bg-slate-100 active:bg-slate-200 rounded-r font-black text-slate-600 text-center flex items-center justify-center text-xs px-1 font-sans">+</button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function editBillQty(type, index, val) {
+            let inputQty = parseInt(val) || 0;
+            const item = courtsData[currentCourt][type][index];
+            if (inputQty > item.qty) inputQty = item.qty;
+            if (inputQty < 0) inputQty = 0;
+            
+            item.billQty = inputQty;
+            calculateAll();
+        }
+
+        function updateQty(type, index, delta) {
+            const item = courtsData[currentCourt][type][index];
+            const oldQty = item.qty;
+            item.qty = Math.max(0, item.qty + delta);
+            
+            if (item.qty > oldQty) {
+                item.billQty += (item.qty - oldQty);
+            } else {
+                if (item.billQty > item.qty) {
+                    item.billQty = item.qty;
+                }
+            }
+            calculateAll();
+        }
+
+        function getCourtHourlyRate(hour, dayType) {
+            if (dayType === 'weekday') {
+                if (hour >= 5 && hour < 9) return 70;
+                if (hour >= 9 && hour < 16) return 60;
+                return 70;
+            } else {
+                return 70;
+            }
+        }
+
+        function calculateAll() {
+            const customerName = document.getElementById('customer-name').value.trim() || "Khách lẻ";
+            const dayType = document.getElementById('day-type').value;
+            const discountType = document.getElementById('discount-select').value;
+            
+            const ownerDiscount = parseFloat(document.getElementById('owner-discount').value) || 0;
+            const startTimeStr = document.getElementById('start-time').value || "00:00";
+            const endTimeStr = document.getElementById('end-time').value || "00:00";
+
+            document.getElementById('bill-customer-name').innerText = customerName;
+
+            let totalMinutes = 0;
+            let courtFeeOriginal = 0;
+            let courtFeeDisplay = 0;
+            let discountAppliedText = "Không";
+
+            if (startTimeStr && endTimeStr && startTimeStr !== "00:00" && endTimeStr !== "00:00") {
+                let [startHrs, startMins] = startTimeStr.split(':').map(Number);
+                let [endHrs, endMins] = endTimeStr.split(':').map(Number);
+
+                let startTotalMins = startHrs * 60 + startMins;
+                let endTotalMins = endHrs * 60 + endMins;
+
+                if (endTotalMins < startTotalMins) {
+                    endTotalMins += 24 * 60;
+                }
+
+                totalMinutes = endTotalMins - startTotalMins;
+
+                let currentMins = startTotalMins;
+                while (currentMins < endTotalMins) {
+                    let checkHour = Math.floor((currentMins % (24 * 60)) / 60);
+                    let minuteRate = getCourtHourlyRate(checkHour, dayType) / 60;
+                    courtFeeOriginal += minuteRate;
+                    currentMins++;
+                }
+
+                courtFeeOriginal = Math.round(courtFeeOriginal * 10) / 10;
+
+                if (discountType === 'student') {
+                    if (dayType === 'weekday' && startHrs >= 5 && endHrs <= 17 && startTotalMins < endTotalMins) {
+                        courtFeeDisplay = Math.round(totalMinutes * (39 / 60) * 10) / 10;
+                        discountAppliedText = "HSSV 39k/h";
+                    } else {
+                        courtFeeDisplay = courtFeeOriginal;
+                        discountAppliedText = "HSSV (Sai khung)";
+                    }
+                } else if (discountType === 'fixed') {
+                    courtFeeDisplay = Math.round(courtFeeOriginal * 0.85 * 10) / 10;
+                    discountAppliedText = "Cố định (-15%)";
+                } else {
+                    courtFeeDisplay = courtFeeOriginal;
+                }
+            }
+
+            document.getElementById('bill-time-range').innerText = `${startTimeStr} → ${endTimeStr} (${totalMinutes}p)`;
+            document.getElementById('court-fee-original').innerText = formatNum(courtFeeOriginal) + "k";
+            document.getElementById('court-fee-display').innerText = formatNum(courtFeeDisplay) + "k";
+            document.getElementById('discount-applied').innerText = discountAppliedText;
+            document.getElementById('bill-owner-discount').innerText = formatNum(ownerDiscount) + "k";
+
+            // HIỂN THỊ NƯỚC: Cho phép nhập số lượng tính vào sân cuối giờ
+            let drinksFeeBill = 0; 
+            let drinksFeeTotal = 0; 
+            let drinksNotesHtml = [];
+            
+            courtsData[currentCourt].drinks.forEach((item, idx) => {
+                if (item.qty > 0) {
+                    let totalCost = item.price * item.qty;
+                    let billCost = item.price * item.billQty;
+                    let paidNowQty = item.qty - item.billQty;
+                    
+                    drinksFeeTotal += totalCost;
+                    drinksFeeBill += billCost;
+                    
+                    drinksNotesHtml.push(`
+                        <div class="flex justify-between items-center bg-slate-100 p-1 rounded border border-slate-200 gap-1">
+                            <div class="flex items-center gap-1 font-sans text-slate-700 font-medium truncate">
+                                <span>${item.name} (Tổng:<b>${item.qty}</b>)</span>
+                            </div>
+                            <div class="flex items-center gap-1 shrink-0 font-mono">
+                                <span class="text-[10px] text-slate-400">Vào sân:</span>
+                                <input type="number" value="${item.billQty}" min="0" max="${item.qty}" oninput="editBillQty('drinks', ${idx}, this.value)" class="w-10 text-center bg-white border border-slate-300 rounded font-black text-teal-700 py-0.5 text-[11px]">
+                                ${paidNowQty > 0 ? `<span class="text-[9px] text-emerald-600 font-bold font-sans px-1 bg-emerald-50 rounded border border-emerald-200">Trả liền: ${paidNowQty}</span>` : ''}
+                            </div>
+                        </div>
+                    `);
+                }
+            });
+            document.getElementById('drinks-fee-display').innerText = formatNum(drinksFeeBill) + "k";
+            document.getElementById('drinks-list-note').innerHTML = drinksNotesHtml.length > 0 ? drinksNotesHtml.join("") : "<span class='text-[9px] text-slate-400 font-mono italic'>Chưa gọi món nào</span>";
+
+            // HIỂN THỊ PHỤ KIỆN: Cho phép nhập số lượng tính vào sân cuối giờ
+            let gearFeeBill = 0; 
+            let gearFeeTotal = 0; 
+            let gearNotesHtml = [];
+            
+            courtsData[currentCourt].gear.forEach((item, idx) => {
+                if (item.qty > 0) {
+                    let totalCost = item.price * item.qty;
+                    let billCost = item.price * item.billQty;
+                    let paidNowQty = item.qty - item.billQty;
+                    
+                    gearFeeTotal += totalCost;
+                    gearFeeBill += billCost;
+
+                    gearNotesHtml.push(`
+                        <div class="flex justify-between items-center bg-slate-100 p-1 rounded border border-slate-200 gap-1">
+                            <div class="flex items-center gap-1 font-sans text-slate-700 font-medium truncate">
+                                <span>${item.name} (Tổng:<b>${item.qty}</b>)</span>
+                            </div>
+                            <div class="flex items-center gap-1 shrink-0 font-mono">
+                                <span class="text-[10px] text-slate-400">Vào sân:</span>
+                                <input type="number" value="${item.billQty}" min="0" max="${item.qty}" oninput="editBillQty('gear', ${idx}, this.value)" class="w-10 text-center bg-white border border-slate-300 rounded font-black text-blue-700 py-0.5 text-[11px]">
+                                ${paidNowQty > 0 ? `<span class="text-[9px] text-emerald-600 font-bold font-sans px-1 bg-emerald-50 rounded border border-emerald-200">Trả liền: ${paidNowQty}</span>` : ''}
+                            </div>
+                        </div>
+                    `);
+                }
+            });
+            document.getElementById('gear-fee-display').innerText = formatNum(gearFeeBill) + "k";
+            document.getElementById('gear-list-note').innerHTML = gearNotesHtml.length > 0 ? gearNotesHtml.join("") : "<span class='text-[9px] text-slate-400 font-mono italic'>Chưa gọi phụ kiện</span>";
+
+            // Tổng thanh toán của bill cuối giờ
+            let totalPayment = courtFeeDisplay + drinksFeeBill + gearFeeBill - ownerDiscount;
+            if (totalPayment < 0) totalPayment = 0;
+            totalPayment = Math.round(totalPayment * 10) / 10;
+
+            document.getElementById('total-fee').innerText = formatNum(totalPayment) + "k";
+
+            let bankUnitsInput = parseFloat(document.getElementById('bank-units').value) || 0;
+            document.getElementById('text-bank-real').innerText = formatNum(bankUnitsInput) + "k";
+
+            courtsData[currentCourt].calculated = {
+                customerName, dayType, startTimeStr, endTimeStr, totalMinutes,
+                courtFee: courtFeeDisplay,
+                servicesFeeBill: drinksFeeBill + gearFeeBill,
+                servicesFeeTotal: drinksFeeTotal + gearFeeTotal,
+                totalPayment,
+                finalRevenue: totalPayment + (drinksFeeTotal - drinksFeeBill) + (gearFeeTotal - gearFeeBill), 
+                bankReceived: bankUnitsInput
+            };
+
+            saveCourtState(currentCourt);
+        }
+
+        function resetCurrentCourt() {
+            const pass = prompt(`Vui lòng nhập MẬT KHẨU để xóa trống SÂN ${currentCourt}:`);
+            if (pass === SECURITY_PASSWORD) {
+                forceResetCourt(currentCourt);
+            } else if (pass !== null) {
+                alert("❌ Mật khẩu không chính xác!");
+            }
+        }
+
+        function forceResetCourt(courtNum) {
+            courtsData[courtNum] = {
+                customer: "", dayType: "weekday", discount: "none", ownerDiscount: 0, start: "00:00", end: "00:00", bankUnits: 0,
+                drinks: [],
+                gear: [],
+                calculated: {}
+            };
+            localStorage.setItem('pab_courtsData', JSON.stringify(courtsData));
+            loadCourtState(courtNum);
+        }
+
+        function saveAndCheckout() {
+            const calc = courtsData[currentCourt].calculated;
+            if (!calc || (calc.totalMinutes === 0 && calc.servicesFeeTotal === 0)) {
+                alert("⚠️ Vui lòng chọn khung giờ hoặc mặt hàng hợp lệ trước khi thanh toán đơn!");
+                return;
+            }
+
+            let billGoodsProfitK = 0; 
+            const savedDrinks = [];
+            const savedGear = [];
+
+            courtsData[currentCourt].drinks.forEach(item => {
+                if (item.qty > 0) {
+                    const invItem = globalInventory.find(i => i.id === item.id);
+                    let itemCost = 0;
+                    if (invItem) {
+                        invItem.qty = Math.max(0, invItem.qty - item.qty);
+                        itemCost = invItem.cost;
+                    }
+                    let itemProfitK = (item.price - itemCost) * item.qty;
+                    billGoodsProfitK += itemProfitK;
+
+                    savedDrinks.push({ name: item.name, price: item.price, cost: itemCost, qty: item.qty, billQty: item.billQty, profit: itemProfitK });
+                }
+            });
+
+            courtsData[currentCourt].gear.forEach(item => {
+                if (item.qty > 0) {
+                    const invItem = globalInventory.find(i => i.id === item.id);
+                    let itemCost = 0;
+                    if (invItem) {
+                        invItem.qty = Math.max(0, invItem.qty - item.qty);
+                        itemCost = invItem.cost;
+                    }
+                    let itemProfitK = (item.price - itemCost) * item.qty;
+                    billGoodsProfitK += itemProfitK;
+
+                    savedGear.push({ name: item.name, price: item.price, cost: itemCost, qty: item.qty, billQty: item.billQty, profit: itemProfitK });
+                }
+            });
+
+            localStorage.setItem('pab_inventory', JSON.stringify(globalInventory));
+
+            const now = new Date();
+            const timeLog = now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+            const dateLog = now.toLocaleDateString('sv-SE');
+
+            const itemLog = {
+                id: Date.now(),
+                date: dateLog,
+                time: timeLog,
+                court: currentCourt,
+                customer: calc.customerName,
+                range: `${calc.startTimeStr}-${calc.endTimeStr}`,
+                courtFee: calc.courtFee,
+                servicesFee: calc.servicesFeeTotal, 
+                total: calc.finalRevenue, 
+                bank: calc.bankReceived,
+                profit: billGoodsProfitK, 
+                dayTypeText: calc.dayType === 'weekday' ? "Ngày thường (T2-T6)" : "Cuối tuần (T7-CN)",
+                ownerDiscountApplied: document.getElementById('owner-discount').value ? parseFloat(document.getElementById('owner-discount').value) : 0,
+                details: {
+                    drinks: savedDrinks,
+                    gear: savedGear
+                }
+            };
+
+            paymentHistory.push(itemLog);
+            localStorage.setItem('pab_paymentHistory', JSON.stringify(paymentHistory));
+
+            showToastMessage();
+            forceResetCourt(currentCourt);
+            renderHistory(); 
+        }
+
+        function showToastMessage() {
+            const toast = document.getElementById('toast-success');
+            toast.classList.remove('opacity-0', 'pointer-events-none', 'scale-90');
+            toast.classList.add('scale-100', 'opacity-100');
+            
+            setTimeout(() => {
+                toast.classList.remove('scale-100', 'opacity-100');
+                toast.classList.add('opacity-0', 'pointer-events-none', 'scale-90');
+            }, 1500);
+        }
+
+        function renderHistory() {
+            const filterDate = document.getElementById('filter-date').value;
+            const tbody = document.getElementById('history-tbody');
+            tbody.innerHTML = "";
+
+            let dayTotal = 0;
+            let dayBank = 0;
+            let dayExpense = 0;
+            let monthTotal = 0;
+
+            const currentMonthStr = filterDate ? filterDate.substring(0, 7) : "";
+
+            paymentHistory.forEach(item => {
+                if (item.date.substring(0, 7) === currentMonthStr) {
+                    monthTotal += item.total;
+                }
+
+                if (item.date === filterDate) {
+                    dayTotal += item.total;
+                    dayBank += item.bank;
+
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-slate-900/80 transition border-b border-slate-800/40 font-medium cursor-pointer";
+                    tr.onclick = () => openBillDetailsModal(item);
+                    tr.innerHTML = `
+                        <td class="p-2 text-slate-400">${item.time}</td>
+                        <td class="p-2 font-black text-teal-400 font-sans">Sân ${item.court}</td>
+                        <td class="p-2 font-bold max-w-[120px] truncate font-sans">${item.customer}</td>
+                        <td class="p-2 text-teal-200 font-mono text-[10px]">${item.range}</td>
+                        <td class="p-2 text-right">${formatNum(item.courtFee)}k</td>
+                        <td class="p-2 text-right text-amber-400">${formatNum(item.servicesFee)}k</td>
+                        <td class="p-2 text-right font-black text-emerald-400">${formatNum(item.total)}k</td>
+                        <td class="p-2 text-right font-bold text-yellow-300">${formatNum(item.profit || 0)}k</td>
+                        <td class="p-2 pl-4 text-sky-400 font-bold">${item.bank > 0 ? formatNum(item.bank) + 'k' : '—'}</td>
+                        <td class="p-2 text-center">
+                            <button onclick="event.stopPropagation(); deleteHistoryItem(${item.id})" class="text-red-400 hover:text-red-600 font-bold px-1 font-sans">✕</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                }
+            });
+
+            const expenseContainer = document.getElementById('expense-list-container');
+            expenseContainer.innerHTML = "";
+            
+            expensesData.forEach(exp => {
+                if(exp.date === filterDate) {
+                    dayExpense += exp.amount;
+                    expenseContainer.innerHTML += `
+                        <div class="flex justify-between items-center bg-slate-950/60 p-1.5 rounded border border-slate-800 text-slate-300">
+                            <span>• ${exp.reason}</span>
+                            <span class="text-red-400 font-bold">-${formatNum(exp.amount)}k 
+                                <button onclick="deleteExpenseItem(${exp.id})" class="text-slate-500 hover:text-red-500 font-sans ml-2 font-black">✕</button>
+                            </span>
+                        </div>
+                    `;
+                }
+            });
+
+            if (expenseContainer.innerHTML === "") {
+                expenseContainer.innerHTML = `<span class="text-slate-500 italic text-[10px]">* Hôm nay không có khoản chi nào phát sinh.</span>`;
+            }
+
+            let dayNet = dayTotal - dayExpense;
+
+            document.getElementById('stat-day-total').innerText = formatNum(dayTotal) + "k";
+            document.getElementById('stat-day-bank').innerText = formatNum(dayBank) + "k";
+            document.getElementById('stat-day-expense').innerText = formatNum(dayExpense) + "k";
+            document.getElementById('stat-day-net').innerText = formatNum(dayNet) + "k";
+            document.getElementById('stat-month-total').innerText = formatNum(monthTotal) + "k";
+        }
+
+        function addNewExpense() {
+            const reason = document.getElementById('exp-add-reason').value.trim();
+            const amount = parseFloat(document.getElementById('exp-add-amount').value) || 0;
+            const filterDate = document.getElementById('filter-date').value;
+
+            if(!reason) {
+                alert("⚠️ Vui lòng nhập nội dung/lý do chi!");
+                return;
+            }
+            if(amount <= 0) {
+                alert("⚠️ Vui lòng nhập số tiền chi lớn hơn 0!");
+                return;
+            }
+
+            const newExp = {
+                id: Date.now(),
+                date: filterDate,
+                reason: reason,
+                amount: amount
+            };
+
+            expensesData.push(newExp);
+            localStorage.setItem('pab_expensesData', JSON.stringify(expensesData));
+
+            document.getElementById('exp-add-reason').value = "";
+            document.getElementById('exp-add-amount').value = "";
+            
+            renderHistory();
+        }
+
+        function deleteExpenseItem(id) {
+            expensesData = expensesData.filter(e => e.id !== id);
+            localStorage.setItem('pab_expensesData', JSON.stringify(expensesData));
+            renderHistory();
+        }
+
+        function openBillDetailsModal(item) {
+            document.getElementById('modal-title-sub').innerText = `Sân ${item.court} — Ngày lập: ${item.date} lúc ${item.time}`;
+            document.getElementById('modal-customer').innerText = item.customer || "Khách lẻ";
+            document.getElementById('modal-range').innerText = `${item.range}`;
+            document.getElementById('modal-daytype').innerText = item.dayTypeText || "Ngày thường (T2-T6)";
+            document.getElementById('modal-court-fee').innerText = `${formatNum(item.courtFee)}k`;
+            document.getElementById('modal-services-fee').innerText = `${formatNum(item.servicesFee)}k`;
+            document.getElementById('modal-discount-fee').innerText = `-${formatNum(item.ownerDiscountApplied || 0)}k`;
+            document.getElementById('modal-total-fee').innerText = `${formatNum(item.total)}k`;
+            document.getElementById('modal-bank-fee').innerText = `${formatNum(item.bank || 0)}k`;
+            document.getElementById('modal-profit-fee').innerText = `${formatNum(item.profit || 0)}k`;
+
+            const drinksContainer = document.getElementById('modal-drinks-list');
+            drinksContainer.innerHTML = "";
+            if (item.details && item.details.drinks && item.details.drinks.length > 0) {
+                document.getElementById('modal-drinks-section').style.display = "block";
+                item.details.drinks.forEach(d => {
+                    let bQty = d.hasOwnProperty('billQty') ? d.billQty : d.qty;
+                    let pNow = d.qty - bQty;
+                    let textStatus = `(Vào sân: ${bQty}${pNow > 0 ? `, Trả liền: ${pNow}` : ''})`;
+                    drinksContainer.innerHTML += `<div class="flex justify-between"><span>• ${d.name} <b class="text-slate-400">x${d.qty}</b> <span class="text-[10px] text-teal-600">${textStatus}</span></span><span>${formatNum(d.price * d.qty)}k</span></div>`;
+                });
+            } else {
+                document.getElementById('modal-drinks-section').style.display = "none";
+            }
+
+            const gearContainer = document.getElementById('modal-gear-list');
+            gearContainer.innerHTML = "";
+            if (item.details && item.details.gear && item.details.gear.length > 0) {
+                document.getElementById('modal-gear-section').style.display = "block";
+                item.details.gear.forEach(g => {
+                    let bQty = g.hasOwnProperty('billQty') ? g.billQty : g.qty;
+                    let pNow = g.qty - bQty;
+                    let textStatus = `(Vào sân: ${bQty}${pNow > 0 ? `, Trả liền: ${pNow}` : ''})`;
+                    gearContainer.innerHTML += `<div class="flex justify-between"><span>• ${g.name} <b class="text-slate-400">x${g.qty}</b> <span class="text-[10px] text-blue-600">${textStatus}</span></span><span>${formatNum(g.price * g.qty)}k</span></div>`;
+                });
+            } else {
+                document.getElementById('modal-gear-section').style.display = "none";
+            }
+
+            const modal = document.getElementById('bill-detail-modal');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('bill-detail-modal');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+        }
+
+        function deleteHistoryItem(id) {
+            const pass = prompt("Vui lòng nhập MẬT KHẨU để xóa bản ghi doanh thu này:");
+            if (pass === SECURITY_PASSWORD) {
+                paymentHistory = paymentHistory.filter(item => item.id !== id);
+                localStorage.setItem('pab_paymentHistory', JSON.stringify(paymentHistory));
+                renderHistory();
+            } else if (pass !== null) {
+                alert("❌ Mật khẩu không chính xác!");
+            }
+        }
+
+        function clearAllHistory() {
+            const pass = prompt("⚠️ CẢNH BÁO: Hành động này sẽ xóa TOÀN BỘ doanh thu và chi phí lưu trữ trên máy!\nNhập mật khẩu hệ thống để tiếp tục:");
+            if (pass === SECURITY_PASSWORD) {
+                const confirm2 = confirm("Bạn có chắc chắn 100% muốn xóa sạch lịch sử không? (Không thể hoàn tác)");
+                if (confirm2) {
+                    paymentHistory = [];
+                    expensesData = [];
+                    localStorage.removeItem('pab_paymentHistory');
+                    localStorage.removeItem('pab_expensesData');
+                    renderHistory();
+                    alert("💥 Đã xóa sạch toàn bộ dữ liệu doanh thu & chi phí.");
+                }
+            } else if (pass !== null) {
+                alert("❌ Mật khẩu không chính xác!");
+            }
+        }
+
+        function renderInventoryTable() {
+            const tbody = document.getElementById('inventory-tbody');
+            tbody.innerHTML = "";
+
+            globalInventory.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-900/40 border-b border-slate-800/60 font-medium";
+                
+                const profitPerItem = Math.round((item.price - item.cost) * 10) / 10;
+
+                tr.innerHTML = `
+                    <td class="p-2 text-slate-400 text-[10px] font-sans">${item.type === 'drinks' ? '🥤 Nước/Đồ ăn' : '🏸 Phụ kiện'}</td>
+                    <td class="p-2 font-bold text-teal-200 font-sans">${item.name}</td>
+                    <td class="p-2 text-center">
+                        <input type="number" value="${item.qty}" min="0" onchange="editInventoryField('${item.id}', 'qty', this.value)" class="w-20 px-1 py-0.5 bg-slate-950 border border-slate-700 text-center text-white font-black rounded focus:outline-teal-500">
+                    </td>
+                    <td class="p-2 text-right">
+                        <input type="number" value="${item.cost}" min="0" step="any" onchange="editInventoryField('${item.id}', 'cost', this.value)" class="w-24 px-1 py-0.5 bg-slate-950 border border-slate-700 text-right text-slate-300 font-bold rounded focus:outline-teal-500">
+                    </td>
+                    <td class="p-2 text-right">
+                        <input type="number" value="${item.price}" min="0" step="any" onchange="editInventoryField('${item.id}', 'price', this.value)" class="w-24 px-1 py-0.5 bg-slate-950 border border-slate-700 text-right text-amber-400 font-black rounded focus:outline-teal-500">
+                    </td>
+                    <td class="p-2 text-right text-emerald-400 font-bold font-sans">
+                        +${formatNum(profitPerItem)}k <span class="text-[9px] text-slate-400 font-normal font-sans">/món</span>
+                    </td>
+                    <td class="p-2 text-center">
+                        <button onclick="deleteInventoryItem('${item.id}')" class="text-red-400 hover:text-red-600 font-bold px-1 font-sans">✕</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function editInventoryField(id, field, value) {
+            const item = globalInventory.find(i => i.id === id);
+            if (item) {
+                if (field === 'qty') item.qty = parseInt(value) || 0;
+                if (field === 'cost') item.cost = parseFloat(value) || 0;
+                if (field === 'price') item.price = parseFloat(value) || 0;
+                
+                localStorage.setItem('pab_inventory', JSON.stringify(globalInventory));
+                syncCourtsWithInventory();
+                calculateAll();
+            }
+        }
+
+        function addNewProductToInventory() {
+            const name = document.getElementById('inv-add-name').value.trim();
+            const type = document.getElementById('inv-add-type').value;
+            const qty = parseInt(document.getElementById('inv-add-qty').value) || 0;
+            const cost = parseFloat(document.getElementById('inv-add-cost').value) || 0;
+            const price = parseFloat(document.getElementById('inv-add-price').value) || 0;
+
+            if (!name) {
+                alert("⚠️ Vui lòng nhập tên món hàng muốn thêm!");
+                return;
+            }
+
+            const uniqueId = 'prod_' + Date.now();
+            const newItem = { id: uniqueId, name, type, qty, cost, price };
+
+            globalInventory.push(newItem);
+            localStorage.setItem('pab_inventory', JSON.stringify(globalInventory));
+
+            document.getElementById('inv-add-name').value = "";
+            document.getElementById('inv-add-qty').value = "";
+            document.getElementById('inv-add-cost').value = "";
+            document.getElementById('inv-add-price').value = "";
+
+            syncCourtsWithInventory();
+            loadCourtState(currentCourt);
+            renderInventoryTable();
+        }
+
+        function deleteInventoryItem(id) {
+            const item = globalInventory.find(i => i.id === id);
+            if (!item) return;
+
+            const pass = prompt(`Vui lòng nhập MẬT KHẨU hệ thống để gỡ bỏ hoàn toàn món [${item.name}] ra khỏi kho bán:`);
+            if (pass === SECURITY_PASSWORD) {
+                globalInventory = globalInventory.filter(i => i.id !== id);
+                localStorage.setItem('pab_inventory', JSON.stringify(globalInventory));
+                
+                syncCourtsWithInventory();
+                loadCourtState(currentCourt);
+                renderInventoryTable();
+            } else if (pass !== null) {
+                alert("❌ Mật khẩu không chính xác!");
+            }
+        }
+    </script>
+</body>
+</html>

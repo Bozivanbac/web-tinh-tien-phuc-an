@@ -20,7 +20,7 @@ HTML
                 <span class="text-2xl">🏸</span>
                 <div>
                     <h1 class="text-base sm:text-lg font-black tracking-tight text-teal-400">PHÚC AN BADMINTON</h1>
-                    <p class="text-[10px] text-slate-300 font-semibold">Hệ thống tính tiền & Quản lý kho bãi chuyên nghiệp v2.7</p>
+                    <p class="text-[10px] text-slate-300 font-semibold">Hệ thống tính tiền & Quản lý kho bãi chuyên nghiệp v2.8</p>
                 </div>
             </div>
             <div class="flex bg-slate-950/40 p-1 rounded-xl border border-teal-500/20 w-full sm:w-auto gap-1">
@@ -123,14 +123,10 @@ HTML
                     <span id="quick-total-fee" class="text-base font-mono font-black text-amber-400">0đ</span>
                 </div>
 
-                <div class="grid grid-cols-2 gap-2">
+                <div class="grid grid-cols-1 gap-2">
                     <div>
-                        <label class="block text-[9px] font-bold text-amber-400 mb-0.5">Tiền mặt nhận (k)</label>
-                        <input id="quick-cash" type="number" placeholder="0" class="w-full bg-slate-900 border border-teal-800 rounded px-2 py-1 text-xs font-bold text-amber-400 text-center focus:outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-[9px] font-bold text-sky-400 mb-0.5">Chuyển khoản nhận (k)</label>
-                        <input id="quick-bank" type="number" placeholder="0" class="w-full bg-slate-900 border border-teal-800 rounded px-2 py-1 text-xs font-bold text-sky-400 text-center focus:outline-none">
+                        <label class="block text-[10px] font-black text-sky-400 mb-0.5">Khách Chuyển Khoản (k)</label>
+                        <input id="quick-bank" type="number" placeholder="Nhập số tiền CK nếu có..." oninput="calculateAll()" class="w-full bg-slate-900 border border-teal-800 rounded px-3 py-1.5 text-xs font-bold text-sky-400 text-center focus:outline-none focus:border-sky-500">
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-2 mt-3">
@@ -183,18 +179,14 @@ HTML
                     </div>
 
                     <div class="mt-4 pt-3 border-t border-dashed border-slate-800 space-y-2">
-                        <div class="grid grid-cols-3 gap-2">
+                        <div class="grid grid-cols-2 gap-2">
                             <div>
                                 <label class="block text-[10px] font-black text-red-400 mb-0.5">Bớt thêm (k)</label>
                                 <input id="owner-discount" type="number" placeholder="0" oninput="calculateAll()" class="w-full bg-slate-950 border border-slate-700 rounded px-1.5 py-1 text-xs font-bold text-red-400 text-center focus:outline-none">
                             </div>
                             <div>
-                                <label class="block text-[10px] font-black text-amber-400 mb-0.5">Tiền mặt (k)</label>
-                                <input id="cash-units" type="number" placeholder="0" oninput="calculateAll()" class="w-full bg-slate-950 border border-slate-700 rounded px-1.5 py-1 text-xs font-bold text-amber-400 text-center focus:outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-black text-sky-400 mb-0.5">Chuyển khoản (k)</label>
-                                <input id="bank-units" type="number" placeholder="0" oninput="calculateAll()" class="w-full bg-slate-950 border border-slate-700 rounded px-1.5 py-1 text-xs font-bold text-sky-400 text-center focus:outline-none">
+                                <label class="block text-[10px] font-black text-sky-400 mb-0.5">Khách Chuyển Khoản (k)</label>
+                                <input id="bank-units" type="number" placeholder="Nhập số tiền CK..." oninput="calculateAll()" class="w-full bg-slate-950 border border-sky-900/50 rounded px-1.5 py-1 text-xs font-bold text-sky-400 text-center focus:outline-none focus:border-sky-500">
                             </div>
                         </div>
                     </div>
@@ -206,15 +198,14 @@ HTML
                         <span class="text-xl font-mono font-black text-emerald-400" id="total-fee">0đ</span>
                     </div>
                     <div class="flex justify-between items-center text-[11px] text-slate-400 border-t border-slate-800/60 pt-1 mt-1">
-                        <span>Tổng tiền thực nhận (đã đưa):</span>
-                        <span class="font-black text-emerald-400 font-mono" id="text-total-received">0đ</span>
+                        <span>Hình thức nhận tiền:</span>
                     </div>
-                    <div class="grid grid-cols-2 gap-2 text-[10px] text-slate-400 mt-0.5">
-                        <div>Tiền mặt: <span id="text-cash-real" class="text-amber-400 font-bold">0đ</span></div>
-                        <div class="text-right">Chuyển khoản: <span id="text-bank-real" class="text-sky-400 font-bold">0đ</span></div>
+                    <div class="grid grid-cols-2 gap-2 text-[11px] text-slate-400 mt-1 bg-slate-900 p-2 rounded border border-slate-800">
+                        <div>💵 Tiền mặt: <br><span id="text-cash-real" class="text-sm font-mono font-black text-amber-400">0đ</span></div>
+                        <div class="text-right">💳 Chuyển khoản: <br><span id="text-bank-real" class="text-sm font-mono font-black text-sky-400">0đ</span></div>
                     </div>
 
-                    <div class="grid grid-cols-3 gap-2 mt-3">
+                    <div class="grid grid-cols-3 gap-2 mt-4">
                         <button onclick="resetCurrentCourt()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 py-2 rounded-lg font-bold text-xs transition">Làm mới sân</button>
                         <button onclick="saveAndCheckout()" class="col-span-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-black py-2 rounded-lg text-xs tracking-wide transition shadow-md">XUẤT ĐƠN SÂN & TRỪ KHO</button>
                     </div>
@@ -483,8 +474,8 @@ HTML
             court.endTime = document.getElementById('end-time').value;
             court.discountType = document.getElementById('discount-select').value;
             court.ownerDiscount = parseFloat(document.getElementById('owner-discount').value) || 0;
-            court.cashUnits = parseFloat(document.getElementById('cash-units').value) || 0;
             court.bankUnits = parseFloat(document.getElementById('bank-units').value) || 0;
+            // Tiền mặt sẽ tự động tính dựa trên tổng tiền trừ chuyển khoản
         }
 
         function triggerToast(message) {
@@ -546,7 +537,6 @@ HTML
                 document.getElementById('end-time').value = court.endTime;
                 document.getElementById('discount-select').value = court.discountType;
                 document.getElementById('owner-discount').value = court.ownerDiscount > 0 ? court.ownerDiscount : "";
-                document.getElementById('cash-units').value = court.cashUnits > 0 ? court.cashUnits : "";
                 document.getElementById('bank-units').value = court.bankUnits > 0 ? court.bankUnits : "";
 
                 renderShortcutTime();
@@ -673,7 +663,6 @@ HTML
                 court.endTime = document.getElementById('end-time').value;
                 court.discountType = document.getElementById('discount-select').value;
                 court.ownerDiscount = parseFloat(document.getElementById('owner-discount').value) || 0;
-                court.cashUnits = parseFloat(document.getElementById('cash-units').value) || 0;
                 court.bankUnits = parseFloat(document.getElementById('bank-units').value) || 0;
             }
 
@@ -708,6 +697,13 @@ HTML
                     totalQuickFee += itemTotal;
                     listHtml += `<div class="flex justify-between"><span>• ${prod.name} (x${qty})</span><span>${formatNum(itemTotal)}k</span></div>`;
                 });
+
+                const qBank = parseFloat(document.getElementById('quick-bank').value) || 0;
+                let qCash = totalQuickFee - qBank;
+                if (qCash < 0) qCash = 0;
+
+                court.bankUnits = qBank;
+                court.cashUnits = Math.round(qCash * 100) / 100;
 
                 document.getElementById('quick-items-list').innerHTML = listHtml || `<span class="text-slate-500 italic text-[11px]">Giỏ hàng đang trống...</span>`;
                 document.getElementById('quick-total-fee').innerText = `${formatNum(totalQuickFee)}k`;
@@ -766,8 +762,11 @@ HTML
 
             document.getElementById('total-fee').innerText = `${formatNum(finalTotal)}k`;
 
-            let totalReceived = court.cashUnits + court.bankUnits;
-            document.getElementById('text-total-received').innerText = `${formatNum(totalReceived)}k`;
+            // LOGIC MỚI: Tiền mặt = Tổng phải thu - Chuyển khoản
+            let calculatedCash = finalTotal - court.bankUnits;
+            if (calculatedCash < 0) calculatedCash = 0;
+            court.cashUnits = Math.round(calculatedCash * 100) / 100;
+
             document.getElementById('text-cash-real').innerText = `${formatNum(court.cashUnits)}k`;
             document.getElementById('text-bank-real').innerText = `${formatNum(court.bankUnits)}k`;
 
@@ -788,14 +787,12 @@ HTML
             document.getElementById('end-time').value = "";
             document.getElementById('discount-select').value = "none";
             document.getElementById('owner-discount').value = "";
-            document.getElementById('cash-units').value = "";
             document.getElementById('bank-units').value = "";
             calculateAll();
         }
 
         function resetQuickSaleCart() {
             courtsData['quick'].items = {};
-            document.getElementById('quick-cash').value = "";
             document.getElementById('quick-bank').value = "";
             calculateAll();
         }
@@ -808,8 +805,7 @@ HTML
                 return;
             }
 
-            const qCash = parseFloat(document.getElementById('quick-cash').value) || 0;
-            const qBank = parseFloat(document.getElementById('quick-bank').value) || 0;
+            calculateAll(); // Đảm bảo tính toán số tiền mặt/chuyển khoản chuẩn xác lần cuối
 
             let drinksFee = 0;
             let gearFee = 0;
@@ -852,13 +848,13 @@ HTML
                 serviceFee: Math.round(serviceTotal * 100) / 100,
                 totalBill: Math.round(serviceTotal * 100) / 100,
                 profitGoods: Math.round(profitGoods * 100) / 100,
-                cashReceived: qCash,
-                bankReceived: qBank,
+                cashReceived: court.cashUnits,
+                bankReceived: court.bankUnits,
                 rawDetails: {
                     customerName: "Khách vãng lai (Mua lẻ)",
                     dayType: "weekday",
                     startTime: "", endTime: "", discountType: "none", ownerDiscount: 0,
-                    cashUnits: qCash, bankUnits: qBank,
+                    cashUnits: court.cashUnits, bankUnits: court.bankUnits,
                     items: JSON.parse(JSON.stringify(court.items))
                 }
             };
@@ -867,7 +863,6 @@ HTML
             localStorage.setItem('pab_history', JSON.stringify(paymentHistory));
             localStorage.setItem('pab_inventory', JSON.stringify(globalInventory));
 
-            document.getElementById('quick-cash').value = "";
             document.getElementById('quick-bank').value = "";
             courtsData['quick'].items = {}; 
 
@@ -888,6 +883,8 @@ HTML
                 alert("⚠️ Sân trống chưa có dữ liệu thời gian hoặc dịch vụ để xuất đơn.");
                 return;
             }
+
+            calculateAll(); // Đảm bảo đồng bộ tiền mặt và chuyển khoán trước khi xuất dữ liệu
 
             for (let prodId in court.items) {
                 const qty = court.items[prodId];
@@ -923,7 +920,6 @@ HTML
 
             let profitGoods = (drinksFee + gearFee) - totalCostGoods;
 
-            // SỬA LỖI LỊCH SỬ: Chuẩn hóa bo tròn số thập phân trước khi lưu trữ
             const billRecord = {
                 id: 'PAB-' + Date.now(),
                 date: new Date().toLocaleDateString('sv-SE'),
@@ -954,7 +950,6 @@ HTML
             document.getElementById('end-time').value = "";
             document.getElementById('discount-select').value = "none";
             document.getElementById('owner-discount').value = "";
-            document.getElementById('cash-units').value = "";
             document.getElementById('bank-units').value = "";
             
             renderMenuDichVu();
@@ -997,7 +992,6 @@ HTML
             const filteredBills = paymentHistory.filter(bill => bill.date === filterDate);
             
             filteredBills.forEach(bill => {
-                // SỬA LỖI LỊCH SỬ: Đảm bảo chuyển đổi chuỗi lưu trữ thành Số thực để tránh lỗi tính toán cộng chuỗi
                 const cFee = parseFloat(bill.courtFee) || 0;
                 const sFee = parseFloat(bill.serviceFee) || 0;
                 const tBill = parseFloat(bill.totalBill) || 0;

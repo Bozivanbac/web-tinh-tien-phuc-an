@@ -487,9 +487,9 @@ HTML
                     return { 
                         id: invItem.id, 
                         name: invItem.name, 
-                        price: invItem.price, 
-                        qty: match ? match.qty : 0,
-                        billQty: match && match.hasOwnProperty('billQty') ? match.billQty : (match ? match.qty : 0)
+                        price: Number(invItem.price), 
+                        qty: match ? Number(match.qty) : 0,
+                        billQty: match && match.hasOwnProperty('billQty') ? Number(match.billQty) : (match ? Number(match.qty) : 0)
                     };
                 });
 
@@ -498,9 +498,9 @@ HTML
                     return { 
                         id: invItem.id, 
                         name: invItem.name, 
-                        price: invItem.price, 
-                        qty: match ? match.qty : 0,
-                        billQty: match && match.hasOwnProperty('billQty') ? match.billQty : (match ? match.qty : 0)
+                        price: Number(invItem.price), 
+                        qty: match ? Number(match.qty) : 0,
+                        billQty: match && match.hasOwnProperty('billQty') ? Number(match.billQty) : (match ? Number(match.qty) : 0)
                     };
                 });
             });
@@ -639,7 +639,7 @@ HTML
             if (inputQty > item.qty) inputQty = item.qty;
             if (inputQty < 0) inputQty = 0;
             
-            item.billQty = inputQty;
+            item.billQty = Number(inputQty);
             calculateAll();
         }
 
@@ -831,6 +831,7 @@ HTML
             loadCourtState(courtNum);
         }
 
+        /* FIX CHÍ MẠNG: ÉP KIỂU SỐ TUYỆT ĐỐI CHO QTY VÀ BILLQTY KHI LƯU LỊCH SỬ HÓA ĐƠN */
         function saveAndCheckout() {
             const calc = courtsData[currentCourt].calculated;
             if (!calc || (calc.totalMinutes === 0 && calc.servicesFeeTotal === 0)) {
@@ -853,7 +854,14 @@ HTML
                     let itemProfitK = (item.price - itemCost) * item.qty;
                     billGoodsProfitK += itemProfitK;
 
-                    savedDrinks.push({ name: item.name, price: item.price, cost: itemCost, qty: item.qty, billQty: item.billQty, profit: itemProfitK });
+                    savedDrinks.push({ 
+                        name: item.name, 
+                        price: Number(item.price), 
+                        cost: Number(itemCost), 
+                        qty: Number(item.qty), 
+                        billQty: Number(item.billQty), 
+                        profit: Number(itemProfitK) 
+                    });
                 }
             });
 
@@ -868,7 +876,14 @@ HTML
                     let itemProfitK = (item.price - itemCost) * item.qty;
                     billGoodsProfitK += itemProfitK;
 
-                    savedGear.push({ name: item.name, price: item.price, cost: itemCost, qty: item.qty, billQty: item.billQty, profit: itemProfitK });
+                    savedGear.push({ 
+                        name: item.name, 
+                        price: Number(item.price), 
+                        cost: Number(itemCost), 
+                        qty: Number(item.qty), 
+                        billQty: Number(item.billQty), 
+                        profit: Number(itemProfitK) 
+                    });
                 }
             });
 
@@ -1025,6 +1040,7 @@ HTML
             renderHistory();
         }
 
+        /* FIX: SỬA LẠI LOGIC THUỘC TÍNH ĐỌC DỮ LIỆU ĐỂ HIỂN THỊ ĐÚNG SỐ HÀNG ĐÃ BÁN */
         function openBillDetailsModal(item) {
             document.getElementById('modal-title-sub').innerText = `Sân ${item.court} — Ngày lập: ${item.date} lúc ${item.time}`;
             document.getElementById('modal-customer').innerText = item.customer || "Khách lẻ";
@@ -1042,13 +1058,29 @@ HTML
             if (item.details && item.details.drinks && item.details.drinks.length > 0) {
                 document.getElementById('modal-drinks-section').style.display = "block";
                 item.details.drinks.forEach(d => {
-                    let bQty = d.hasOwnProperty('billQty') ? d.billQty : d.qty;
-                    let pNow = d.qty - bQty;
+                    let bQty = d.hasOwnProperty('billQty') ? Number(d.billQty) : Number(d.qty);
+                    let totalQty = Number(d.qty);
+                    let pNow = totalQty - bQty;
                     let textStatus = `(Vào sân: ${bQty}${pNow > 0 ? `, Trả liền: ${pNow}` : ''})`;
-                    drinksContainer.innerHTML += `<div class="flex justify-between"><span>• ${d.name} <b class="text-slate-400">x${d.qty}</b> <span class="text-[10px] text-teal-600">${textStatus}</span></span><span>${formatNum(d.price * d.qty)}k</span></div>`;
+                    drinksContainer.innerHTML += `<div class="flex justify-between"><span>• ${d.name} <b class="text-slate-900 font-bold">x${totalQty}</b> <span class="text-[10px] text-teal-600">${textStatus}</span></span><span>${formatNum(d.price * totalQty)}k</span></div>`;
                 });
             } else {
                 document.getElementById('modal-drinks-section').style.display = "none";
+            }
+
+            const gearContainer = document.getElementById('modal-gear-list');
+            gearContainer.innerHTML = "";
+            if (item.details && item.details.gear && item.details.gear.length > 0) {
+                document.getElementById('modal-gear-section').style.display = "block";
+                item.details.gear.forEach(g => {
+                    let bQty = g.hasOwnProperty('billQty') ? Number(g.billQty) : Number(g.qty);
+                    let totalQty = Number(g.qty);
+                    let pNow = totalQty - bQty;
+                    let textStatus = `(Vào sân: ${bQty}${pNow > 0 ? `, Trả liền: ${pNow}` : ''})`;
+                    gearContainer.innerHTML += `<div class="flex justify-between"><span>• ${g.name} <b class="text-slate-900 font-bold">x${totalQty}</b> <span class="text-[10px] text-blue-600">${textStatus}</span></span><span>${formatNum(g.price * totalQty)}k</span></div>`;
+                });
+            } else {
+                document.getElementById('modal-gear-section').style.display = "none";
             }
 
             const modal = document.getElementById('bill-detail-modal');
@@ -1134,7 +1166,6 @@ HTML
             }
         }
 
-        /* FIX: HÀM THÊM MÓN MỚI CHUẨN ĐỊNH DẠNG SỐ (NUMBER) VÀ ĐỒNG BỘ */
         function addNewProductToInventory() {
             const name = document.getElementById('inv-add-name').value.trim();
             const type = document.getElementById('inv-add-type').value;
@@ -1152,8 +1183,6 @@ HTML
             }
 
             const uniqueId = 'prod_' + Date.now();
-            
-            // Ép dữ liệu chuẩn kiểu Number trước khi đưa vào Object
             const newItem = { 
                 id: uniqueId, 
                 name: name, 
@@ -1163,7 +1192,6 @@ HTML
                 price: Number(price) 
             };
 
-            // Đọc lại từ bộ nhớ đệm trước khi push để tránh ghi đè lỗi dữ liệu đang chạy
             if (localStorage.getItem('pab_inventory')) {
                 globalInventory = JSON.parse(localStorage.getItem('pab_inventory'));
             }
@@ -1171,16 +1199,12 @@ HTML
             globalInventory.push(newItem);
             localStorage.setItem('pab_inventory', JSON.stringify(globalInventory));
 
-            // Reset rỗng form nhập liệu
             document.getElementById('inv-add-name').value = "";
             document.getElementById('inv-add-qty').value = "";
             document.getElementById('inv-add-cost').value = "";
             document.getElementById('inv-add-price').value = "";
 
-            // Đồng bộ dữ liệu kho hàng xuống trạng thái sân hiện hành
             syncCourtsWithInventory();
-            
-            // Ép hệ thống vẽ lại bảng quản lý kho và danh mục menu chọn đồ uống / phụ kiện
             renderInventoryTable();
             loadCourtState(currentCourt);
             

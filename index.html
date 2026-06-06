@@ -20,7 +20,7 @@ HTML
                 <span class="text-2xl">🏸</span>
                 <div>
                     <h1 class="text-base sm:text-lg font-black tracking-tight text-teal-400">PHÚC AN BADMINTON</h1>
-                    <p class="text-[10px] text-slate-300 font-semibold">Hệ thống tính tiền & Quản lý kho bãi chuyên nghiệp v2.8</p>
+                    <p class="text-[10px] text-slate-300 font-semibold">Hệ thống tính tiền & Quản lý kho bãi chuyên nghiệp v2.9</p>
                 </div>
             </div>
             <div class="flex bg-slate-950/40 p-1 rounded-xl border border-teal-500/20 w-full sm:w-auto gap-1">
@@ -87,19 +87,18 @@ HTML
             </section>
 
             <section class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200">
-                <div class="flex justify-between items-center mb-3 pb-1 border-b border-slate-100">
+                <div class="flex justify-between items-center mb-4 pb-1 border-b border-slate-100">
                     <h3 class="text-xs font-black text-slate-700 uppercase tracking-wider">📦 THÊM ĐỒ UỐNG / PHỤ KIỆN CHO: <span id="menu-current-target" class="text-teal-600 font-black bg-teal-50 px-2 py-0.5 rounded ml-1">SÂN 1</span></h3>
-                    <span class="text-[10px] text-slate-400 font-medium italic">Bấm chọn đối tượng nhận trên thanh Header đầu trang</span>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <h3 class="text-xs font-black text-slate-500 mb-2 flex items-center gap-1">🥤 NƯỚC UỐNG & THỰC PHẨM</h3>
-                        <div id="menu-drinks" class="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-[260px] overflow-y-auto pr-1">
+                        <h3 class="text-xs font-black text-teal-700 mb-2.5 pb-1 border-b border-dashed border-slate-200 flex items-center gap-1">🥤 NƯỚC UỐNG & THỰC PHẨM</h3>
+                        <div id="menu-drinks" class="grid grid-cols-2 sm:grid-cols-3 gap-2 md:max-h-[300px] md:overflow-y-auto pr-0 md:pr-1">
                             </div>
                     </div>
                     <div>
-                        <h3 class="text-xs font-black text-slate-500 mb-2 flex items-center gap-1">🏸 PHỤ KIỆN THỂ THAO</h3>
-                        <div id="menu-gear" class="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-[260px] overflow-y-auto pr-1">
+                        <h3 class="text-xs font-black text-amber-700 mb-2.5 pb-1 border-b border-dashed border-slate-200 flex items-center gap-1">🏸 PHỤ KIỆN THỂ THAO</h3>
+                        <div id="menu-gear" class="grid grid-cols-2 sm:grid-cols-3 gap-2 md:max-h-[300px] md:overflow-y-auto pr-0 md:pr-1">
                             </div>
                     </div>
                 </div>
@@ -247,7 +246,7 @@ HTML
                         <p id="stat-day-expense" class="text-lg font-mono font-black text-red-400 mt-1">0đ</p>
                     </div>
                     <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center col-span-2 md:col-span-1 bg-gradient-to-b from-slate-950 to-emerald-950/20">
-                        <p class="text-[10px] font-black text-emerald-400 uppercase">Thuần Sau Chi (Quỹ thực tế)</p>
+                        <p class="text-[10px] font-black text-emerald-400 uppercase">Thuần Sau Chi</p>
                         <p id="stat-day-net" class="text-lg font-mono font-black text-emerald-400 mt-1">0đ</p>
                     </div>
                 </div>
@@ -475,7 +474,6 @@ HTML
             court.discountType = document.getElementById('discount-select').value;
             court.ownerDiscount = parseFloat(document.getElementById('owner-discount').value) || 0;
             court.bankUnits = parseFloat(document.getElementById('bank-units').value) || 0;
-            // Tiền mặt sẽ tự động tính dựa trên tổng tiền trừ chuyển khoản
         }
 
         function triggerToast(message) {
@@ -577,14 +575,14 @@ HTML
 
             globalInventory.forEach(prod => {
                 const card = document.createElement('div');
-                card.className = "bg-white border border-slate-200 rounded-lg p-1 text-center flex flex-col justify-between shadow-sm relative";
+                card.className = "bg-white border border-slate-200 rounded-lg p-1.5 text-center flex flex-col justify-between shadow-sm relative";
                 card.innerHTML = `
                     <div class="truncate font-bold text-slate-700 text-[11px]" title="${prod.name}">${prod.name}</div>
                     <div class="text-teal-600 font-black text-xs my-0.5">${prod.price}k</div>
                     <div class="flex items-center justify-between bg-white border border-slate-300 rounded shadow-inner overflow-hidden max-w-[90px] mx-auto">
-                        <button onclick="updateItemQty('${prod.id}', -1)" class="w-6 font-black bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs py-0.5">-</button>
+                        <button onclick="updateItemQty('${prod.id}', -1)" class="w-6 font-black bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs py-1">-</button>
                         <span id="qty-view-${prod.id}" class="flex-1 font-mono font-black text-slate-800 text-xs">0</span>
-                        <button id="btn-plus-${prod.id}" onclick="updateItemQty('${prod.id}', 1)" class="w-6 font-black bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs py-0.5">+</button>
+                        <button id="btn-plus-${prod.id}" onclick="updateItemQty('${prod.id}', 1)" class="w-6 font-black bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs py-1">+</button>
                     </div>
                     <div class="text-[8px] text-slate-400 font-semibold mt-1">Tồn: <span id="stock-view-${prod.id}">${prod.qty}</span></div>
                 `;
@@ -762,7 +760,6 @@ HTML
 
             document.getElementById('total-fee').innerText = `${formatNum(finalTotal)}k`;
 
-            // LOGIC MỚI: Tiền mặt = Tổng phải thu - Chuyển khoản
             let calculatedCash = finalTotal - court.bankUnits;
             if (calculatedCash < 0) calculatedCash = 0;
             court.cashUnits = Math.round(calculatedCash * 100) / 100;
@@ -799,13 +796,12 @@ HTML
 
         function checkoutQuickSale() {
             const court = courtsData['quick'];
-            
             if (Object.keys(court.items).length === 0) {
                 alert("⚠️ Giỏ hàng trống! Vui lòng chọn nước uống cho khách vãng lai.");
                 return;
             }
 
-            calculateAll(); // Đảm bảo tính toán số tiền mặt/chuyển khoản chuẩn xác lần cuối
+            calculateAll(); 
 
             let drinksFee = 0;
             let gearFee = 0;
@@ -814,11 +810,9 @@ HTML
             for (let prodId in court.items) {
                 const qty = court.items[prodId];
                 const prod = globalInventory.find(p => p.id === prodId);
-                if (prod) {
-                    if (prod.qty < qty) {
-                        alert(`❌ LỖI HỆ THỐNG: Mặt hàng [${prod.name}] không đủ tồn kho để chốt đơn! (Hiện còn: ${prod.qty}).`);
-                        return;
-                    }
+                if (prod && prod.qty < qty) {
+                    alert(`❌ LỖI HỆ THỐNG: Mặt hàng [${prod.name}] không đủ tồn kho để chốt đơn! (Hiện còn: ${prod.qty}).`);
+                    return;
                 }
             }
 
@@ -884,7 +878,7 @@ HTML
                 return;
             }
 
-            calculateAll(); // Đảm bảo đồng bộ tiền mặt và chuyển khoán trước khi xuất dữ liệu
+            calculateAll(); 
 
             for (let prodId in court.items) {
                 const qty = court.items[prodId];
@@ -938,7 +932,6 @@ HTML
             };
 
             paymentHistory.push(billRecord);
-            
             localStorage.setItem('pab_history', JSON.stringify(paymentHistory));
             localStorage.setItem('pab_inventory', JSON.stringify(globalInventory));
 
@@ -1061,7 +1054,6 @@ HTML
 
         function deleteBill(billId, event) {
             event.stopPropagation(); 
-            
             const enteredPassword = prompt("🔐 Nhập mật khẩu chủ sân để XÓA đơn hàng này:");
             if (enteredPassword === null) return; 
 

@@ -4,13 +4,16 @@ HTML
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Phúc An Badminton Club - Hệ Thống Cloud v3.3</title>
+    <title>Phúc An Badminton Club - Cloud POS v3.4</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f0f4f8; }
-        .edit-input { background: #fff; border: 1px solid #93c5fd; font-weight: bold; text-align: center; width: 60px; border-radius: 4px; padding: 2px; }
-        .edit-input:focus { outline: 2px solid #2563eb; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; } /* Nền tối dịu mắt */
+        .edit-input { background: #1e293b; border: 1px solid #38bdf8; font-weight: bold; text-align: center; width: 60px; border-radius: 4px; padding: 2px; color: #f8fafc; }
+        .edit-input:focus { outline: 2px solid #0284c7; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
     </style>
 
     <script type="module">
@@ -39,89 +42,90 @@ HTML
         window.onload = () => initSystem();
     </script>
 </head>
-<body class="text-slate-800 antialiased">
+<body class="text-slate-200 antialiased bg-slate-950">
 
-    <header class="bg-gradient-to-r from-blue-900 via-sky-900 to-slate-900 text-white shadow-md sticky top-0 z-40 border-b border-sky-500/20">
+    <header class="bg-slate-900 border-b border-slate-800 shadow-xl sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 py-2 flex flex-wrap justify-between items-center gap-3">
             <div class="flex items-center gap-3">
-                <div class="bg-white p-1 rounded-full shadow-inner border border-sky-400">
-                    <img src="https://lh3.googleusercontent.com/d/1XW_e-fVz7NfI9UuE2vP2z89f8gV5wT7Y" alt="Phúc An Badminton Logo" class="w-12 h-12 object-contain rounded-full">
+                <div class="bg-slate-950 p-0.5 rounded-xl border border-sky-500/30 shadow-md">
+                    <img src="https://lh3.googleusercontent.com/d/1XW_e-fVz7NfI9UuE2vP2z89f8gV5wT7Y" alt="Phúc An Badminton Logo" class="w-12 h-12 object-contain rounded-lg">
                 </div>
                 <div>
-                    <h1 class="text-base sm:text-lg font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-blue-200">PHÚC AN BADMINTON</h1>
-                    <p class="text-[10px] text-sky-300 font-bold uppercase tracking-wider">Hệ thống Cloud POS v3.3 — Đồng bộ thương hiệu</p>
+                    <h1 class="text-base sm:text-lg font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-blue-400 to-white">PHÚC AN BADMINTON</h1>
+                    <p class="text-[10px] text-sky-400 font-bold uppercase tracking-widest">Hệ thống Cloud POS v3.4 — Giao diện Dark-Mode</p>
                 </div>
             </div>
             
-            <div class="flex bg-slate-950/50 p-1.5 rounded-xl border border-sky-500/20 w-full sm:w-auto gap-1">
-                <button id="btn-court-1" onclick="switchCourt(1)" class="px-5 py-1.5 rounded-lg font-bold text-xs transition shadow-sm bg-gradient-to-r from-blue-600 to-sky-600 text-white border border-blue-400/20">SÂN 1</button>
-                <button id="btn-court-2" onclick="switchCourt(2)" class="px-5 py-1.5 rounded-lg font-bold text-xs transition text-sky-200 hover:bg-sky-800/40">SÂN 2</button>
-                <button id="btn-court-quick" onclick="switchCourt('quick')" class="px-5 py-1.5 rounded-lg font-bold text-xs transition text-rose-300 hover:bg-rose-950/40">🛒 BÁN LẺ VÃNG LAI</button>
+            <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800 gap-1 w-full sm:w-auto">
+                <button id="btn-court-1" onclick="switchCourt(1)" class="px-5 py-1.5 rounded-lg font-bold text-xs transition bg-sky-600 text-white shadow-md">SÂN 1</button>
+                <button id="btn-court-2" onclick="switchCourt(2)" class="px-5 py-1.5 rounded-lg font-bold text-xs transition text-slate-400 hover:bg-slate-900">SÂN 2</button>
+                <button id="btn-court-quick" onclick="switchCourt('quick')" class="px-4 py-1.5 rounded-lg font-bold text-xs transition text-rose-400 hover:bg-rose-950/30">🛒 BÁN LẺ VÃNG LAI</button>
             </div>
         </div>
     </header>
 
-    <div id="toast-success" class="fixed top-20 right-4 z-50 bg-blue-600 text-white font-bold px-4 py-2 rounded-xl shadow-lg border border-blue-400 flex items-center gap-2 transition duration-300 opacity-0 scale-90 pointer-events-none text-xs">
+    <div id="toast-success" class="fixed top-20 right-4 z-50 bg-sky-600 text-white font-bold px-4 py-2 rounded-xl shadow-2xl border border-sky-400 flex items-center gap-2 transition duration-300 opacity-0 scale-90 pointer-events-none text-xs">
         <span>⚡</span> <span id="toast-msg">Thành công!</span>
     </div>
 
     <main class="max-w-7xl mx-auto p-3 grid grid-cols-1 lg:grid-cols-12 gap-3">
+        
         <div class="lg:col-span-8 space-y-3">
-            <section id="time-config-section" class="bg-white rounded-xl p-3.5 shadow-sm border border-slate-200">
-                <div class="flex justify-between items-center mb-2.5 pb-2 border-b border-slate-100">
-                    <h2 class="text-xs font-bold text-slate-700 flex items-center gap-1.5 uppercase tracking-wider">⏱️ Cấu hình thời gian chơi</h2>
-                    <span id="live-status" class="text-[9px] text-blue-700 font-bold bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">Sẵn Sàng</span>
+            <section id="time-config-section" class="bg-slate-900 rounded-xl p-3.5 border border-slate-800 shadow-sm">
+                <div class="flex justify-between items-center mb-2.5 pb-2 border-b border-slate-800">
+                    <h2 class="text-xs font-bold text-slate-400 flex items-center gap-1.5 uppercase tracking-wider">⏱️ Cấu hình thời gian chơi</h2>
+                    <span id="live-status" class="text-[9px] text-sky-400 font-bold bg-sky-950 px-1.5 py-0.5 rounded border border-sky-900/50">Sẵn Sàng</span>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 mb-1">Tên khách hàng</label>
-                        <input id="customer-name" type="text" placeholder="Nhập tên khách..." oninput="calculateAll()" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-slate-800 focus:outline-blue-500">
+                        <input id="customer-name" type="text" placeholder="Khách lẻ..." oninput="calculateAll()" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-slate-200 focus:outline-none focus:border-sky-500">
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 mb-1">Loại ngày áp dụng</label>
-                        <select id="day-type" onchange="onDayTypeChange()" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-bold text-slate-800 focus:outline-blue-500">
+                        <select id="day-type" onchange="onDayTypeChange()" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2 py-1.5 text-xs font-bold text-slate-200 focus:outline-none focus:border-sky-500">
                             <option value="weekday">Ngày thường (T2 - T6)</option>
                             <option value="weekend">Cuối tuần (T7 & CN)</option>
                         </select>
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 mb-1">Chương trình ưu đãi</label>
-                        <select id="discount-select" onchange="calculateAll()" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-bold text-slate-800 focus:outline-blue-500">
+                        <select id="discount-select" onchange="calculateAll()" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2 py-1.5 text-xs font-bold text-slate-200 focus:outline-none focus:border-sky-500">
                             <option value="none">Không giảm giá</option>
-                            <option value="student">Học sinh / Sinh viên (39k/h - Khung 5h-17h T2-T6)</option>
+                            <option value="student">Học sinh / Sinh viên (39k/h)</option>
                             <option value="fixed">Khách cố định (-15% tiền sân)</option>
                         </select>
                     </div>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2.5 pt-2.5 border-t border-dashed border-slate-100">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2.5 pt-2.5 border-t border-dashed border-slate-800">
                     <div class="grid grid-cols-2 gap-2">
                         <div>
                             <label class="block text-[10px] font-bold text-slate-500 mb-0.5">⏰ Giờ vào</label>
-                            <input id="start-time" type="time" oninput="calculateAll()" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800 focus:outline-blue-500">
+                            <input id="start-time" type="time" oninput="calculateAll()" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2 py-1 text-xs font-bold text-slate-200 focus:border-sky-500">
                         </div>
                         <div>
                             <label class="block text-[10px] font-bold text-slate-500 mb-0.5">🏁 Giờ ra</label>
-                            <input id="end-time" type="time" oninput="calculateAll()" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800 focus:outline-blue-500">
+                            <input id="end-time" type="time" oninput="calculateAll()" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2 py-1 text-xs font-bold text-slate-200 focus:border-sky-500">
                         </div>
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-slate-500 mb-1">⏰ Khung giờ gốc sân</label>
+                        <label class="block text-[10px] font-bold text-slate-500 mb-1">⏰ Chọn nhanh khung giờ</label>
                         <div id="shortcut-container" class="grid grid-cols-3 gap-1"></div>
                     </div>
                 </div>
             </section>
 
-            <section class="bg-white rounded-xl p-3.5 shadow-sm border border-slate-200">
-                <div class="mb-3 pb-1.5 border-b border-slate-100 flex justify-between items-center">
-                    <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">📦 Gọi Đồ Cho: <span id="menu-current-target" class="text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded ml-1">SÂN 1</span></h3>
+            <section class="bg-slate-900 rounded-xl p-3.5 border border-slate-800 shadow-sm">
+                <div class="mb-3 pb-1.5 border-b border-slate-800 flex justify-between items-center">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">📦 Gọi Đồ Cho: <span id="menu-current-target" class="text-sky-400 font-bold bg-sky-950 px-2 py-0.5 rounded ml-1 border border-sky-900/50">SÂN 1</span></h3>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <h3 class="text-[11px] font-bold text-blue-700 mb-2 pb-1 border-b border-dashed border-slate-100">🥤 ĐỒ UỐNG & ĐỒ ĂN</h3>
+                        <h3 class="text-[11px] font-bold text-sky-400 mb-2 pb-1 border-b border-dashed border-slate-800">🥤 ĐỒ UỐNG & ĐỒ ĂN</h3>
                         <div id="menu-drinks" class="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-[220px] overflow-y-auto pr-1"></div>
                     </div>
                     <div>
-                        <h3 class="text-[11px] font-bold text-rose-700 mb-2 pb-1 border-b border-dashed border-slate-100">🏸 PHỤ KIỆN & CẦU ĐẤU</h3>
+                        <h3 class="text-[11px] font-bold text-rose-400 mb-2 pb-1 border-b border-dashed border-slate-800">🏸 PHỤ KIỆN & CẦU ĐẤU</h3>
                         <div id="menu-gear" class="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-[220px] overflow-y-auto pr-1"></div>
                     </div>
                 </div>
@@ -129,72 +133,72 @@ HTML
         </div>
 
         <div class="lg:col-span-4 space-y-3">
-            <section id="section-quick-sale" class="bg-slate-900 border border-rose-900/30 rounded-xl p-3.5 shadow-sm text-white hidden">
-                <div class="flex justify-between items-center mb-2 border-b border-rose-900/40 pb-1.5">
-                    <span class="font-bold text-xs text-rose-400 tracking-wider">🛒 GIỎ HÀNG BÁN LẺ KHÁCH VÃNG LAI</span>
+            <section id="section-quick-sale" class="bg-slate-900 border border-rose-950 rounded-xl p-3.5 shadow-xl text-slate-200 hidden">
+                <div class="flex justify-between items-center mb-2 border-b border-slate-800 pb-1.5">
+                    <span class="font-bold text-xs text-rose-400 tracking-wider">🛒 GIỎ HÀNG KHÁCH VÃNG LAI</span>
                 </div>
-                <div class="text-xs space-y-1.5 mb-2 max-h-[100px] overflow-y-auto bg-slate-950 p-2 rounded border border-slate-800">
-                    <div id="quick-items-list" class="space-y-1 text-rose-100"></div>
+                <div class="text-xs space-y-1.5 mb-2 max-h-[100px] overflow-y-auto bg-slate-950 p-2 rounded border border-slate-850">
+                    <div id="quick-items-list" class="space-y-1 text-rose-100/80"></div>
                 </div>
-                <div class="flex justify-between items-center bg-slate-950 p-2 rounded mb-2 border border-slate-800">
-                    <span class="text-[10px] font-bold text-rose-300">TỔNG TIỀN HÀNG:</span>
+                <div class="flex justify-between items-center bg-slate-950 p-2 rounded mb-2 border border-slate-850">
+                    <span class="text-[10px] font-bold text-slate-400">TỔNG TIỀN HÀNG:</span>
                     <span id="quick-total-fee" class="text-base font-bold text-rose-400">0đ</span>
                 </div>
                 <div class="grid grid-cols-1 gap-1">
-                    <label class="text-[10px] font-bold text-sky-300">Khách Chuyển Khoản (k)</label>
-                    <input id="quick-bank" type="number" oninput="calculateAll()" class="w-full bg-slate-950 border border-slate-700 rounded px-2.5 py-1 text-xs font-bold text-sky-300 text-center focus:outline-none">
+                    <label class="text-[10px] font-bold text-sky-400">Khách Chuyển Khoản (k)</label>
+                    <input id="quick-bank" type="number" oninput="calculateAll()" class="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1 text-xs font-bold text-sky-400 text-center focus:outline-none">
                 </div>
                 <div class="grid grid-cols-2 gap-2 mt-3">
-                    <button onclick="resetQuickSaleCart()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 py-1 rounded-lg text-xs font-medium transition">Xóa</button>
-                    <button onclick="checkoutQuickSale()" class="bg-gradient-to-r from-rose-600 to-blue-600 hover:from-rose-700 hover:to-blue-700 text-white font-bold py-1 rounded-lg text-xs shadow transition">⚡ CHỐT ĐƠN VÃNG LAI</button>
+                    <button onclick="resetQuickSaleCart()" class="bg-slate-800 hover:bg-slate-700 text-slate-400 py-1 rounded-lg text-xs font-medium transition">Xóa</button>
+                    <button onclick="checkoutQuickSale()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold py-1 rounded-lg text-xs shadow transition">⚡ CHỐT ĐƠN VÃNG LAI</button>
                 </div>
             </section>
 
-            <section id="section-court-bill" class="bg-slate-900 text-white rounded-xl p-3.5 shadow-md flex flex-col justify-between sticky top-20">
+            <section id="section-court-bill" class="bg-slate-900 text-slate-200 rounded-xl p-3.5 border border-slate-800 shadow-xl flex flex-col justify-between sticky top-20">
                 <div>
                     <div class="flex justify-between items-center mb-2 pb-1.5 border-b border-slate-800">
-                        <span class="font-bold text-xs text-slate-400 tracking-wider">HÓA ĐƠN ĐƠN SÂN</span>
-                        <span class="text-xs font-bold bg-blue-500/10 text-sky-400 px-2 rounded">SÂN <span id="bill-court-title">1</span></span>
+                        <span class="font-bold text-xs text-slate-500 tracking-wider">CHI TIẾT THANH TOÁN</span>
+                        <span class="text-xs font-bold bg-sky-950 text-sky-400 px-2.5 py-0.5 rounded border border-sky-900/50">SÂN <span id="bill-court-title">1</span></span>
                     </div>
                     <div class="space-y-2 text-xs max-h-[160px] overflow-y-auto pr-1">
-                        <div class="flex justify-between bg-slate-950 p-2 rounded border border-slate-800">
+                        <div class="flex justify-between bg-slate-950 p-2 rounded border border-slate-850">
                             <div>
                                 <p class="font-bold text-slate-200" id="bill-customer-name">Khách lẻ</p>
-                                <p class="text-[10px] text-slate-400" id="bill-time-range">00:00 → 00:00 (0 phút)</p>
+                                <p class="text-[10px] text-slate-500" id="bill-time-range">00:00 → 00:00 (0 phút)</p>
                             </div>
                             <div class="text-right">
-                                <p class="line-through text-slate-600 text-[10px]" id="court-fee-original">0đ</p>
+                                <p class="line-through text-slate-700 text-[10px]" id="court-fee-original">0đ</p>
                                 <p class="font-bold text-sky-400" id="court-fee-display">0đ</p>
                             </div>
                         </div>
-                        <div class="flex justify-between text-[10px] text-slate-400 px-1">
+                        <div class="flex justify-between text-[10px] text-slate-500 px-1">
                             <span>Ưu đãi áp dụng:</span>
                             <span class="font-bold text-rose-400" id="discount-applied">Không</span>
                         </div>
-                        <div class="bg-slate-950 p-2 rounded border border-slate-800/60 space-y-1">
-                            <div class="flex justify-between font-bold text-slate-400 border-b border-slate-800/80 pb-1 text-[10px]">
-                                <span>🥤 ĐỒ UỐNG / THỰC PHẨM</span>
-                                <span id="drinks-fee-display" class="text-white">0đ</span>
+                        <div class="bg-slate-950 p-2 rounded border border-slate-850 space-y-1">
+                            <div class="flex justify-between font-bold text-slate-400 border-b border-slate-800/60 pb-1 text-[10px]">
+                                <span>🥤 ĐỒ UỐNG / MÓN ĂN</span>
+                                <span id="drinks-fee-display" class="text-slate-200">0đ</span>
                             </div>
-                            <div id="drinks-list-note" class="space-y-0.5 text-slate-400 text-[10px] font-light"></div>
+                            <div id="drinks-list-note" class="space-y-0.5 text-slate-500 text-[10px] font-light"></div>
                         </div>
-                        <div class="bg-slate-950 p-2 rounded border border-slate-800/60 space-y-1">
-                            <div class="flex justify-between font-bold text-slate-400 border-b border-slate-800/80 pb-1 text-[10px]">
+                        <div class="bg-slate-950 p-2 rounded border border-slate-850 space-y-1">
+                            <div class="flex justify-between font-bold text-slate-400 border-b border-slate-800/60 pb-1 text-[10px]">
                                 <span>🏸 PHỤ KIỆN / CẦU ĐẤU</span>
-                                <span id="gear-fee-display" class="text-white">0đ</span>
+                                <span id="gear-fee-display" class="text-slate-200">0đ</span>
                             </div>
-                            <div id="gear-list-note" class="space-y-0.5 text-slate-400 text-[10px] font-light"></div>
+                            <div id="gear-list-note" class="space-y-0.5 text-slate-500 text-[10px] font-light"></div>
                         </div>
                     </div>
                     <div class="mt-2 pt-2 border-t border-dashed border-slate-800">
                         <div class="grid grid-cols-2 gap-2">
                             <div>
                                 <label class="block text-[10px] text-rose-400 mb-0.5">Giảm thêm (k)</label>
-                                <input id="owner-discount" type="number" placeholder="0" oninput="calculateAll()" class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-0.5 text-xs font-bold text-rose-400 text-center focus:outline-none">
+                                <input id="owner-discount" type="number" placeholder="0" oninput="calculateAll()" class="w-full bg-slate-950 border border-slate-800 rounded px-2 py-0.5 text-xs font-bold text-rose-400 text-center focus:outline-none">
                             </div>
                             <div>
                                 <label class="block text-[10px] text-sky-400 mb-0.5">Khách Chuyển Khoản (k)</label>
-                                <input id="bank-units" type="number" placeholder="0" oninput="calculateAll()" class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-0.5 text-xs font-bold text-sky-400 text-center focus:outline-none">
+                                <input id="bank-units" type="number" placeholder="0" oninput="calculateAll()" class="w-full bg-slate-950 border border-slate-800 rounded px-2 py-0.5 text-xs font-bold text-sky-400 text-center focus:outline-none">
                             </div>
                         </div>
                     </div>
@@ -203,15 +207,15 @@ HTML
                 <div class="mt-3 bg-slate-950 p-2.5 rounded-xl border border-slate-800">
                     <div class="flex justify-between items-center">
                         <span class="text-[11px] font-bold text-slate-400">TỔNG PHẢI THU:</span>
-                        <span class="text-lg font-bold text-blue-400" id="total-fee">0đ</span>
+                        <span class="text-lg font-bold text-sky-400" id="total-fee">0đ</span>
                     </div>
-                    <div class="grid grid-cols-2 gap-2 text-[10px] text-slate-400 mt-1.5 bg-slate-900 p-1.5 rounded border border-slate-800">
+                    <div class="grid grid-cols-2 gap-2 text-[10px] text-slate-500 mt-1.5 bg-slate-900 p-1.5 rounded border border-slate-800">
                         <div>💵 Tiền mặt: <span id="text-cash-real" class="font-bold text-rose-400 block text-xs">0đ</span></div>
                         <div class="text-right">💳 Chuyển khoản: <span id="text-bank-real" class="font-bold text-sky-400 block text-xs">0đ</span></div>
                     </div>
                     <div class="grid grid-cols-3 gap-2 mt-3">
-                        <button onclick="resetCurrentCourt()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 py-1.5 rounded-lg text-xs transition">Làm mới</button>
-                        <button onclick="saveAndCheckout()" class="col-span-2 bg-gradient-to-r from-blue-600 to-sky-600 hover:from-blue-700 hover:to-sky-700 text-white font-bold py-1.5 rounded-lg text-xs transition shadow-sm">XUẤT ĐƠN & TRỪ TỒN KHO</button>
+                        <button onclick="resetCurrentCourt()" class="bg-slate-800 hover:bg-slate-700 text-slate-400 py-1.5 rounded-lg text-xs transition">Làm mới</button>
+                        <button onclick="saveAndCheckout()" class="col-span-2 bg-sky-600 hover:bg-sky-700 text-white font-bold py-1.5 rounded-lg text-xs transition shadow-md">XUẤT ĐƠN & ĐỒNG BỘ KHO</button>
                     </div>
                 </div>
             </section>
@@ -219,45 +223,45 @@ HTML
     </main>
 
     <section class="max-w-7xl mx-auto px-3 pb-12 mt-1">
-        <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-slate-200">
-            <div class="bg-slate-50 px-4 py-2 flex flex-wrap justify-between items-center gap-2 border-b border-slate-200">
+        <div class="bg-slate-900 rounded-xl shadow-xl overflow-hidden border border-slate-800">
+            <div class="bg-slate-950 px-4 py-2 flex flex-wrap justify-between items-center gap-2 border-b border-slate-800">
                 <div class="flex gap-4">
-                    <button id="tab-btn-history" onclick="switchTab('history')" class="py-1.5 text-xs font-bold border-b-2 border-blue-600 text-blue-600 transition">📊 BÁO CÁO DOANH THU</button>
-                    <button id="tab-btn-inventory" onclick="switchTab('inventory')" class="py-1.5 text-xs font-bold text-slate-400 hover:text-slate-700 transition">📦 QUẢN LÝ KHO TỒN</button>
+                    <button id="tab-btn-history" onclick="switchTab('history')" class="py-1.5 text-xs font-bold border-b-2 border-sky-400 text-sky-400 transition">📊 BÁO CÁO DOANH THU</button>
+                    <button id="tab-btn-inventory" onclick="switchTab('inventory')" class="py-1.5 text-xs font-bold text-slate-500 hover:text-slate-300 transition">📦 QUẢN LÝ KHO TỒN v3.1</button>
                 </div>
                 <div class="flex items-center gap-1.5 text-xs">
                     <span class="text-slate-500 font-medium">Chọn ngày:</span>
-                    <input id="filter-date" type="date" onchange="renderHistory()" class="bg-white border border-slate-300 rounded px-2 py-0.5 font-bold text-slate-700 focus:outline-none">
+                    <input id="filter-date" type="date" onchange="renderHistory()" class="bg-slate-900 border border-slate-800 text-slate-300 rounded px-2 py-0.5 font-bold focus:outline-none">
                 </div>
             </div>
 
             <div id="tab-content-history" class="p-3.5 space-y-3">
                 <div class="grid grid-cols-2 md:grid-cols-5 gap-2.5">
-                    <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200 text-center">
+                    <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-850 text-center">
                         <p class="text-[9px] font-bold text-slate-500 uppercase">Tổng Hóa Đơn</p>
-                        <p id="stat-day-total" class="text-base font-bold text-slate-800 mt-0.5">0đ</p>
+                        <p id="stat-day-total" class="text-base font-bold text-slate-200 mt-0.5">0đ</p>
                     </div>
-                    <div class="bg-rose-50/50 p-2.5 rounded-lg border border-rose-200 text-center">
-                        <p class="text-[9px] font-bold text-rose-700 uppercase">💵 Tiền Mặt</p>
-                        <p id="stat-day-cash" class="text-base font-bold text-rose-700 mt-0.5">0đ</p>
+                    <div class="bg-rose-950/20 p-2.5 rounded-lg border border-rose-900/30 text-center">
+                        <p class="text-[9px] font-bold text-rose-400 uppercase">💵 Tiền Mặt</p>
+                        <p id="stat-day-cash" class="text-base font-bold text-rose-400 mt-0.5">0đ</p>
                     </div>
-                    <div class="bg-sky-50/50 p-2.5 rounded-lg border border-sky-200 text-center">
-                        <p class="text-[9px] font-bold text-sky-700 uppercase">💳 Chuyển Khoản</p>
-                        <p id="stat-day-bank" class="text-base font-bold text-sky-700 mt-0.5">0đ</p>
+                    <div class="bg-sky-950/20 p-2.5 rounded-lg border border-sky-900/30 text-center">
+                        <p class="text-[9px] font-bold text-sky-400 uppercase">💳 Chuyển Khoản</p>
+                        <p id="stat-day-bank" class="text-base font-bold text-sky-400 mt-0.5">0đ</p>
                     </div>
-                    <div class="bg-slate-100 p-2.5 rounded-lg border border-slate-300 text-center">
-                        <p class="text-[9px] font-bold text-slate-600 uppercase">Chi Phí Đã Chi</p>
-                        <p id="stat-day-expense" class="text-base font-bold text-slate-700 mt-0.5">0đ</p>
+                    <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-850 text-center">
+                        <p class="text-[9px] font-bold text-slate-500 uppercase">Chi Phí Đã Chi</p>
+                        <p id="stat-day-expense" class="text-base font-bold text-slate-300 mt-0.5">0đ</p>
                     </div>
-                    <div class="bg-blue-50 p-2.5 rounded-lg border border-blue-200 text-center col-span-2 md:col-span-1">
-                        <p class="text-[9px] font-bold text-blue-700 uppercase">Thuần Sau Chi</p>
-                        <p id="stat-day-net" class="text-base font-bold text-blue-700 mt-0.5">0đ</p>
+                    <div class="bg-sky-950/40 p-2.5 rounded-lg border border-sky-900/60 text-center col-span-2 md:col-span-1">
+                        <p class="text-[9px] font-bold text-sky-400 uppercase">Thuần Sau Chi</p>
+                        <p id="stat-day-net" class="text-base font-bold text-sky-400 mt-0.5">0đ</p>
                     </div>
                 </div>
 
-                <div class="overflow-x-auto border border-slate-200 rounded-lg">
-                    <table class="w-full text-left text-xs text-slate-600 font-medium">
-                        <thead class="bg-slate-50 text-slate-500 font-bold border-b border-slate-200 uppercase tracking-wider text-[10px]">
+                <div class="overflow-x-auto border border-slate-800 rounded-lg">
+                    <table class="w-full text-left text-xs text-slate-400 font-medium">
+                        <thead class="bg-slate-950 text-slate-500 font-bold border-b border-slate-800 uppercase tracking-wider text-[10px]">
                             <tr>
                                 <th class="p-2">Giờ</th>
                                 <th class="p-2">Vị Trí</th>
@@ -265,95 +269,79 @@ HTML
                                 <th class="p-2">Chi Tiết Sân</th>
                                 <th class="p-2 text-right">Tiền Sân</th>
                                 <th class="p-2 text-right">Dịch Vụ</th>
-                                <th class="p-2 text-right text-blue-600">Tổng Thu</th>
-                                <th class="p-2 text-right text-rose-600">Lời Hàng</th>
-                                <th class="p-2 text-left pl-3 text-rose-700">Mặt</th>
-                                <th class="p-2 text-left pl-3 text-sky-700">CK</th>
-                                <th class="p-2 text-center">Hủy</th>
+                                <th class="p-2 text-right text-sky-400">Tổng Thu</th>
+                                <th class="p-2 text-right text-rose-400">Lời Hàng</th>
+                                <th class="p-2 text-left pl-3 text-rose-400">Mặt</th>
+                                <th class="p-2 text-left pl-3 text-sky-400">CK</th>
+                                <th class="p-2 text-center">Xóa</th>
                             </tr>
                         </thead>
-                        <tbody id="history-tbody" class="divide-y divide-slate-100"></tbody>
+                        <tbody id="history-tbody" class="divide-y divide-slate-800/60"></tbody>
                     </table>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
-                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
-                        <h3 class="text-[11px] font-bold text-rose-700 mb-1.5 uppercase">💸 Ghi nhận chi phí phát sinh</h3>
+                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-850">
+                        <h3 class="text-[11px] font-bold text-rose-400 mb-1.5 uppercase">💸 Ghi nhận chi phí phát sinh</h3>
                         <div class="flex gap-1.5">
-                            <input id="exp-add-reason" type="text" placeholder="Lý do chi..." class="flex-1 bg-white border border-slate-300 rounded px-2 py-1 text-xs focus:outline-none">
-                            <input id="exp-add-amount" type="number" placeholder="Tiền (k)" class="w-20 bg-white border border-slate-300 rounded px-2 py-1 text-xs text-center focus:outline-none">
+                            <input id="exp-add-reason" type="text" placeholder="Lý do chi..." class="flex-1 bg-slate-900 border border-slate-800 rounded px-2 py-1 text-xs text-slate-200 focus:outline-none">
+                            <input id="exp-add-amount" type="number" placeholder="k" class="w-16 bg-slate-900 border border-slate-800 rounded px-2 py-1 text-xs text-center text-slate-200 focus:outline-none">
                             <button onclick="addNewExpense()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-3 py-1 rounded text-xs transition">Thêm</button>
                         </div>
                     </div>
-                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-850">
                         <h3 class="text-[11px] font-bold text-slate-500 mb-1.5 uppercase">📋 Danh sách khoản chi</h3>
                         <div id="expense-list-container" class="space-y-1 max-h-[80px] overflow-y-auto text-xs"></div>
                     </div>
                 </div>
             </section>
 
-            <div id="tab-content-inventory" class="p-3.5 space-y-4 hidden">
-                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
-                    <h3 class="text-[11px] font-bold text-blue-800 mb-2 uppercase tracking-wide">➕ Nhập sản phẩm mới vào danh mục kho</h3>
-                    <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
-                        <input id="inv-add-name" type="text" placeholder="Tên sản phẩm..." class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs font-medium focus:outline-blue-500">
-                        <select id="inv-add-type" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs font-bold focus:outline-blue-500">
-                            <option value="drinks">🥤 Đồ uống & Món ăn</option>
-                            <option value="gear">🏸 Phụ kiện thể thao</option>
-                        </select>
-                        <input id="inv-add-qty" type="number" placeholder="SL Quả lẻ/Món" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-center focus:outline-blue-500">
-                        <input id="inv-add-cost" type="number" step="0.1" placeholder="Giá vốn (k)" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-center focus:outline-blue-500">
-                        <input id="inv-add-price" type="number" step="0.1" placeholder="Giá bán (k)" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-center focus:outline-blue-500">
-                    </div>
-                    <button onclick="addNewProductToInventory()" class="mt-2 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 rounded text-xs transition">XÁC NHẬN LƯU SẢN PHẨM MỚI</button>
-                </div>
-
-                <div class="overflow-x-auto border border-slate-200 rounded-lg">
-                    <table class="w-full text-left text-xs text-slate-700 font-medium bg-white">
-                        <thead class="bg-slate-50 text-slate-500 font-bold border-b border-slate-200 uppercase tracking-wider text-[10px]">
+            <div id="tab-content-inventory" class="p-3.5 space-y-3 hidden">
+                <div class="overflow-x-auto border border-slate-800 rounded-lg">
+                    <table class="w-full text-left text-xs text-slate-300 font-medium bg-slate-900">
+                        <thead class="bg-slate-950 text-slate-500 font-bold border-b border-slate-800 uppercase tracking-wider text-[10px]">
                             <tr>
-                                <th class="p-2.5 w-28">Phân Loại</th>
-                                <th class="p-2.5">Tên Mặt Hàng</th>
-                                <th class="p-2.5 text-center w-48">Số Lượng Tồn Kho Thực Tế</th>
-                                <th class="p-2.5 text-center w-28">Giá Vốn (✍️)</th>
-                                <th class="p-2.5 text-center w-28">Giá Bán (✍️)</th>
-                                <th class="p-2.5 text-right w-28 text-rose-700">Chênh Lệch</th>
-                                <th class="p-2.5 text-center w-16">Hành Động</th>
+                                <th class="p-2.5">Sản Phẩm Trong Kho</th>
+                                <th class="p-2.5 text-center w-40">Số Lượng Gốc Quả Lẻ / Cái (✍️)</th>
+                                <th class="p-2.5 text-center w-48">Quy Đổi Hiển Thị Thực Tế</th>
+                                <th class="p-2.5 text-center w-24">Giá Vốn (✍️)</th>
+                                <th class="p-2.5 text-center w-24">Giá Bán (✍️)</th>
+                                <th class="p-2.5 text-right w-24 text-rose-400">Lời Gốc</th>
                             </tr>
                         </thead>
-                        <tbody id="inventory-tbody" class="divide-y divide-slate-100"></tbody>
+                        <tbody id="inventory-tbody" class="divide-y divide-slate-800"></tbody>
                     </table>
                 </div>
-                <p class="text-[10px] text-slate-400 italic">💡 Hướng dẫn: Để sửa đổi Số lượng, Giá Vốn hoặc Giá Bán, anh chỉ cần nhấp chuột thẳng vào con số đó trên bảng, nhập giá mới rồi bấm ra ngoài là hệ thống tự động lưu lên Cloud.</p>
+                <p class="text-[10px] text-slate-500 italic">💡 Mẹo thao tác nhanh v3.1: Anh nhấp trực tiếp chuột vào các ô có ký hiệu (✍️) để thay đổi nhanh Số Lượng, Giá Vốn hoặc Giá Bán. Hệ thống sẽ tự động lưu lên mây Cloud tức thì.</p>
             </div>
         </div>
     </section>
 
-    <div id="bill-detail-modal" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 pointer-events-none transition duration-300">
-        <div class="bg-white text-slate-800 rounded-xl p-4 max-w-sm w-full border border-slate-200 shadow-xl relative">
-            <button onclick="closeModal()" class="absolute top-2.5 right-3 text-slate-400 hover:text-slate-600 font-bold">✕</button>
-            <h3 class="text-sm font-bold text-blue-700 border-b border-slate-100 pb-1.5 mb-2.5 uppercase">📄 Chi tiết đơn hàng</h3>
+    <div id="bill-detail-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 pointer-events-none transition duration-300">
+        <div class="bg-slate-900 text-slate-200 rounded-xl p-4 max-w-sm w-full border border-slate-800 shadow-2xl relative">
+            <button onclick="closeModal()" class="absolute top-2.5 right-3 text-slate-500 hover:text-slate-300 font-bold">✕</button>
+            <h3 class="text-sm font-bold text-sky-400 border-b border-slate-800 pb-1.5 mb-2.5 uppercase">📄 Chi tiết đơn hàng</h3>
             <div class="space-y-2 text-xs font-medium">
-                <div class="flex justify-between"><span class="text-slate-400">Vị trí đơn:</span> <span id="modal-title-sub" class="font-bold"></span></div>
-                <div class="flex justify-between"><span class="text-slate-400">Khách hàng:</span> <span id="modal-customer" class="font-bold"></span></div>
-                <div class="flex justify-between"><span class="text-slate-400">Thời gian:</span> <span id="modal-range" class="text-slate-600"></span></div>
-                <div class="flex justify-between border-b border-slate-100 pb-1.5"><span class="text-slate-400">Tiền sân:</span> <span id="modal-court-fee" class="font-bold text-blue-600"></span></div>
-                <div id="modal-drinks-section" class="bg-slate-50 p-2 rounded border border-slate-200">
-                    <p class="text-[9px] font-bold text-slate-500 mb-1">🥤 ĐỒ UỐNG / ĐỒ ĂN</p>
-                    <div id="modal-drinks-list" class="space-y-0.5 text-[11px] text-slate-600"></div>
+                <div class="flex justify-between"><span class="text-slate-500">Vị trí đơn:</span> <span id="modal-title-sub" class="font-bold text-slate-200"></span></div>
+                <div class="flex justify-between"><span class="text-slate-500">Khách hàng:</span> <span id="modal-customer" class="font-bold text-slate-200"></span></div>
+                <div class="flex justify-between"><span class="text-slate-500">Thời gian:</span> <span id="modal-range" class="text-slate-400"></span></div>
+                <div class="flex justify-between border-b border-slate-800 pb-1.5"><span class="text-slate-500">Tiền sân:</span> <span id="modal-court-fee" class="font-bold text-sky-400"></span></div>
+                <div id="modal-drinks-section" class="bg-slate-950 p-2 rounded border border-slate-850">
+                    <p class="text-[9px] font-bold text-slate-500 mb-1">🥤 ĐỒ UỐNG / MÓN ĂN</p>
+                    <div id="modal-drinks-list" class="space-y-0.5 text-[11px] text-slate-400"></div>
                 </div>
-                <div id="modal-gear-section" class="bg-slate-50 p-2 rounded border border-slate-200">
+                <div id="modal-gear-section" class="bg-slate-950 p-2 rounded border border-slate-850">
                     <p class="text-[9px] font-bold text-slate-500 mb-1">🏸 PHỤ KIỆN / CẦU</p>
-                    <div id="modal-gear-list" class="space-y-0.5 text-[11px] text-slate-600"></div>
+                    <div id="modal-gear-list" class="space-y-0.5 text-[11px] text-slate-400"></div>
                 </div>
-                <div class="bg-slate-50 p-2 rounded-lg border border-slate-200 space-y-1">
-                    <div class="flex justify-between"><span class="text-slate-400">Tổng dịch vụ:</span> <span id="modal-services-fee">0đ</span></div>
-                    <div class="flex justify-between"><span class="text-slate-400">Bớt tiền:</span> <span id="modal-discount-fee" class="text-rose-500">0đ</span></div>
-                    <div class="flex justify-between items-center border-t border-slate-200 pt-1.5 mt-1 font-bold"><span class="text-slate-700">TỔNG THU:</span><span id="modal-total-fee" class="text-base text-blue-600">0đ</span></div>
-                    <div class="flex justify-between text-[10px]"><span class="text-slate-400">Lãi hàng hóa:</span> <span id="modal-profit-fee" class="text-rose-600 font-bold">0đ</span></div>
+                <div class="bg-slate-950 p-2 rounded-lg border border-slate-850 space-y-1">
+                    <div class="flex justify-between"><span class="text-slate-500">Tổng dịch vụ:</span> <span id="modal-services-fee">0đ</span></div>
+                    <div class="flex justify-between"><span class="text-slate-500">Bớt tiền:</span> <span id="modal-discount-fee" class="text-rose-400">0đ</span></div>
+                    <div class="flex justify-between items-center border-t border-slate-800 pt-1.5 mt-1 font-bold"><span class="text-slate-300">TỔNG THU:</span><span id="modal-total-fee" class="text-base text-sky-400">0đ</span></div>
+                    <div class="flex justify-between text-[10px]"><span class="text-slate-500">Lãi hàng hóa:</span> <span id="modal-profit-fee" class="text-rose-400 font-bold">0đ</span></div>
                 </div>
             </div>
-            <button onclick="closeModal()" class="mt-3 w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-1 rounded text-xs transition">Đóng cửa sổ</button>
+            <button onclick="closeModal()" class="mt-3 w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-1 rounded text-xs transition">Đóng cửa sổ</button>
         </div>
     </div>
 
@@ -399,17 +387,15 @@ HTML
                 if (prod.packSize === 12) {
                     const sibling = globalInventory.find(p => p.id === prod.linkTo);
                     if (sibling) {
-                        const tubes = Math.floor(sibling.qty / 12);
-                        const units = sibling.qty % 12;
-                        return `<span class="text-blue-600 font-bold">${tubes}</span> ống <span class="text-rose-600">${units}</span> quả`;
+                        const tubes = Math.floor(sibling.qty / 12); const units = sibling.qty % 12;
+                        return `<span class="text-sky-400 font-bold">${tubes}</span> ống <span class="text-rose-400">${units}</span> quả`;
                     }
                 } else {
-                    const tubes = Math.floor(prod.qty / 12);
-                    const units = prod.qty % 12;
-                    return `<span class="text-blue-600 font-bold">${tubes}</span> ống <span class="text-rose-600">${units}</span> quả`;
+                    const tubes = Math.floor(prod.qty / 12); const units = prod.qty % 12;
+                    return `<span class="text-sky-400 font-bold">${tubes}</span> ống <span class="text-rose-400">${units}</span> quả`;
                 }
             }
-            return `<span class="font-bold text-slate-700">${prod.qty}</span> món`;
+            return `<span class="font-bold text-slate-300">${prod.qty}</span> cái`;
         }
 
         function initSystem() {
@@ -436,8 +422,7 @@ HTML
 
         function saveCurrentCourtState() {
             if (currentCourt === 'quick') return; 
-            const court = courtsData[currentCourt];
-            if (!court) return;
+            const court = courtsData[currentCourt]; if (!court) return;
             court.customerName = document.getElementById('customer-name').value;
             court.dayType = document.getElementById('day-type').value;
             court.startTime = document.getElementById('start-time').value;
@@ -448,26 +433,22 @@ HTML
         }
 
         function triggerToast(message) {
-            const toast = document.getElementById('toast-success');
-            document.getElementById('toast-msg').innerText = message;
-            toast.classList.remove('opacity-0', 'scale-90', 'pointer-events-none');
-            toast.classList.add('opacity-100', 'scale-100');
+            const toast = document.getElementById('toast-success'); document.getElementById('toast-msg').innerText = message;
+            toast.classList.remove('opacity-0', 'scale-90', 'pointer-events-none'); toast.classList.add('opacity-100', 'scale-100');
             setTimeout(() => {
-                toast.classList.remove('opacity-100', 'scale-100');
-                toast.classList.add('opacity-0', 'scale-90', 'pointer-events-none');
+                toast.classList.remove('opacity-100', 'scale-100'); toast.classList.add('opacity-0', 'scale-90', 'pointer-events-none');
             }, 2000);
         }
 
         function switchCourt(courtNum) {
-            saveCurrentCourtState();
-            currentCourt = courtNum;
+            saveCurrentCourtState(); currentCourt = courtNum;
 
             ['1', '2', 'quick'].forEach(id => {
                 const btn = document.getElementById(`btn-court-${id}`);
                 if (id === courtNum.toString()) {
-                    btn.className = id === 'quick' ? "px-5 py-1.5 rounded-lg font-bold text-xs transition shadow-sm bg-gradient-to-r from-rose-600 to-rose-700 text-white border border-rose-400/20" : "px-5 py-1.5 rounded-lg font-bold text-xs transition shadow-sm bg-gradient-to-r from-blue-600 to-sky-600 text-white border border-blue-400/20";
+                    btn.className = id === 'quick' ? "px-5 py-1.5 rounded-lg font-bold text-xs transition bg-rose-600 text-white shadow-md" : "px-5 py-1.5 rounded-lg font-bold text-xs transition bg-sky-600 text-white shadow-md";
                 } else {
-                    btn.className = id === 'quick' ? "px-5 py-1.5 rounded-lg font-bold text-xs transition text-rose-300 hover:bg-rose-950/40" : "px-5 py-1.5 rounded-lg font-bold text-xs transition text-sky-200 hover:bg-sky-800/40";
+                    btn.className = id === 'quick' ? "px-5 py-1.5 rounded-lg font-bold text-xs transition text-rose-400 hover:bg-slate-900" : "px-5 py-1.5 rounded-lg font-bold text-xs transition text-slate-400 hover:bg-slate-900";
                 }
             });
 
@@ -478,12 +459,10 @@ HTML
 
             if (courtNum === 'quick') {
                 timeSection.classList.add('hidden'); courtBillSection.classList.add('hidden'); quickSaleSection.classList.remove('hidden');
-                menuTargetLabel.innerText = "MUA LẺ KHÔNG SÂN";
-                menuTargetLabel.className = "text-rose-700 font-bold bg-rose-50 px-2 py-0.5 rounded ml-1";
+                menuTargetLabel.innerText = "MUA LẺ KHÔNG SÂN"; menuTargetLabel.className = "text-rose-400 font-bold bg-rose-950/40 px-2 py-0.5 rounded ml-1 border border-rose-900/30";
             } else {
                 timeSection.classList.remove('hidden'); courtBillSection.classList.remove('hidden'); quickSaleSection.classList.add('hidden');
-                menuTargetLabel.innerText = "SÂN " + courtNum;
-                menuTargetLabel.className = "text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded ml-1";
+                menuTargetLabel.innerText = "SÂN " + courtNum; menuTargetLabel.className = "text-sky-400 font-bold bg-sky-950 px-2 py-0.5 rounded ml-1 border border-sky-900/50";
                 document.getElementById('bill-court-title').innerText = courtNum;
                 
                 const court = courtsData[currentCourt];
@@ -502,80 +481,66 @@ HTML
         function onDayTypeChange() { saveCurrentCourtState(); renderShortcutTime(); calculateAll(); }
 
         function renderShortcutTime() {
-            const container = document.getElementById('shortcut-container');
-            container.innerHTML = "";
+            const container = document.getElementById('shortcut-container'); container.innerHTML = "";
             const type = document.getElementById('day-type').value;
             
             PRICING[type].forEach(slot => {
                 const btn = document.createElement('button');
-                btn.className = "bg-slate-100 hover:bg-blue-50 border border-slate-300 hover:border-blue-400 text-slate-700 font-medium rounded py-1 px-1 text-[10px] transition text-center";
-                btn.innerHTML = `⏱️ ${slot.start}-${slot.end}<br><span class="text-blue-600 font-bold text-[9px]">(${slot.price}k)</span>`;
+                btn.className = "bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-400 font-bold rounded py-1 px-1 text-[10px] transition text-center";
+                btn.innerHTML = `⏱️ ${slot.start}-${slot.end}<br><span class="text-sky-400 text-[9px]">(${slot.price}k)</span>`;
                 btn.onclick = () => { document.getElementById('start-time').value = slot.start; document.getElementById('end-time').value = slot.end; calculateAll(); };
                 container.appendChild(btn);
             });
         }
 
         function renderMenuDichVu() {
-            const drinksContainer = document.getElementById('menu-drinks');
-            const gearContainer = document.getElementById('menu-gear');
-            if(!drinksContainer || !gearContainer) return;
-            drinksContainer.innerHTML = ""; gearContainer.innerHTML = "";
+            const drinksContainer = document.getElementById('menu-drinks'); const gearContainer = document.getElementById('menu-gear');
+            if(!drinksContainer || !gearContainer) return; drinksContainer.innerHTML = ""; gearContainer.innerHTML = "";
 
             globalInventory.forEach(prod => {
                 const card = document.createElement('div');
-                card.className = "bg-slate-50 border border-slate-200 rounded-lg p-1.5 text-center flex flex-col justify-between shadow-sm relative";
+                card.className = "bg-slate-950 border border-slate-850 rounded-lg p-1.5 text-center flex flex-col justify-between shadow-md relative";
                 
                 let availableQty = prod.qty;
                 if (prod.isShuttlecock && prod.packSize === 12) {
-                    const leSibling = globalInventory.find(p => p.id === prod.linkTo);
-                    if (leSibling) availableQty = Math.floor(leSibling.qty / 12);
+                    const leSibling = globalInventory.find(p => p.id === prod.linkTo); if (leSibling) availableQty = Math.floor(leSibling.qty / 12);
                 }
 
                 card.innerHTML = `
-                    <div class="truncate font-semibold text-slate-700 text-[11px]" title="${prod.name}">${prod.name}</div>
-                    <div class="text-blue-700 font-bold text-xs my-0.5">${prod.price}k</div>
-                    <div class="flex items-center justify-between bg-white border border-slate-300 rounded shadow-sm overflow-hidden max-w-[80px] mx-auto">
-                        <button onclick="updateItemQty('${prod.id}', -1)" class="w-5 font-bold bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs py-0.5">-</button>
-                        <span id="qty-view-${prod.id}" class="flex-1 font-bold text-slate-800 text-xs">0</span>
-                        <button onclick="updateItemQty('${prod.id}', 1)" class="w-5 font-bold bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs py-0.5">+</button>
+                    <div class="truncate font-semibold text-slate-300 text-[11px]" title="${prod.name}">${prod.name}</div>
+                    <div class="text-sky-400 font-black text-xs my-0.5">${prod.price}k</div>
+                    <div class="flex items-center justify-between bg-slate-900 border border-slate-800 rounded shadow-inner max-w-[80px] mx-auto">
+                        <button onclick="updateItemQty('${prod.id}', -1)" class="w-5 font-bold bg-slate-800 hover:bg-slate-750 text-slate-400 text-xs py-0.5">-</button>
+                        <span id="qty-view-${prod.id}" class="flex-1 font-bold text-slate-200 text-xs">0</span>
+                        <button onclick="updateItemQty('${prod.id}', 1)" class="w-5 font-bold bg-slate-800 hover:bg-slate-750 text-slate-400 text-xs py-0.5">+</button>
                     </div>
-                    <div class="text-[9px] text-slate-400 mt-1">Kho: ${formatStockDisplay(prod)}</div>
+                    <div class="text-[9px] text-slate-500 mt-1">Tồn: ${formatStockDisplay(prod)}</div>
                 `;
-                if (prod.type === 'drinks') drinksContainer.appendChild(card);
-                else gearContainer.appendChild(card);
+                if (prod.type === 'drinks') drinksContainer.appendChild(card); else gearContainer.appendChild(card);
             });
         }
 
         function updateItemQty(prodId, delta) {
-            const court = courtsData[currentCourt];
-            const currentQty = court.items[prodId] || 0;
-            const prod = globalInventory.find(p => p.id === prodId);
-            if (!prod) return;
+            const court = courtsData[currentCourt]; const currentQty = court.items[prodId] || 0;
+            const prod = globalInventory.find(p => p.id === prodId); if (!prod) return;
 
             let maxAllowed = prod.qty;
             if (prod.isShuttlecock && prod.packSize === 12) {
-                const leSibling = globalInventory.find(p => p.id === prod.linkTo);
-                if (leSibling) maxAllowed = Math.floor(leSibling.qty / 12);
+                const leSibling = globalInventory.find(p => p.id === prod.linkTo); if (leSibling) maxAllowed = Math.floor(leSibling.qty / 12);
             }
 
-            if (delta > 0 && currentQty >= maxAllowed) { alert(`⚠️ Đám mây báo kho không đủ hàng [${prod.name}]!`); return; }
-
-            const newQty = currentQty + delta;
-            if (newQty <= 0) delete court.items[prodId]; else court.items[prodId] = newQty;
+            if (delta > 0 && currentQty >= maxAllowed) { alert(`⚠️ Kho không đủ sản phẩm [${prod.name}]!`); return; }
+            const newQty = currentQty + delta; if (newQty <= 0) delete court.items[prodId]; else court.items[prodId] = newQty;
             calculateAll();
         }
 
         function calculateCourtFee(dayType, startStr, endStr, discountType) {
             if (!startStr || !endStr) return { minutes: 0, fee: 0 };
-            const [sh, sm] = startStr.split(':').map(Number);
-            const [eh, em] = endStr.split(':').map(Number);
-            let totalMinutes = (eh * 60 + em) - (sh * 60 + sm);
-            if (totalMinutes <= 0) return { minutes: 0, fee: 0 };
+            const [sh, sm] = startStr.split(':').map(Number); const [eh, em] = endStr.split(':').map(Number);
+            let totalMinutes = (eh * 60 + em) - (sh * 60 + sm); if (totalMinutes <= 0) return { minutes: 0, fee: 0 };
 
-            let totalFee = 0;
-            const slots = PRICING[dayType];
-            const studentStartLimit = 5 * 60;
-            const studentEndLimit = 17 * 60;
+            let totalFee = 0; const slots = PRICING[dayType];
+            const studentStartLimit = 5 * 60; const studentEndLimit = 17 * 60;
 
             for (let m = sh * 60 + sm; m < eh * 60 + em; m++) {
                 let pricePerMinute = 0;
@@ -584,8 +549,7 @@ HTML
                 } else {
                     let pricePerHour = 0;
                     for (let slot of slots) {
-                        const [sth, stm] = slot.start.split(':').map(Number);
-                        const [eth, etm] = slot.end.split(':').map(Number);
+                        const [sth, stm] = slot.start.split(':').map(Number); const [eth, etm] = slot.end.split(':').map(Number);
                         if (m >= (sth * 60 + stm) && m < (eth * 60 + etm)) { pricePerHour = slot.price; break; }
                     }
                     if (pricePerHour === 0 && slots.length > 0) pricePerHour = slots[slots.length - 1].price;
@@ -597,8 +561,7 @@ HTML
         }
 
         function calculateAll() {
-            const court = courtsData[currentCourt];
-            if (!court) return;
+            const court = courtsData[currentCourt]; if (!court) return;
 
             if (currentCourt !== 'quick') {
                 court.customerName = document.getElementById('customer-name').value;
@@ -611,29 +574,26 @@ HTML
             }
 
             globalInventory.forEach(prod => {
-                const el = document.getElementById(`qty-view-${prod.id}`);
-                if (el) el.innerText = court.items[prod.id] || 0;
+                const el = document.getElementById(`qty-view-${prod.id}`); if (el) el.innerText = court.items[prod.id] || 0;
             });
 
             if (currentCourt === 'quick') {
                 let totalQuickFee = 0, listHtml = "";
                 Object.keys(court.items).forEach(prodId => {
                     const prod = globalInventory.find(p => p.id === prodId); if (!prod) return;
-                    const qty = court.items[prodId]; const itemTotal = prod.price * qty;
-                    totalQuickFee += itemTotal;
+                    const qty = court.items[prodId]; const itemTotal = prod.price * qty; totalQuickFee += itemTotal;
                     listHtml += `<div class="flex justify-between"><span>• ${prod.name} (x${qty})</span><span>${formatNum(itemTotal)}k</span></div>`;
                 });
                 const qBank = parseFloat(document.getElementById('quick-bank').value) || 0;
                 let qCash = totalQuickFee - qBank; if (qCash < 0) qCash = 0;
                 court.bankUnits = qBank; court.cashUnits = Math.round(qCash * 100) / 100;
-                document.getElementById('quick-items-list').innerHTML = listHtml || `<span class="text-rose-200/50 italic text-[11px]">Giỏ hàng đang trống...</span>`;
+                document.getElementById('quick-items-list').innerHTML = listHtml || `<span class="text-slate-600 italic text-[11px]">Giỏ hàng vãng lai đang trống...</span>`;
                 document.getElementById('quick-total-fee').innerText = `${formatNum(totalQuickFee)}k`;
                 return;
             }
 
             const timeCalc = calculateCourtFee(court.dayType, court.startTime, court.endTime, court.discountType);
-            const displayMinutes = timeCalc.minutes;
-            let finalCourtFee = timeCalc.fee; let discountText = "Không";
+            const displayMinutes = timeCalc.minutes; let finalCourtFee = timeCalc.fee; let discountText = "Không";
 
             if (displayMinutes > 0) {
                 if (court.discountType === "student") { discountText = "HSSV (39k/h)"; }
@@ -655,9 +615,9 @@ HTML
             });
 
             document.getElementById('drinks-fee-display').innerText = `${formatNum(drinksFee)}k`;
-            document.getElementById('drinks-list-note').innerHTML = drinksHtml || `<span class="text-slate-500 italic">Chưa chọn đồ uống...</span>`;
+            document.getElementById('drinks-list-note').innerHTML = drinksHtml || `<span class="text-slate-600 italic">Chưa chọn món...</span>`;
             document.getElementById('gear-fee-display').innerText = `${formatNum(gearFee)}k`;
-            document.getElementById('gear-list-note').innerHTML = gearHtml || `<span class="text-slate-500 italic">Chưa chọn phụ kiện...</span>`;
+            document.getElementById('gear-list-note').innerHTML = gearHtml || `<span class="text-slate-600 italic">Chưa chọn phụ kiện...</span>`;
 
             let finalTotal = finalCourtFee + drinksFee + gearFee - court.ownerDiscount; if (finalTotal < 0) finalTotal = 0;
             document.getElementById('total-fee').innerText = `${formatNum(finalTotal)}k`;
@@ -669,9 +629,9 @@ HTML
 
             const statusLabel = document.getElementById('live-status');
             if (displayMinutes > 0 || Object.keys(court.items).length > 0) {
-                statusLabel.innerText = "Đang Hoạt Động"; statusLabel.className = "text-[9px] text-rose-700 font-bold bg-rose-50 px-1.5 py-0.5 rounded border border-rose-200";
+                statusLabel.innerText = "Đang sử dụng"; statusLabel.className = "text-[9px] text-rose-400 font-bold bg-rose-950/40 px-1.5 py-0.5 rounded border border-rose-900/40";
             } else {
-                statusLabel.innerText = "Sẵn Sàng"; statusLabel.className = "text-[9px] text-blue-700 font-bold bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200";
+                statusLabel.innerText = "Sẵn Sàng"; statusLabel.className = "text-[9px] text-sky-400 font-bold bg-sky-950 px-1.5 py-0.5 rounded border border-sky-900/50";
             }
         }
 
@@ -683,8 +643,7 @@ HTML
                     const totalDeductUnits = orderedQty * prod.packSize;
                     const leSibling = prod.packSize === 1 ? prod : globalInventory.find(p => p.id === prod.linkTo);
                     const ongSibling = prod.packSize === 12 ? prod : globalInventory.find(p => p.id === prod.linkTo);
-                    leSibling.qty -= totalDeductUnits;
-                    ongSibling.qty = Math.floor(leSibling.qty / 12);
+                    leSibling.qty -= totalDeductUnits; ongSibling.qty = Math.floor(leSibling.qty / 12);
                     totalCostGoods += (leSibling.cost * totalDeductUnits);
                 } else {
                     prod.qty -= orderedQty; totalCostGoods += (prod.cost * orderedQty);
@@ -705,20 +664,20 @@ HTML
             const quickBill = {
                 id: 'PAB-QUICK-' + Date.now(), date: new Date().toLocaleDateString('sv-SE'),
                 time: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
-                courtNum: "Lẻ", customerName: "Khách lẻ (Mua đồ)", dayType: "N/A", timeRange: "Không thuê sân",
+                courtNum: "Lẻ", customerName: "Khách lẻ mua đồ", dayType: "N/A", timeRange: "Bán vãng lai",
                 courtFee: 0, serviceFee: Math.round(serviceTotal * 100) / 100, totalBill: Math.round(serviceTotal * 100) / 100,
                 profitGoods: Math.round(profitGoods * 100) / 100, cashReceived: court.cashUnits, bankReceived: court.bankUnits,
                 rawDetails: { customerName: "Khách vãng lai", items: JSON.parse(JSON.stringify(court.items)) }
             };
             window.fbPush('history', quickBill); window.fbSet('inventory', globalInventory);
             document.getElementById('quick-bank').value = ""; courtsData['quick'].items = {};
-            triggerToast("Đã chốt đơn lẻ thành công!");
+            triggerToast("Đã chốt hóa đơn bán lẻ!");
         }
 
         function saveAndCheckout() {
             saveCurrentCourtState(); const court = courtsData[currentCourt];
             const timeCalc = calculateCourtFee(court.dayType, court.startTime, court.endTime, court.discountType);
-            if (timeCalc.minutes === 0 && Object.keys(court.items).length === 0) { alert("⚠️ Sân trống rỗng."); return; }
+            if (timeCalc.minutes === 0 && Object.keys(court.items).length === 0) { alert("⚠️ Sân không có dữ liệu tính toán."); return; }
             let finalCourtFee = timeCalc.fee; if (court.discountType === "fixed") finalCourtFee = finalCourtFee * 0.85;
             let drinksFee = 0, gearFee = 0;
             for (let pId in court.items) {
@@ -732,13 +691,13 @@ HTML
                 id: 'PAB-' + Date.now(), date: new Date().toLocaleDateString('sv-SE'),
                 time: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
                 courtNum: currentCourt, customerName: court.customerName.trim() || "Khách lẻ", dayType: court.dayType,
-                timeRange: `${court.startTime || '00:00'} - ${court.endTime || '00:00'} (${timeCalc.minutes} ph)`,
+                timeRange: `${court.startTime || '00:00'}-${court.endTime || '00:00'} (${timeCalc.minutes} ph)`,
                 courtFee: Math.round(finalCourtFee * 100) / 100, serviceFee: Math.round((drinksFee + gearFee) * 100) / 100,
                 totalBill: Math.round(finalTotal * 100) / 100, profitGoods: Math.round(profitGoods * 100) / 100,
                 cashReceived: court.cashUnits, bankReceived: court.bankUnits, rawDetails: JSON.parse(JSON.stringify(court))
             };
             window.fbPush('history', billRecord); window.fbSet('inventory', globalInventory);
-            triggerToast("Đã thanh toán & đồng bộ Cloud!"); resetCurrentCourt();
+            triggerToast("Thanh toán thành công & Lưu Cloud!"); resetCurrentCourt();
         }
 
         function resetCurrentCourt() {
@@ -757,12 +716,12 @@ HTML
             const btnHistory = document.getElementById('tab-btn-history'); const btnInventory = document.getElementById('tab-btn-inventory');
             const contentHistory = document.getElementById('tab-content-history'); const contentInventory = document.getElementById('tab-content-inventory');
             if (tabId === 'history') {
-                btnHistory.className = "py-1.5 text-xs font-bold border-b-2 border-blue-600 text-blue-600 transition";
-                btnInventory.className = "py-1.5 text-xs font-bold text-slate-400 hover:text-slate-700 transition";
+                btnHistory.className = "py-1.5 text-xs font-bold border-b-2 border-sky-400 text-sky-400 transition";
+                btnInventory.className = "py-1.5 text-xs font-bold text-slate-500 hover:text-slate-300 transition";
                 contentHistory.classList.remove('hidden'); contentInventory.classList.add('hidden');
             } else {
-                btnInventory.className = "py-1.5 text-xs font-bold border-b-2 border-blue-600 text-blue-600 transition";
-                btnHistory.className = "py-1.5 text-xs font-bold text-slate-400 hover:text-slate-700 transition";
+                btnInventory.className = "py-1.5 text-xs font-bold border-b-2 border-sky-400 text-sky-400 transition";
+                btnHistory.className = "py-1.5 text-xs font-bold text-slate-500 hover:text-slate-300 transition";
                 contentInventory.classList.remove('hidden'); contentHistory.classList.add('hidden');
             }
         }
@@ -775,33 +734,33 @@ HTML
             
             filteredBills.forEach(bill => {
                 dayTotal += (parseFloat(bill.totalBill) || 0); dayCash += (parseFloat(bill.cashReceived) || 0); dayBank += (parseFloat(bill.bankReceived) || 0);
-                const tr = document.createElement('tr'); tr.className = "border-b border-slate-100 hover:bg-slate-50 transition cursor-pointer text-slate-700 font-semibold";
+                const tr = document.createElement('tr'); tr.className = "border-b border-slate-800/40 hover:bg-slate-800/40 transition cursor-pointer text-slate-300 font-semibold";
                 tr.innerHTML = `
-                    <td class="p-2 text-slate-400 text-[11px]">${bill.time}</td>
-                    <td class="p-2 font-bold ${bill.courtNum === 'Lẻ' ? 'text-rose-600' : 'text-blue-600'}">${bill.courtNum === 'Lẻ' ? 'Mua lẻ' : 'Sân ' + bill.courtNum}</td>
-                    <td class="p-2 text-slate-900 max-w-[100px] truncate">${bill.customerName}</td>
+                    <td class="p-2 text-slate-500 text-[11px]">${bill.time}</td>
+                    <td class="p-2 font-bold ${bill.courtNum === 'Lẻ' ? 'text-rose-400' : 'text-sky-400'}">${bill.courtNum === 'Lẻ' ? 'Mua lẻ' : 'Sân ' + bill.courtNum}</td>
+                    <td class="p-2 text-slate-200 max-w-[100px] truncate">${bill.customerName}</td>
                     <td class="p-2 text-slate-500 text-[10px]">${bill.timeRange}</td>
-                    <td class="p-2 text-right text-slate-600">${formatNum(bill.courtFee)}k</td>
-                    <td class="p-2 text-right text-rose-600">${formatNum(bill.serviceFee)}k</td>
-                    <td class="p-2 text-right text-blue-600 font-bold">${formatNum(bill.totalBill)}k</td>
-                    <td class="p-2 text-right text-rose-500">${formatNum(bill.profitGoods)}k</td>
-                    <td class="p-2 text-left pl-3 text-rose-600">${formatNum(bill.cashReceived)}k</td>
-                    <td class="p-2 text-left pl-3 text-sky-600">${formatNum(bill.bankReceived)}k</td>
-                    <td class="p-2 text-center"><button onclick="deleteBill('${bill.id}', event)" class="text-red-400 hover:text-red-600 font-bold">✕</button></td>
+                    <td class="p-2 text-right text-slate-400">${formatNum(bill.courtFee)}k</td>
+                    <td class="p-2 text-right text-rose-400">${formatNum(bill.serviceFee)}k</td>
+                    <td class="p-2 text-right text-sky-400 font-bold">${formatNum(bill.totalBill)}k</td>
+                    <td class="p-2 text-right text-rose-400/80">${formatNum(bill.profitGoods)}k</td>
+                    <td class="p-2 text-left pl-3 text-rose-400">${formatNum(bill.cashReceived)}k</td>
+                    <td class="p-2 text-left pl-3 text-sky-400">${formatNum(bill.bankReceived)}k</td>
+                    <td class="p-2 text-center"><button onclick="deleteBill('${bill.id}', event)" class="text-slate-600 hover:text-red-400 font-bold">✕</button></td>
                 `;
                 tr.onclick = () => openBillModal(bill); tbody.appendChild(tr);
             });
-            if (filteredBills.length === 0) { tbody.innerHTML = `<tr><td colspan="11" class="p-4 text-center text-slate-400 italic">Chưa phát sinh đơn hàng.</td></tr>`; }
+            if (filteredBills.length === 0) { tbody.innerHTML = `<tr><td colspan="11" class="p-4 text-center text-slate-600 italic">Chưa phát sinh hóa đơn nào.</td></tr>`; }
 
             const filteredExpenses = expensesData.filter(exp => exp.date === filterDate);
             const expContainer = document.getElementById('expense-list-container'); expContainer.innerHTML = "";
             filteredExpenses.forEach(exp => {
                 dayExpense += exp.amount;
-                const div = document.createElement('div'); div.className = "flex justify-between bg-white p-1 rounded border border-slate-200 text-slate-600";
-                div.innerHTML = `<span>• [${exp.time}] ${exp.reason}</span><span class="font-bold text-red-500">-${formatNum(exp.amount)}k</span>`;
+                const div = document.createElement('div'); div.className = "flex justify-between bg-slate-900 p-1 rounded border border-slate-800 text-slate-400";
+                div.innerHTML = `<span>• [${exp.time}] ${exp.reason}</span><span class="font-bold text-rose-400">-${formatNum(exp.amount)}k</span>`;
                 expContainer.appendChild(div);
             });
-            if (filteredExpenses.length === 0) { expContainer.innerHTML = `<span class="text-slate-400 italic block pt-0.5">Không có khoản chi.</span>`; }
+            if (filteredExpenses.length === 0) { expContainer.innerHTML = `<span class="text-slate-600 italic block pt-0.5">Không có khoản chi ra.</span>`; }
 
             document.getElementById('stat-day-total').innerText = `${formatNum(dayTotal)}k`;
             document.getElementById('stat-day-cash').innerText = `${formatNum(dayCash)}k`;
@@ -811,12 +770,12 @@ HTML
         }
 
         function deleteBill(billId, event) {
-            event.stopPropagation(); const enteredPassword = prompt("🔐 Nhập mật khẩu XÓA đơn:");
+            event.stopPropagation(); const enteredPassword = prompt("🔐 Nhập mật khẩu để XÓA đơn:");
             if (enteredPassword === MASTER_PASSWORD) {
                 window.fbListen('history', (snapshot) => {
                     if(snapshot) { Object.keys(snapshot).forEach(key => { if(snapshot[key].id === billId) { window.fbRemove(`history/${key}`); } }); }
                 });
-                alert("Đã xóa đơn trên Cloud!");
+                alert("Đã xóa đơn khỏi hệ thống mây Cloud!");
             } else { alert("❌ Sai mật khẩu."); }
         }
 
@@ -828,101 +787,61 @@ HTML
         }
 
         window.startEditCell = function(index, field, currentValue) {
-            const cellId = `cell-${field}-${index}`;
-            const td = document.getElementById(cellId);
-            if (!td) return;
-
-            const input = document.createElement('input');
-            input.type = 'number';
-            input.step = '0.1';
-            input.value = currentValue;
-            input.className = 'edit-input';
-            
+            const cellId = `cell-${field}-${index}`; const td = document.getElementById(cellId); if (!td) return;
+            const input = document.createElement('input'); input.type = 'number'; input.step = '0.1'; input.value = currentValue; input.className = 'edit-input';
             input.onblur = function() { commitEditCell(index, field, this.value); };
             input.onkeydown = function(e) { if (e.key === 'Enter') { this.blur(); } };
-
-            td.innerHTML = '';
-            td.appendChild(input);
-            input.focus();
-            input.select();
+            td.innerHTML = ''; td.appendChild(input); input.focus(); input.select();
         };
 
         function commitEditCell(index, field, newValueStr) {
-            const val = parseFloat(newValueStr);
-            if (isNaN(val) || val < 0) { renderInventoryTable(); return; }
-
+            const val = parseFloat(newValueStr); if (isNaN(val) || val < 0) { renderInventoryTable(); return; }
             globalInventory[index][field] = val;
-
             if (field === 'qty') {
                 const prod = globalInventory[index];
                 if (prod.isShuttlecock && prod.packSize === 1) {
-                    const ongSibling = globalInventory.find(p => p.id === prod.linkTo);
-                    if (ongSibling) ongSibling.qty = Math.floor(val / 12);
+                    const ongSibling = globalInventory.find(p => p.id === prod.linkTo); if (ongSibling) ongSibling.qty = Math.floor(val / 12);
                 }
             }
-
-            window.fbSet('inventory', globalInventory);
-            triggerToast("Đã lưu thay đổi!");
+            window.fbSet('inventory', globalInventory); triggerToast("Đã cập nhật số liệu kho!");
         }
 
         function renderInventoryTable() {
             const tbody = document.getElementById('inventory-tbody'); if(!tbody) return; tbody.innerHTML = "";
 
             globalInventory.forEach((prod, index) => {
-                const markup = prod.price - prod.cost;
-                const tr = document.createElement('tr');
-                tr.className = "border-b border-slate-100 hover:bg-slate-50/80 transition text-slate-700 font-medium text-xs";
+                const markup = prod.price - prod.cost; const tr = document.createElement('tr');
+                tr.className = "border-b border-slate-800 hover:bg-slate-950/40 transition text-slate-300 font-medium text-xs";
                 
                 let qtyCellHtml = "";
                 if (prod.isShuttlecock && prod.packSize === 12) {
-                    qtyCellHtml = `<span class="text-slate-400 italic text-[10px]">Đồng bộ từ lẻ</span>`;
+                    qtyCellHtml = `<span class="text-slate-600 italic text-[10px]">Tự quy đổi từ lẻ</span>`;
                 } else {
                     qtyCellHtml = `
-                        <div id="cell-qty-${index}" onclick="startEditCell(${index}, 'qty', ${prod.qty})" class="cursor-pointer hover:bg-blue-50 border border-dashed border-transparent hover:border-blue-400 rounded px-2 py-0.5 inline-block font-bold text-blue-600">
+                        <div id="cell-qty-${index}" onclick="startEditCell(${index}, 'qty', ${prod.qty})" class="cursor-pointer hover:bg-slate-800 border border-dashed border-transparent hover:border-sky-500 rounded px-2 py-0.5 inline-block font-bold text-sky-400 font-mono">
                             ${prod.qty}
                         </div>
                     `;
                 }
 
                 tr.innerHTML = `
-                    <td class="p-2 text-slate-400 font-normal">${prod.type === 'drinks' ? '🥤 Đồ uống' : '🏸 Phụ kiện'}</td>
-                    <td class="p-2 font-bold text-slate-800">${prod.name}</td>
-                    <td class="p-2 text-center">
-                        <div class="flex flex-col items-center">
-                            ${qtyCellHtml}
-                            <div class="text-[10px] text-slate-400 font-light mt-0.5">(${formatStockDisplay(prod)})</div>
-                        </div>
+                    <td class="p-2.5 font-bold text-slate-200">${prod.name}</td>
+                    <td class="p-2.5 text-center">${qtyCellHtml}</td>
+                    <td class="p-2.5 text-center text-[11px] text-slate-400">${formatStockDisplay(prod)}</td>
+                    <td class="p-2.5 text-center" id="cell-cost-${index}" onclick="startEditCell(${index}, 'cost', ${prod.cost})">
+                        <span class="cursor-pointer hover:bg-slate-800 border border-dashed border-transparent hover:border-rose-500 rounded px-2 py-0.5 text-rose-400 font-bold font-mono">${prod.cost}k</span>
                     </td>
-                    <td class="p-2 text-center" id="cell-cost-${index}" onclick="startEditCell(${index}, 'cost', ${prod.cost})">
-                        <span class="cursor-pointer hover:bg-rose-50 border border-dashed border-transparent hover:border-rose-400 rounded px-2 py-0.5 text-rose-600 font-bold font-mono">${prod.cost}k</span>
+                    <td class="p-2.5 text-center" id="cell-price-${index}" onclick="startEditCell(${index}, 'price', ${prod.price})">
+                        <span class="cursor-pointer hover:bg-slate-800 border border-dashed border-transparent hover:border-sky-500 rounded px-2 py-0.5 text-sky-400 font-bold font-mono">${prod.price}k</span>
                     </td>
-                    <td class="p-2 text-center" id="cell-price-${index}" onclick="startEditCell(${index}, 'price', ${prod.price})">
-                        <span class="cursor-pointer hover:bg-blue-50 border border-dashed border-transparent hover:border-blue-400 rounded px-2 py-0.5 text-blue-600 font-bold font-mono">${prod.price}k</span>
-                    </td>
-                    <td class="p-2 text-right font-bold text-slate-500 font-mono">${formatNum(markup)}k</td>
-                    <td class="p-2 text-center">
-                        <button onclick="deleteProductFromInventory(${index})" class="text-slate-300 hover:text-red-500 font-bold text-[11px] transition">Xóa</button>
-                    </td>
+                    <td class="p-2.5 text-right font-bold text-slate-500 font-mono">${formatNum(markup)}k</td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        function addNewProductToInventory() {
-            const name = document.getElementById('inv-add-name').value.trim(); const type = document.getElementById('inv-add-type').value;
-            const qty = parseInt(document.getElementById('inv-add-qty').value); const cost = parseFloat(document.getElementById('inv-add-cost').value);
-            const price = parseFloat(document.getElementById('inv-add-price').value);
-            if (!name || isNaN(qty) || qty < 0 || isNaN(cost) || cost < 0 || isNaN(price) || price < 0) return;
-            const uniqueId = 'prod_' + Date.now();
-            globalInventory.push({ id: uniqueId, name, type, qty, cost, price }); window.fbSet('inventory', globalInventory);
-            document.getElementById('inv-add-name').value = ""; document.getElementById('inv-add-qty').value = "";
-            document.getElementById('inv-add-cost').value = ""; document.getElementById('inv-add-price').value = "";
-        }
-
-        function deleteProductFromInventory(index) { if(confirm("❌ Chắc chắn muốn xóa món này khỏi danh mục?")) { globalInventory.splice(index, 1); window.fbSet('inventory', globalInventory); } }
-
         function openBillModal(bill) {
-            document.getElementById('modal-title-sub').innerText = `${bill.courtNum === 'Lẻ' ? 'Đơn bán lẻ' : 'Sân ' + bill.courtNum} (${bill.time})`;
+            document.getElementById('modal-title-sub').innerText = `${bill.courtNum === 'Lẻ' ? 'Đơn lẻ vãng lai' : 'Sân ' + bill.courtNum} (${bill.time})`;
             document.getElementById('modal-customer').innerText = bill.customerName; document.getElementById('modal-range').innerText = bill.timeRange;
             document.getElementById('modal-court-fee').innerText = `${formatNum(bill.courtFee)}k`;
             let drinksListHtml = "", gearListHtml = ""; const raw = bill.rawDetails;
@@ -937,10 +856,10 @@ HTML
             const gSection = document.getElementById('modal-gear-section'); if (gearListHtml) { gSection.style.display = "block"; document.getElementById('modal-gear-list').innerHTML = gearListHtml; } else { gSection.style.display = "none"; }
             document.getElementById('modal-services-fee').innerText = `${formatNum(bill.serviceFee)}k`; document.getElementById('modal-discount-fee').innerText = `-${formatNum(raw ? raw.ownerDiscount : 0)}k`;
             document.getElementById('modal-total-fee').innerText = `${formatNum(bill.totalBill)}k`; document.getElementById('modal-profit-fee').innerText = `${formatNum(bill.profitGoods)}k`;
-            const modal = document.getElementById('bill-detail-modal'); modal.className = "fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 opacity-100 transition duration-300";
+            const modal = document.getElementById('bill-detail-modal'); modal.className = "fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 opacity-100 transition duration-300";
         }
 
-        function closeModal() { const modal = document.getElementById('bill-detail-modal'); modal.className = "fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 pointer-events-none transition duration-300"; }
+        function closeModal() { const modal = document.getElementById('bill-detail-modal'); modal.className = "fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 pointer-events-none transition duration-300"; }
     </script>
 </body>
 </html>

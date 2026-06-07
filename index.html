@@ -7,10 +7,10 @@ HTML
     <title>Phúc An Badminton - Premium Cloud POS v3.1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;500;600;700;800&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0b0f19; }
         
-        /* Ẩn con trỏ nhập liệu và tối ưu ô sửa nhanh */
+        /* Tối ưu ô sửa nhanh trong bảng kho */
         .edit-input { 
             background: #111827; 
             border: 1px solid #06b6d4; 
@@ -64,7 +64,7 @@ HTML
         <div class="max-w-[1400px] mx-auto flex flex-wrap justify-between items-center gap-4">
             <div class="flex items-center gap-4">
                 <div class="bg-slate-950 p-2 rounded-2xl border border-cyan-500/30 shadow-xl shadow-cyan-500/5">
-                    <img src="https://lh3.googleusercontent.com/d/1XW_e-fVz7NfI9UuE2vP2z89f8gV5wT7Y" alt="Phúc An Logo" class="w-12 h-12 object-contain rounded-xl">
+                    <div class="w-12 h-12 bg-cyan-500/10 rounded-xl flex items-center justify-center border border-cyan-500/20 font-black text-cyan-400 text-xl">PA</div>
                 </div>
                 <div>
                     <h1 class="text-xl font-black tracking-wider text-white">PHÚC AN BADMINTON</h1>
@@ -236,7 +236,7 @@ HTML
         <div class="bg-slate-900 rounded-2xl overflow-hidden border border-slate-800 shadow-2xl">
             <div class="bg-slate-950 px-6 py-3.5 flex flex-wrap justify-between items-center gap-4 border-b border-slate-800">
                 <div class="flex gap-6">
-                    <button id="tab-btn-history" onclick="switchTab('history')" class="py-2 text-sm font-bold text-slate-500 hover:text-slate-300 transition">📊 DOANH THU HỆ THỐNG</button>
+                    <button id="tab-btn-history" onclick="switchTab('history')" class="py-2 text-sm font-bold text-slate-500 hover:text-slate-300 transition border-b-2 border-transparent">📊 DOANH THU HỆ THỐNG</button>
                     <button id="tab-btn-inventory" onclick="switchTab('inventory')" class="py-2 text-sm font-bold border-b-2 border-cyan-400 text-cyan-400 transition">📦 QUẢN LÝ KHO HÀNG CHUẨN v3.1</button>
                 </div>
                 <div class="flex items-center gap-2 text-sm">
@@ -256,7 +256,7 @@ HTML
 
                 <div class="overflow-x-auto border border-slate-800 rounded-xl">
                     <table class="w-full text-left text-sm font-medium text-slate-300">
-                        <thead class="bg-slate-950 border-b border-slate-800 text-xs text-slate-400 uppercase tracking-wider">
+                        <head class="bg-slate-950 border-b border-slate-800 text-xs text-slate-400 uppercase tracking-wider">
                             <tr>
                                 <th class="p-3">Giờ</th><th class="p-3">Khu vực</th><th class="p-3">Khách hàng</th><th class="p-3">Thời gian chơi</th>
                                 <th class="p-3 text-right">Tiền Sân</th><th class="p-3 text-right">Dịch vụ</th><th class="p-3 text-right text-cyan-400">Tổng cộng</th>
@@ -289,7 +289,7 @@ HTML
                         <thead class="bg-slate-950 text-slate-400 font-bold border-b border-slate-800 uppercase tracking-wider text-xs">
                             <tr>
                                 <th class="p-3 pl-5">Tên sản phẩm thiết bị</th>
-                                <th class="p-3 text-center w-40">Số lượng gốc</th>
+                                <th class="p-3 text-center w-40">Số lượng gốc (Nhấn để sửa)</th>
                                 <th class="p-3 text-center w-48">Quy đổi v3.1</th>
                                 <th class="p-3 text-center w-32">Giá vốn</th>
                                 <th class="p-3 text-center w-32">Giá bán</th>
@@ -317,7 +317,7 @@ HTML
                     <div id="modal-drinks-list" class="space-y-1 text-slate-300 text-xs"></div>
                 </div>
                 <div id="modal-gear-section" class="bg-slate-950 p-3 rounded-xl border border-slate-850">
-                    <p class="text-[11px] font-bold text-slate-400 mb-1.5 uppercase tracking-wider">🏸 PHỤ KIỆN VÀ CẦU ДẤU</p>
+                    <p class="text-[11px] font-bold text-slate-400 mb-1.5 uppercase tracking-wider">🏸 PHỤ KIỆN VÀ CẦU ĐẤU</p>
                     <div id="modal-gear-list" class="space-y-1 text-slate-300 text-xs"></div>
                 </div>
                 <div class="bg-slate-950 p-3 rounded-xl border border-slate-850 space-y-1.5">
@@ -367,14 +367,16 @@ HTML
             document.getElementById('filter-date').value = new Date().toLocaleDateString('sv-SE');
             courtsData = { 1: getEmptyObj(), 2: getEmptyObj(), 'quick': { items: {} } };
 
+            // CHỐNG LỖI MẤT KHO: Nhận diện cả mảng và Object từ Firebase
             window.fbListen('inventory', (data) => {
-                globalInventory = data ? Object.values(data) : JSON.parse(JSON.stringify(initialInventory));
+                globalInventory = data ? (Array.isArray(data) ? data : Object.values(data)) : JSON.parse(JSON.stringify(initialInventory));
                 if (!data) window.fbSet('inventory', globalInventory);
                 renderMenuDichVu(); renderInventoryTable(); calculateAll();
             });
             window.fbListen('history', (data) => { paymentHistory = data ? Object.values(data) : []; renderHistory(); });
             window.fbListen('expenses', (data) => { expensesData = data ? Object.values(data) : []; renderHistory(); });
             switchCourt(1);
+            switchTab('inventory'); // Mặc định mở tab kho như anh mong muốn
         }
 
         function getEmptyObj() { return { customerName: "", dayType: "weekday", startTime: "", endTime: "", discountType: "none", ownerDiscount: 0, cashUnits: 0, bankUnits: 0, items: {} }; }
@@ -436,7 +438,7 @@ HTML
 
             globalInventory.forEach(prod => {
                 const item = document.createElement('div');
-                item.className = "bg-slate-950 border border-slate-850 rounded-xl p-2.5 flex flex-col justify-between text-center shadow-md";
+                item.className = "bg-slate-950 border border-slate-855 rounded-xl p-2.5 flex flex-col justify-between text-center shadow-md";
                 item.innerHTML = `
                     <div class="truncate font-bold text-slate-300 text-xs">${prod.name}</div>
                     <div class="text-cyan-400 font-extrabold text-sm my-1">${prod.price}k</div>
@@ -575,8 +577,8 @@ HTML
         function resetQuickSaleCart() { courtsData['quick'].items = {}; document.getElementById('quick-bank').value=""; calculateAll(); }
 
         function switchTab(t) {
-            document.getElementById('tab-btn-history').className = t==='history' ? "py-2 text-sm font-bold border-b-2 border-cyan-400 text-cyan-400 transition" : "py-2 text-sm font-bold text-slate-500 hover:text-slate-300 transition";
-            document.getElementById('tab-btn-inventory').className = t==='inventory' ? "py-2 text-sm font-bold border-b-2 border-cyan-400 text-cyan-400 transition" : "py-2 text-sm font-bold text-slate-500 hover:text-slate-300 transition";
+            document.getElementById('tab-btn-history').className = t==='history' ? "py-2 text-sm font-bold border-b-2 border-cyan-400 text-cyan-400 transition" : "py-2 text-sm font-bold text-slate-500 hover:text-slate-300 transition border-b-2 border-transparent";
+            document.getElementById('tab-btn-inventory').className = t==='inventory' ? "py-2 text-sm font-bold border-b-2 border-cyan-400 text-cyan-400 transition" : "py-2 text-sm font-bold text-slate-500 hover:text-slate-300 transition border-b-2 border-transparent";
             if(t==='history') { document.getElementById('tab-content-history').classList.remove('hidden'); document.getElementById('tab-content-inventory').classList.add('hidden'); }
             else { document.getElementById('tab-content-inventory').classList.remove('hidden'); document.getElementById('tab-content-history').classList.add('hidden'); }
         }
@@ -598,7 +600,7 @@ HTML
         function deleteBill(id, e) { e.stopPropagation(); if (prompt("🔐 Vui lòng cung cấp mật khẩu quản trị cao cấp để XÓA đơn này:") === MASTER_PASSWORD) { window.fbListen('history', (snap) => { if(snap) Object.keys(snap).forEach(k => { if(snap[k].id === id) window.fbRemove(`history/${k}`); }); }); } }
         function addNewExpense() { const r = document.getElementById('exp-add-reason').value.trim(); const a = parseFloat(document.getElementById('exp-add-amount').value); if (r && a > 0) { window.fbPush('expenses', { id: 'EXP-'+Date.now(), date: document.getElementById('filter-date').value, time: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}), reason: r, amount: a }); document.getElementById('exp-add-reason').value=""; document.getElementById('exp-add-amount').value=""; } }
 
-        // SỬA LỖI ĐỒNG BỘ HAI CHIỀU - XÁC ĐỊNH SẢN PHẨM THEO ID CHÍNH XÁC KHÔNG DÙNG INDEX LỆCH
+        // CHỐNG LỖI KHO: ĐỒNG BỘ HAI CHIỀU THEO ID CHÍNH XÁC TUYỆT ĐỐI
         window.startEditCell = function(pId, field, cur) {
             const td = document.getElementById(`cell-${field}-${pId}`); if (!td) return;
             const input = document.createElement('input'); input.type = 'number'; input.step = '0.1'; input.value = cur; input.className = 'edit-input';
@@ -609,13 +611,13 @@ HTML
                     const targetProd = globalInventory.find(x => x.id === pId);
                     if (targetProd) {
                         targetProd[field] = val;
-                        // Đồng bộ nhanh từ quả lẻ sang hộp nguyên của v3.1
+                        // Logic quy đổi tự động v3.1 từ quả lẻ sang hộp nguyên
                         if (field === 'qty' && targetProd.isShuttlecock && targetProd.packSize === 1) {
                             const sib = globalInventory.find(x => x.id === targetProd.linkTo); 
                             if (sib) sib.qty = Math.floor(val / 12);
                         }
                         window.fbSet('inventory', globalInventory); 
-                        triggerToast("Đã cập nhật kho thành công!");
+                        triggerToast("Đã cập nhật kho dữ liệu thành công!");
                     }
                 } else renderInventoryTable();
             };

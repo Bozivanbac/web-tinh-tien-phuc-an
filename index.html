@@ -10,7 +10,7 @@ HTML
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;500;600;700;800&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0b0f19; }
         
-        /* Định dạng ô input khi nhấn vào sửa số lượng/giá */
+        /* Định dạng ô input: Đã chặn con trỏ nhấp nháy (caret-color) */
         .edit-input { 
             background: #0f172a !important; 
             border: 2px solid #06b6d4 !important; 
@@ -20,8 +20,11 @@ HTML
             border-radius: 8px; 
             padding: 4px; 
             color: #22d3ee !important;
+            caret-color: transparent !important; /* Chặn con trỏ nhấp nháy */
+            outline: none !important;
+            cursor: pointer;
         }
-        .edit-input:focus { outline: none; box-shadow: 0 0 10px rgba(6, 182, 212, 0.5); }
+        .edit-input:focus { box-shadow: 0 0 10px rgba(6, 182, 212, 0.5); }
 
         /* Custom thanh cuộn */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -243,7 +246,7 @@ HTML
                 </div>
             </div>
 
-            <div id="tab-content-history" class="p-4 space-y-4 hidden">
+            <div id="tab-content-history" class="p-4 space-y-4 hidden block-state-control">
                 <div class="grid grid-cols-2 md:grid-cols-5 gap-3 text-center">
                     <div class="bg-slate-950 p-3 rounded-xl border border-slate-855"><p class="text-[11px] text-slate-400 uppercase font-bold tracking-wider">Tổng hóa đơn</p><p id="stat-day-total" class="text-base font-black text-white mt-1">0đ</p></div>
                     <div class="bg-rose-950/20 p-3 rounded-xl border border-rose-900/30"><p class="text-[11px] text-rose-400 uppercase font-bold tracking-wider">💵 Tiền mặt</p><p id="stat-day-cash" class="text-base font-black text-rose-400 mt-1">0đ</p></div>
@@ -279,15 +282,15 @@ HTML
                         <div id="expense-list-container" class="space-y-1.5 max-h-[85px] overflow-y-auto text-sm"></div>
                     </div>
                 </div>
-            </section>
+            </div>
 
-            <div id="tab-content-inventory" class="p-4">
+            <div id="tab-content-inventory" class="p-4 block-state-control" style="display: block;">
                 <div class="overflow-x-auto border border-slate-800 rounded-xl">
                     <table class="w-full text-left text-sm text-slate-300 font-medium">
                         <thead class="bg-slate-950 text-slate-400 font-bold border-b border-slate-800 uppercase tracking-wider text-xs">
                             <tr>
-                                <th class="p-4 pl-5">Tên sản phẩm thiết bị</th>
-                                <th class="p-4 text-center">Số lượng gốc (Nhấn số để sửa/nhập hàng)</th>
+                                <th class="p-4 pl-5 w-1/4">Tên sản phẩm thiết bị</th>
+                                <th class="p-4 text-center">Số lượng gốc (Nhấn số để sửa)</th>
                                 <th class="p-4 text-center">Quy đổi v3.5</th>
                                 <th class="p-4 text-center">Giá vốn (k)</th>
                                 <th class="p-4 text-center">Giá bán (k)</th>
@@ -361,9 +364,19 @@ HTML
             return `<span class="font-bold text-slate-400">${prod.qty} chiếc</span>`;
         }
 
+        // Đảm bảo không lỗi ngày khởi tạo
         function initSystem() {
-            document.getElementById('filter-date').value = new Date().toLocaleDateString('sv-SE');
+            try {
+                const tzOffset = (new Date()).getTimezoneOffset() * 60000;
+                const localISOTime = (new Date(Date.now() - tzOffset)).toISOString().slice(0, 10);
+                document.getElementById('filter-date').value = localISOTime;
+            } catch(e) { document.getElementById('filter-date').value = ""; }
+
             courtsData = { 1: getEmptyObj(), 2: getEmptyObj(), 'quick': { items: {} } };
+
+            // Hiển thị tab Kho ngay từ đầu
+            switchTab('inventory');
+            switchCourt(1);
 
             window.fbListen('inventory', (data) => {
                 globalInventory = data ? (Array.isArray(data) ? data : Object.values(data)) : JSON.parse(JSON.stringify(initialInventory));
@@ -374,8 +387,6 @@ HTML
             });
             window.fbListen('history', (data) => { paymentHistory = data ? Object.values(data) : []; renderHistory(); });
             window.fbListen('expenses', (data) => { expensesData = data ? Object.values(data) : []; renderHistory(); });
-            switchCourt(1);
-            switchTab('inventory');
         }
 
         function getEmptyObj() { return { customerName: "", dayType: "weekday", startTime: "", endTime: "", discountType: "none", ownerDiscount: 0, cashUnits: 0, bankUnits: 0, items: {} }; }
@@ -403,10 +414,10 @@ HTML
             });
 
             if (n === 'quick') {
-                document.getElementById('time-config-section').classList.add('hidden'); document.getElementById('section-court-bill').classList.add('hidden'); document.getElementById('section-quick-sale').classList.remove('hidden');
+                document.getElementById('time-config-section').style.display = 'none'; document.getElementById('section-court-bill').style.display = 'none'; document.getElementById('section-quick-sale').style.display = 'block';
                 document.getElementById('menu-current-target').innerText = "VÃNG LAI";
             } else {
-                document.getElementById('time-config-section').classList.remove('hidden'); document.getElementById('section-court-bill').classList.remove('hidden'); document.getElementById('section-quick-sale').classList.add('hidden');
+                document.getElementById('time-config-section').style.display = 'block'; document.getElementById('section-court-bill').style.display = 'flex'; document.getElementById('section-quick-sale').style.display = 'none';
                 document.getElementById('menu-current-target').innerText = "SÂN " + n; document.getElementById('bill-court-title').innerText = n;
                 const c = courtsData[n];
                 document.getElementById('customer-name').value = c.customerName; document.getElementById('day-type').value = c.dayType;
@@ -505,7 +516,7 @@ HTML
             document.getElementById('court-fee-original').innerText = `${formatNum(fee)}k`;
             document.getElementById('court-fee-display').innerText = `${formatNum(finalCourtFee)}k`;
 
-            let dFee = 0, gFee = 0, dHtml = "", gHtml = "";
+            let dFee = 0, gFee = 0, dHtml = ""; let gHtml = "";
             Object.keys(c.items).forEach(id => {
                 const p = globalInventory.find(x => x.id === id); const totalItem = p.price * c.items[id];
                 if (p.type === 'drinks') { dFee += totalItem; dHtml += `<div>• ${p.name} (x${c.items[id]})</div>`; }
@@ -575,11 +586,24 @@ HTML
         function resetCurrentCourt() { courtsData[currentCourt] = getEmptyObj(); if(currentCourt!=='quick') { document.getElementById('customer-name').value=""; document.getElementById('start-time').value=""; document.getElementById('end-time').value=""; document.getElementById('discount-select').value="none"; document.getElementById('owner-discount').value=""; document.getElementById('bank-units').value=""; } calculateAll(); }
         function resetQuickSaleCart() { courtsData['quick'].items = {}; document.getElementById('quick-bank').value=""; calculateAll(); }
 
+        // Logic chuyển Tab xử lý cực mạnh: gỡ ẩn và ép hiển thị
         function switchTab(t) {
-            document.getElementById('tab-btn-history').className = t==='history' ? "py-2 text-sm font-bold border-b-2 border-cyan-400 text-cyan-400 transition" : "py-2 text-sm font-bold text-slate-500 hover:text-slate-300 transition border-b-2 border-transparent";
-            document.getElementById('tab-btn-inventory').className = t==='inventory' ? "py-2 text-sm font-bold border-b-2 border-cyan-400 text-cyan-400 transition" : "py-2 text-sm font-bold text-slate-500 hover:text-slate-300 transition border-b-2 border-transparent";
-            if(t==='history') { document.getElementById('tab-content-history').classList.remove('hidden'); document.getElementById('tab-content-inventory').classList.add('hidden'); }
-            else { document.getElementById('tab-content-inventory').classList.remove('hidden'); document.getElementById('tab-content-history').classList.add('hidden'); }
+            const histBtn = document.getElementById('tab-btn-history');
+            const invBtn = document.getElementById('tab-btn-inventory');
+            const histContent = document.getElementById('tab-content-history');
+            const invContent = document.getElementById('tab-content-inventory');
+
+            if(t === 'history') { 
+                histBtn.className = "py-2 text-sm font-bold border-b-2 border-cyan-400 text-cyan-400 transition";
+                invBtn.className = "py-2 text-sm font-bold text-slate-500 hover:text-slate-300 transition border-b-2 border-transparent";
+                histContent.style.display = 'block';
+                invContent.style.display = 'none';
+            } else { 
+                invBtn.className = "py-2 text-sm font-bold border-b-2 border-cyan-400 text-cyan-400 transition";
+                histBtn.className = "py-2 text-sm font-bold text-slate-500 hover:text-slate-300 transition border-b-2 border-transparent";
+                invContent.style.display = 'block';
+                histContent.style.display = 'none';
+            }
         }
 
         function renderHistory() {
@@ -599,7 +623,7 @@ HTML
         function deleteBill(id, e) { e.stopPropagation(); if (prompt("🔐 Vui lòng cung cấp mật khẩu quản trị cao cấp để XÓA đơn này:") === MASTER_PASSWORD) { window.fbListen('history', (snap) => { if(snap) Object.keys(snap).forEach(k => { if(snap[k].id === id) window.fbRemove(`history/${k}`); }); }); } }
         function addNewExpense() { const r = document.getElementById('exp-add-reason').value.trim(); const a = parseFloat(document.getElementById('exp-add-amount').value); if (r && a > 0) { window.fbPush('expenses', { id: 'EXP-'+Date.now(), date: document.getElementById('filter-date').value, time: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}), reason: r, amount: a }); document.getElementById('exp-add-reason').value=""; document.getElementById('exp-add-amount').value=""; } }
 
-        // HÀM CHỈNH SỬA Ô TỒN KHO / GIÁ TỐC ĐỘ CAO KHÔNG CRASH
+        // HÀM CHỈNH SỬA Ô KHO HÀNG (Cải tiến giao diện chớp/con trỏ)
         window.startEditCell = function(pId, field, curValue) {
             const td = document.getElementById(`cell-${field}-${pId}`);
             if (!td) return;
@@ -615,7 +639,6 @@ HTML
                     const prod = globalInventory.find(x => x.id === pId);
                     if (prod) {
                         prod[field] = val;
-                        // Tự động đồng bộ số lượng quả lẻ sang bao/hộp cho cầu đấu
                         if (field === 'qty' && prod.isShuttlecock && prod.packSize === 1) {
                             const sib = globalInventory.find(x => x.id === prod.linkTo);
                             if (sib) sib.qty = Math.floor(val / 12);
@@ -635,26 +658,30 @@ HTML
             input.select();
         };
 
-        // HÀM VẼ BẢNG KHO HÀNG ĐÃ FIX TRIỆT ĐỂ LỖI CHUỖI ONCLICK
+        // HÀM VẼ BẢNG KHO
         function renderInventoryTable() {
             const tbody = document.getElementById('inventory-tbody'); 
             if (!tbody) return;
             tbody.innerHTML = "";
             
+            if(!globalInventory || globalInventory.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-500 italic">Dữ liệu kho đang trống...</td></tr>`;
+                return;
+            }
+
             globalInventory.forEach((prod) => {
                 const tr = document.createElement('tr'); 
                 tr.className = "border-b border-slate-800/60 hover:bg-slate-900/60 transition text-slate-300 font-semibold text-xs";
                 
-                // Thiết lập hiển thị cho dòng Ống cầu và Quả lẻ
                 let qtyCellHtml = "";
                 if (prod.packSize === 12) {
                     qtyCellHtml = `<span class="text-slate-600 italic text-xs">Tự tính từ Quả lẻ</span>`;
                 } else {
-                    qtyCellHtml = `<span class="text-cyan-400 font-bold bg-slate-950 px-3 py-1.5 rounded-lg border border-cyan-500/20 cursor-pointer hover:bg-slate-800 transition">${prod.qty}</span>`;
+                    qtyCellHtml = `<span class="text-cyan-400 font-bold bg-slate-950 px-4 py-2 rounded-lg border border-cyan-500/20 cursor-pointer hover:bg-slate-800 transition">${prod.qty}</span>`;
                 }
 
                 tr.innerHTML = `
-                    <td class="p-4 pl-5 text-white font-bold text-sm">${prod.name}</td>
+                    <td class="p-4 pl-5 text-white font-bold text-sm truncate">${prod.name}</td>
                     <td class="p-4 text-center" id="cell-qty-${prod.id}">${qtyCellHtml}</td>
                     <td class="p-4 text-center text-xs">${formatStockDisplay(prod)}</td>
                     <td class="p-4 text-center" id="cell-cost-${prod.id}"><span class="cursor-pointer text-rose-400 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800 hover:bg-slate-850 transition">${prod.cost}k</span></td>
@@ -662,7 +689,6 @@ HTML
                     <td class="p-4 text-right pr-5 text-emerald-400 font-bold text-sm">${formatNum(prod.price - prod.cost)}k</td>
                 `;
 
-                // Gán sự kiện click bằng mã JavaScript trực tiếp để triệt tiêu hoàn toàn lỗi vỡ chuỗi
                 if (prod.packSize !== 12) {
                     const qtyTd = tr.querySelector(`#cell-qty-${prod.id}`);
                     if (qtyTd) { qtyTd.addEventListener('click', () => startEditCell(prod.id, 'qty', prod.qty)); }

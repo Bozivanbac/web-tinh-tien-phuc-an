@@ -4,26 +4,24 @@ HTML
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Phúc An Badminton - Premium Cloud POS v3.1</title>
+    <title>Phúc An Badminton - Premium Cloud POS v3.2</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;500;600;700;800&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0b0f19; }
         
-        /* Tối ưu ô sửa nhanh trong bảng kho */
+        /* Định dạng ô sửa nhanh số lượng và giá */
         .edit-input { 
-            background: #111827; 
-            border: 1px solid #06b6d4; 
+            background: #0f172a !important; 
+            border: 2px solid #06b6d4 !important; 
             font-weight: 700; 
             text-align: center; 
-            width: 65px; 
+            width: 75px; 
             border-radius: 6px; 
-            padding: 2px 0; 
-            color: #22d3ee;
-            caret-color: transparent;
+            padding: 4px; 
+            color: #22d3ee !important;
         }
         .edit-input:focus { outline: none; box-shadow: 0 0 10px rgba(6, 182, 212, 0.5); }
-        .editable-cell { caret-color: transparent; }
 
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -68,12 +66,12 @@ HTML
                 </div>
                 <div>
                     <h1 class="text-xl font-black tracking-wider text-white">PHÚC AN BADMINTON</h1>
-                    <p class="text-xs text-cyan-400 font-bold uppercase tracking-widest mt-0.5">Hệ thống Quản lý POS v3.1 Premium</p>
+                    <p class="text-xs text-cyan-400 font-bold uppercase tracking-widest mt-0.5">Hệ thống Quản lý POS v3.2 Premium</p>
                 </div>
             </div>
             
             <div class="flex bg-slate-950 p-1.5 rounded-2xl border border-slate-800 gap-2 shadow-inner">
-                <button id="btn-court-1" onclick="switchCourt(1)" class="px-6 py-2.5 rounded-xl font-bold text-sm transition bg-cyan-600 text-white shadow-lg shadow-cyan-600/20">SÂN 1</button>
+                <button id="btn-court-1" onclick="switchCourt(1)" class="px-6 py-2.5 rounded-xl font-bold text-sm transition bg-cyan-600 text-white shadow-lg">SÂN 1</button>
                 <button id="btn-court-2" onclick="switchCourt(2)" class="px-6 py-2.5 rounded-xl font-bold text-sm transition text-slate-400 hover:bg-slate-900">SÂN 2</button>
                 <button id="btn-court-quick" onclick="switchCourt('quick')" class="px-6 py-2.5 rounded-xl font-bold text-sm transition text-rose-400 hover:bg-rose-950/30">🛒 BÁN LẺ VÃNG LAI</button>
             </div>
@@ -204,11 +202,11 @@ HTML
                         <div class="grid grid-cols-2 gap-3 pt-2 border-t border-slate-800/60">
                             <div>
                                 <label class="block text-xs font-bold text-rose-400 mb-1">Giảm thêm (k)</label>
-                                <input id="owner-discount" type="number" placeholder="0" oninput="calculateAll()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-sm font-bold text-rose-400 text-center focus:outline-none focus:border-rose-500/30">
+                                <input id="owner-discount" type="number" placeholder="0" oninput="calculateAll()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-sm font-bold text-rose-400 text-center focus:outline-none">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-cyan-400 mb-1">Khách CK (k)</label>
-                                <input id="bank-units" type="number" placeholder="0" oninput="calculateAll()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-sm font-bold text-cyan-400 text-center focus:outline-none focus:border-cyan-500/30">
+                                <input id="bank-units" type="number" placeholder="0" oninput="calculateAll()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-sm font-bold text-cyan-400 text-center focus:outline-none">
                             </div>
                         </div>
                     </div>
@@ -225,7 +223,7 @@ HTML
                     </div>
                     <div class="grid grid-cols-3 gap-2 mt-3">
                         <button onclick="resetCurrentCourt()" class="bg-slate-800 hover:bg-slate-700 text-slate-400 py-2 rounded-xl text-xs font-bold transition">Xóa</button>
-                        <button onclick="saveAndCheckout()" class="col-span-2 bg-cyan-600 hover:bg-cyan-700 text-white font-extrabold py-2.5 rounded-xl text-xs shadow-lg shadow-cyan-600/20 transition tracking-wide">XUẤT ĐƠN & ĐỒNG BỘ CLOUD</button>
+                        <button onclick="saveAndCheckout()" class="col-span-2 bg-cyan-600 hover:bg-cyan-700 text-white font-extrabold py-2.5 rounded-xl text-xs shadow-lg transition tracking-wide">XUẤT ĐƠN & ĐỒNG BỘ CLOUD</button>
                     </div>
                 </div>
             </section>
@@ -237,11 +235,11 @@ HTML
             <div class="bg-slate-950 px-6 py-3.5 flex flex-wrap justify-between items-center gap-4 border-b border-slate-800">
                 <div class="flex gap-6">
                     <button id="tab-btn-history" onclick="switchTab('history')" class="py-2 text-sm font-bold text-slate-500 hover:text-slate-300 transition border-b-2 border-transparent">📊 DOANH THU HỆ THỐNG</button>
-                    <button id="tab-btn-inventory" onclick="switchTab('inventory')" class="py-2 text-sm font-bold border-b-2 border-cyan-400 text-cyan-400 transition">📦 QUẢN LÝ KHO HÀNG CHUẨN v3.1</button>
+                    <button id="tab-btn-inventory" onclick="switchTab('inventory')" class="py-2 text-sm font-bold border-b-2 border-cyan-400 text-cyan-400 transition">📦 QUẢN LÝ KHO HÀNG CHUẨN v3.2</button>
                 </div>
                 <div class="flex items-center gap-2 text-sm">
                     <span class="text-slate-400 font-medium">Chọn ngày dữ liệu:</span>
-                    <input id="filter-date" type="date" onchange="renderHistory()" class="bg-slate-900 border border-slate-800 text-slate-200 rounded-xl px-3 py-1 font-bold focus:outline-none focus:border-cyan-500/50 cursor-pointer">
+                    <input id="filter-date" type="date" onchange="renderHistory()" class="bg-slate-900 border border-slate-800 text-slate-200 rounded-xl px-3 py-1 font-bold focus:outline-none cursor-pointer">
                 </div>
             </div>
 
@@ -256,11 +254,11 @@ HTML
 
                 <div class="overflow-x-auto border border-slate-800 rounded-xl">
                     <table class="w-full text-left text-sm font-medium text-slate-300">
-                        <head class="bg-slate-950 border-b border-slate-800 text-xs text-slate-400 uppercase tracking-wider">
+                        <thead class="bg-slate-950 border-b border-slate-800 text-xs text-slate-400 uppercase tracking-wider">
                             <tr>
                                 <th class="p-3">Giờ</th><th class="p-3">Khu vực</th><th class="p-3">Khách hàng</th><th class="p-3">Thời gian chơi</th>
                                 <th class="p-3 text-right">Tiền Sân</th><th class="p-3 text-right">Dịch vụ</th><th class="p-3 text-right text-cyan-400">Tổng cộng</th>
-                                <th class="p-3 text-right text-slate-400">Lời gốc</th><th class="p-3 pl-4 text-rose-400">Tiền mặt</th><th class="p-3 pl-4 text-cyan-400">Chuyển khoản</th><th class="p-3 text-center">Hành động</th>
+                                <th class="p-3 text-right text-slate-500">Lời gốc</th><th class="p-3 pl-4 text-rose-400">Tiền mặt</th><th class="p-3 pl-4 text-cyan-400">Chuyển khoản</th><th class="p-3 text-center">Hành động</th>
                             </tr>
                         </thead>
                         <tbody id="history-tbody" class="divide-y divide-slate-800/60 bg-slate-900/20"></tbody>
@@ -271,9 +269,9 @@ HTML
                     <div class="bg-slate-950 p-4 rounded-xl border border-slate-850">
                         <span class="text-xs font-bold text-rose-400 uppercase tracking-wider block mb-2">💸 Ghi nhận chi phí phát sinh</span>
                         <div class="flex gap-2">
-                            <input id="exp-add-reason" type="text" placeholder="Nhập lý do chi trong ngày..." class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-rose-500/30">
-                            <input id="exp-add-amount" type="number" placeholder="Số k..." class="w-24 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-center text-white focus:outline-none focus:border-rose-500/30">
-                            <button onclick="addNewExpense()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition shadow-lg shadow-rose-600/10">Thêm khoản chi</button>
+                            <input id="exp-add-reason" type="text" placeholder="Nhập lý do chi trong ngày..." class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none">
+                            <input id="exp-add-amount" type="number" placeholder="Số k..." class="w-24 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-center text-white focus:outline-none">
+                            <button onclick="addNewExpense()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition shadow-lg">Thêm khoản chi</button>
                         </div>
                     </div>
                     <div class="bg-slate-950 p-4 rounded-xl border border-slate-850">
@@ -288,12 +286,12 @@ HTML
                     <table class="w-full text-left text-sm text-slate-300 font-medium">
                         <thead class="bg-slate-950 text-slate-400 font-bold border-b border-slate-800 uppercase tracking-wider text-xs">
                             <tr>
-                                <th class="p-3 pl-5">Tên sản phẩm thiết bị</th>
-                                <th class="p-3 text-center w-40">Số lượng gốc (Nhấn để sửa)</th>
-                                <th class="p-3 text-center w-48">Quy đổi v3.1</th>
-                                <th class="p-3 text-center w-32">Giá vốn</th>
-                                <th class="p-3 text-center w-32">Giá bán</th>
-                                <th class="p-3 text-right pr-5 text-emerald-400">Lợi nhuận gốc</th>
+                                <th class="p-4 pl-5">Tên sản phẩm thiết bị</th>
+                                <th class="p-4 text-center">Số lượng gốc (Nhấn số để sửa/nhập hàng)</th>
+                                <th class="p-4 text-center">Quy đổi v3.2</th>
+                                <th class="p-4 text-center">Giá vốn (k)</th>
+                                <th class="p-4 text-center">Giá bán (k)</th>
+                                <th class="p-4 text-right pr-5 text-emerald-400">Lợi nhuận gốc / Đơn vị</th>
                             </tr>
                         </thead>
                         <tbody id="inventory-tbody" class="divide-y divide-slate-800/60 bg-slate-900/40"></tbody>
@@ -358,7 +356,7 @@ HTML
         function formatStockDisplay(prod) {
             if (prod.isShuttlecock) {
                 const target = prod.packSize === 12 ? globalInventory.find(p => p.id === prod.linkTo) : prod;
-                if (target) { const t = Math.floor(target.qty / 12); const u = target.qty % 12; return `<span class="text-cyan-400 font-bold">${t} bao / hộp</span> <span class="text-rose-400 font-bold">${u} quả lẻ</span>`; }
+                if (target) { const t = Math.floor(target.qty / 12); const u = target.qty % 12; return `<span class="text-cyan-400 font-bold">${t} bao/hộp</span> <span class="text-rose-400 font-bold">${u} quả lẻ</span>`; }
             }
             return `<span class="font-bold text-slate-400">${prod.qty} chiếc</span>`;
         }
@@ -367,7 +365,6 @@ HTML
             document.getElementById('filter-date').value = new Date().toLocaleDateString('sv-SE');
             courtsData = { 1: getEmptyObj(), 2: getEmptyObj(), 'quick': { items: {} } };
 
-            // CHỐNG LỖI MẤT KHO: Nhận diện cả mảng và Object từ Firebase
             window.fbListen('inventory', (data) => {
                 globalInventory = data ? (Array.isArray(data) ? data : Object.values(data)) : JSON.parse(JSON.stringify(initialInventory));
                 if (!data) window.fbSet('inventory', globalInventory);
@@ -376,7 +373,7 @@ HTML
             window.fbListen('history', (data) => { paymentHistory = data ? Object.values(data) : []; renderHistory(); });
             window.fbListen('expenses', (data) => { expensesData = data ? Object.values(data) : []; renderHistory(); });
             switchCourt(1);
-            switchTab('inventory'); // Mặc định mở tab kho như anh mong muốn
+            switchTab('inventory'); // Mở trực tiếp tab kho để anh kiểm tra hàng hóa
         }
 
         function getEmptyObj() { return { customerName: "", dayType: "weekday", startTime: "", endTime: "", discountType: "none", ownerDiscount: 0, cashUnits: 0, bankUnits: 0, items: {} }; }
@@ -600,43 +597,62 @@ HTML
         function deleteBill(id, e) { e.stopPropagation(); if (prompt("🔐 Vui lòng cung cấp mật khẩu quản trị cao cấp để XÓA đơn này:") === MASTER_PASSWORD) { window.fbListen('history', (snap) => { if(snap) Object.keys(snap).forEach(k => { if(snap[k].id === id) window.fbRemove(`history/${k}`); }); }); } }
         function addNewExpense() { const r = document.getElementById('exp-add-reason').value.trim(); const a = parseFloat(document.getElementById('exp-add-amount').value); if (r && a > 0) { window.fbPush('expenses', { id: 'EXP-'+Date.now(), date: document.getElementById('filter-date').value, time: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}), reason: r, amount: a }); document.getElementById('exp-add-reason').value=""; document.getElementById('exp-add-amount').value=""; } }
 
-        // CHỐNG LỖI KHO: ĐỒNG BỘ HAI CHIỀU THEO ID CHÍNH XÁC TUYỆT ĐỐI
-        window.startEditCell = function(pId, field, cur) {
-            const td = document.getElementById(`cell-${field}-${pId}`); if (!td) return;
-            const input = document.createElement('input'); input.type = 'number'; input.step = '0.1'; input.value = cur; input.className = 'edit-input';
+        // SỬA LỖI ĐỒNG BỘ: Hàm gọi ô Input chỉnh sửa chuẩn hoá không bị crash giao diện
+        window.startEditCell = function(pId, field, curValue) {
+            const td = document.getElementById(`cell-${field}-${pId}`);
+            if (!td) return;
+
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.value = curValue;
+            input.className = 'edit-input';
             
             input.onblur = function() {
-                const val = parseFloat(this.value); 
+                const val = parseFloat(this.value);
                 if (!isNaN(val) && val >= 0) {
-                    const targetProd = globalInventory.find(x => x.id === pId);
-                    if (targetProd) {
-                        targetProd[field] = val;
-                        // Logic quy đổi tự động v3.1 từ quả lẻ sang hộp nguyên
-                        if (field === 'qty' && targetProd.isShuttlecock && targetProd.packSize === 1) {
-                            const sib = globalInventory.find(x => x.id === targetProd.linkTo); 
+                    const prod = globalInventory.find(x => x.id === pId);
+                    if (prod) {
+                        prod[field] = val;
+                        // Tự động đồng bộ số lượng quy đổi từ quả lẻ sang hộp nguyên cho cầu đấu
+                        if (field === 'qty' && prod.isShuttlecock && prod.packSize === 1) {
+                            const sib = globalInventory.find(x => x.id === prod.linkTo);
                             if (sib) sib.qty = Math.floor(val / 12);
                         }
-                        window.fbSet('inventory', globalInventory); 
-                        triggerToast("Đã cập nhật kho dữ liệu thành công!");
+                        window.fbSet('inventory', globalInventory);
+                        triggerToast("Đã cập nhật dữ liệu hàng hóa!");
                     }
-                } else renderInventoryTable();
+                } else {
+                    renderInventoryTable();
+                }
             };
+
             input.onkeydown = function(e) { if (e.key === 'Enter') this.blur(); };
-            td.innerHTML = ''; td.appendChild(input); input.focus(); input.select();
+            td.innerHTML = '';
+            td.appendChild(input);
+            input.focus();
+            input.select();
         };
 
         function renderInventoryTable() {
-            const tbody = document.getElementById('inventory-tbody'); tbody.innerHTML = "";
+            const tbody = document.getElementById('inventory-tbody'); 
+            tbody.innerHTML = "";
+            
             globalInventory.forEach((prod) => {
-                const tr = document.createElement('tr'); tr.className = "border-b border-slate-800/60 hover:bg-slate-900/60 transition text-slate-300 font-semibold text-xs";
-                let qtyHtml = prod.packSize === 12 ? `<span class="text-slate-600 italic text-xs">Tự động tính từ quả lẻ</span>` : `<div id="cell-qty-${prod.id}" onclick="startEditCell('${prod.id}', 'qty', ${prod.qty})" class="editable-cell cursor-pointer hover:bg-slate-800 text-cyan-400 px-3 py-1 inline-block rounded-xl border border-transparent hover:border-cyan-500/20 font-bold">${prod.qty}</div>`;
+                const tr = document.createElement('tr'); 
+                tr.className = "border-b border-slate-800/60 hover:bg-slate-900/60 transition text-slate-300 font-semibold text-xs";
+                
+                // Cột quản lý số lượng gốc
+                let qtyCellHtml = prod.packSize === 12 
+                    ? `<span class="text-slate-600 italic text-xs">Tự tính từ Quả lẻ</span>` 
+                    : `<span class="text-cyan-400 font-bold bg-slate-950 px-3 py-1.5 rounded-lg border border-cyan-500/20 cursor-pointer hover:bg-slate-800 transition">${prod.qty}</span>`;
+
                 tr.innerHTML = `
-                    <td class="p-3 pl-5 text-white font-bold text-sm">${prod.name}</td>
-                    <td class="p-3 text-center">${qtyHtml}</td>
-                    <td class="p-3 text-center text-xs">${formatStockDisplay(prod)}</td>
-                    <td class="p-3 text-center" id="cell-cost-${prod.id}" onclick="startEditCell('${prod.id}', 'cost', ${prod.cost})"><span class="editable-cell cursor-pointer text-rose-400 hover:bg-slate-800 px-3 py-1 rounded-xl">${prod.cost}k</span></td>
-                    <td class="p-3 text-center" id="cell-price-${prod.id}" onclick="startEditCell('${prod.id}', 'price', ${prod.price})"><span class="editable-cell cursor-pointer text-cyan-400 hover:bg-slate-800 px-3 py-1 rounded-xl">${prod.price}k</span></td>
-                    <td class="p-3 text-right pr-5 text-emerald-400 font-bold">${formatNum(prod.price - prod.cost)}k</td>
+                    <td class="p-4 pl-5 text-white font-bold text-sm">${prod.name}</td>
+                    <td class="p-4 text-center" id="cell-qty-${prod.id}" onclick="${prod.packSize !== 12 ? `startEditCell('${prod.id}', 'qty', ${prod.qty})` : ''}">${qtyCellHtml}</td>
+                    <td class="p-4 text-center text-xs">${formatStockDisplay(prod)}</td>
+                    <td class="p-4 text-center" id="cell-cost-${prod.id}" onclick="startEditCell('${prod.id}', 'cost', ${prod.cost})"><span class="cursor-pointer text-rose-400 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800 hover:bg-slate-850 transition">${prod.cost}k</span></td>
+                    <td class="p-4 text-center" id="cell-price-${prod.id}" onclick="startEditCell('${prod.id}', 'price', ${prod.price})"><span class="cursor-pointer text-cyan-400 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800 hover:bg-slate-850 transition">${prod.price}k</span></td>
+                    <td class="p-4 text-right pr-5 text-emerald-400 font-bold text-sm">${formatNum(prod.price - prod.cost)}k</td>
                 `;
                 tbody.appendChild(tr);
             });

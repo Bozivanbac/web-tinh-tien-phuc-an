@@ -314,6 +314,29 @@ HTML
             </div>
 
             <div id="tab-content-inventory" class="p-4 block-state-control" style="display: block;">
+                
+                <div class="bg-slate-950/80 p-4 rounded-xl border border-emerald-900/40 mb-4 shadow-inner">
+                    <h3 class="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        Thêm Sản Phẩm Mới / Nhập Hàng
+                    </h3>
+                    <div class="grid grid-cols-2 md:grid-cols-7 gap-3">
+                        <input id="new-prod-id" type="text" placeholder="Mã (vd: bo_hoc)" title="Mã sản phẩm viết liền không dấu" class="col-span-2 md:col-span-1 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500 transition">
+                        <input id="new-prod-name" type="text" placeholder="Tên sản phẩm" class="col-span-2 md:col-span-2 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500 transition">
+                        <select id="new-prod-type" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500 transition">
+                            <option value="drinks">Đồ uống / Món ăn</option>
+                            <option value="gear">Phụ kiện thể thao</option>
+                        </select>
+                        <input id="new-prod-qty" type="number" placeholder="Số lượng" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500 transition">
+                        <input id="new-prod-cost" type="number" placeholder="Giá vốn (k)" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500 transition">
+                        <input id="new-prod-price" type="number" placeholder="Giá bán (k)" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500 transition">
+                    </div>
+                    <div class="mt-3 flex justify-between items-center">
+                        <p class="text-xs text-slate-500 italic">Lưu ý: Đối với mặt hàng cũ, bạn có thể ấn trực tiếp vào các con số trong bảng bên dưới để sửa tồn kho.</p>
+                        <button onclick="addNewProduct()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-2 rounded-lg text-sm shadow-lg shadow-emerald-500/20 transition">Thêm vào kho</button>
+                    </div>
+                </div>
+
                 <div class="overflow-x-auto border border-slate-800 rounded-xl">
                     <table class="w-full text-left text-sm text-slate-300 font-medium">
                         <thead class="bg-slate-950 text-slate-400 font-bold border-b border-slate-800 uppercase tracking-wider text-xs">
@@ -654,6 +677,42 @@ HTML
         function deleteBill(id, e) { e.stopPropagation(); if (prompt("🔐 Vui lòng cung cấp mật khẩu quản trị cao cấp để XÓA đơn này:") === MASTER_PASSWORD) { window.fbListen('history', (snap) => { if(snap) Object.keys(snap).forEach(k => { if(snap[k].id === id) window.fbRemove(`history/${k}`); }); }); } }
         function addNewExpense() { const r = document.getElementById('exp-add-reason').value.trim(); const a = parseFloat(document.getElementById('exp-add-amount').value); if (r && a > 0) { window.fbPush('expenses', { id: 'EXP-'+Date.now(), date: document.getElementById('filter-date').value, time: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}), reason: r, amount: a }); document.getElementById('exp-add-reason').value=""; document.getElementById('exp-add-amount').value=""; } }
 
+        /* HÀM XỬ LÝ THÊM SẢN PHẨM MỚI VÀO KHO */
+        window.addNewProduct = function() {
+            if (prompt("🔐 Vui lòng nhập mật khẩu quản trị để thêm hàng mới:") !== MASTER_PASSWORD) {
+                alert("⚠️ Sai mật khẩu quản trị!"); return;
+            }
+            
+            const id = document.getElementById('new-prod-id').value.trim().toLowerCase().replace(/\s+/g, '_');
+            const name = document.getElementById('new-prod-name').value.trim();
+            const type = document.getElementById('new-prod-type').value;
+            const qty = parseInt(document.getElementById('new-prod-qty').value);
+            const cost = parseFloat(document.getElementById('new-prod-cost').value);
+            const price = parseFloat(document.getElementById('new-prod-price').value);
+
+            if(!id || !name || isNaN(qty) || isNaN(cost) || isNaN(price)) {
+                alert("⚠️ Vui lòng nhập đầy đủ và chính xác thông tin (các ô số liệu phải là số).");
+                return;
+            }
+            
+            if(globalInventory.some(p => p.id === id)) {
+                alert("⚠️ Mã sản phẩm này đã tồn tại trong kho! Vui lòng đặt mã khác hoặc đổi tên viết tắt.");
+                return;
+            }
+
+            const newProd = { id: id, name: name, type: type, qty: qty, cost: cost, price: price, isShuttlecock: false };
+            globalInventory.push(newProd);
+            window.fbSet('inventory', globalInventory);
+            
+            document.getElementById('new-prod-id').value = "";
+            document.getElementById('new-prod-name').value = "";
+            document.getElementById('new-prod-qty').value = "";
+            document.getElementById('new-prod-cost').value = "";
+            document.getElementById('new-prod-price').value = "";
+            
+            triggerToast("Đã thêm thành công sản phẩm mới!");
+        };
+
         window.startEditCell = function(pId, field, curValue) {
             const td = document.getElementById(`cell-${field}-${pId}`);
             if (!td) return;
@@ -706,15 +765,15 @@ HTML
                 if (prod.packSize === 12) {
                     qtyCellHtml = `<span class="text-slate-600 italic text-xs">Tự tính từ Quả lẻ</span>`;
                 } else {
-                    qtyCellHtml = `<span class="text-cyan-400 font-bold bg-slate-950 px-4 py-2 rounded-lg border border-cyan-500/20 cursor-pointer hover:bg-slate-800 transition">${prod.qty}</span>`;
+                    qtyCellHtml = `<span class="text-cyan-400 font-bold bg-slate-950 px-4 py-2 rounded-lg border border-cyan-500/20 cursor-pointer hover:bg-slate-800 transition shadow-inner">${prod.qty}</span>`;
                 }
 
                 tr.innerHTML = `
                     <td class="p-4 pl-5 text-white font-bold text-sm truncate">${prod.name}</td>
                     <td class="p-4 text-center" id="cell-qty-${prod.id}">${qtyCellHtml}</td>
                     <td class="p-4 text-center text-xs">${formatStockDisplay(prod)}</td>
-                    <td class="p-4 text-center" id="cell-cost-${prod.id}"><span class="cursor-pointer text-rose-400 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800 hover:bg-slate-850 transition">${prod.cost}k</span></td>
-                    <td class="p-4 text-center" id="cell-price-${prod.id}"><span class="cursor-pointer text-cyan-400 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800 hover:bg-slate-850 transition">${prod.price}k</span></td>
+                    <td class="p-4 text-center" id="cell-cost-${prod.id}"><span class="cursor-pointer text-rose-400 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800 hover:bg-slate-850 transition shadow-inner">${prod.cost}k</span></td>
+                    <td class="p-4 text-center" id="cell-price-${prod.id}"><span class="cursor-pointer text-cyan-400 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800 hover:bg-slate-850 transition shadow-inner">${prod.price}k</span></td>
                     <td class="p-4 text-right pr-5 text-emerald-400 font-bold text-sm">${formatNum(prod.price - prod.cost)}k</td>
                 `;
 

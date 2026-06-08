@@ -4,7 +4,7 @@ HTML
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Phúc An Badminton - Premium Cloud POS v4.0</title>
+    <title>Phúc An Badminton - Premium Cloud POS v4.2</title>
     
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -59,7 +59,6 @@ HTML
 
         window.onload = () => {
             initSystem();
-            // Đăng ký Service Worker ảo để kích hoạt tính năng PWA cài thành App
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('data:application/javascript,self.addEventListener("fetch",function(e){});');
             }
@@ -76,7 +75,7 @@ HTML
                 </div>
                 <div>
                     <h1 class="text-base font-black tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500">PHÚC AN POS</h1>
-                    <p class="text-[10px] text-cyan-400 font-bold uppercase tracking-widest">Mobile Native App v4.0</p>
+                    <p class="text-[10px] text-cyan-400 font-bold uppercase tracking-widest">Mobile Native App v4.2</p>
                 </div>
             </div>
             
@@ -156,11 +155,11 @@ HTML
                 </div>
                 <div class="space-y-3">
                     <div>
-                        <span class="text-[10px] font-bold text-cyan-400 block mb-1.5 uppercase tracking-widest">🥤 Đồ ăn & Nước giải khát</span>
+                        <span class="text-[10px] font-bold text-cyan-400 block mb-1.5 uppercase tracking-widest">🥤 ĐỒ ĂN & NƯỚC GIẢI KHÁT</span>
                         <div id="menu-drinks" class="grid grid-cols-2 sm:grid-cols-4 gap-2 max-h-[170px] overflow-y-auto pr-1"></div>
                     </div>
                     <div>
-                        <span class="text-[10px] font-bold text-rose-400 block mb-1.5 uppercase tracking-widest">🏸 Phụ kiện thể thao & Cầu đấu</span>
+                        <span class="text-[10px] font-bold text-rose-400 block mb-1.5 uppercase tracking-widest">🏸 PHỤ KIỆN THỂ THAO & CẦU ĐẤU</span>
                         <div id="menu-gear" class="grid grid-cols-2 sm:grid-cols-4 gap-2 max-h-[170px] overflow-y-auto pr-1"></div>
                     </div>
                 </div>
@@ -255,7 +254,7 @@ HTML
             <div class="bg-slate-950 px-4 py-2.5 flex flex-wrap justify-between items-center gap-2 border-b border-slate-800">
                 <div class="flex gap-4">
                     <button id="tab-btn-history" onclick="switchTab('history')" class="py-1 text-xs font-bold text-slate-500 border-b-2 border-transparent">📊 DOANH THU</button>
-                    <button id="tab-btn-inventory" onclick="switchTab('inventory')" class="py-1 text-xs font-bold text-slate-500 border-b-2 border-transparent">📦 KHO HÀNG CHUẨN v4.0</button>
+                    <button id="tab-btn-inventory" onclick="switchTab('inventory')" class="py-1 text-xs font-bold text-slate-500 border-b-2 border-transparent">📦 KHO HÀNG CHUẨN v4.2</button>
                 </div>
                 <div class="flex items-center gap-1.5 text-xs">
                     <input id="filter-date" type="date" onchange="renderHistory()" class="bg-slate-900 border border-slate-800 text-slate-200 rounded-lg px-2 py-0.5 font-bold focus:outline-none">
@@ -265,10 +264,16 @@ HTML
             <div id="tab-content-history" class="p-3 space-y-3 block-state-control">
                 <div class="grid grid-cols-2 md:grid-cols-5 gap-2 text-center text-xs">
                     <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-855"><p class="text-[10px] text-slate-400 font-bold uppercase">Doanh thu ngày</p><p id="stat-day-total" class="font-black text-white mt-0.5">0đ</p></div>
-                    <div class="bg-rose-950/20 p-2.5 rounded-lg border border-rose-900/30"><p class="text-[10px] text-rose-400 font-bold uppercase">💵 Tiền mặt</p><p id="stat-day-cash" class="font-black text-rose-400 mt-0.5">0đ</p></div>
-                    <div class="bg-cyan-950/20 p-2.5 rounded-lg border border-cyan-900/30"><p class="text-[10px] text-cyan-400 font-bold uppercase">💳 Nhận CK</p><p id="stat-day-bank" class="font-black text-cyan-400 mt-0.5">0đ</p></div>
+                    <div class="bg-rose-950/20 p-2.5 rounded-lg border border-rose-900/30"><p class="text-[10px] text-rose-400 font-bold uppercase">💵 Tiền mặt ngày</p><p id="stat-day-cash" class="font-black text-rose-400 mt-0.5">0đ</p></div>
+                    <div class="bg-cyan-950/20 p-2.5 rounded-lg border border-cyan-900/30"><p class="text-[10px] text-cyan-400 font-bold uppercase">💳 Nhận CK ngày</p><p id="stat-day-bank" class="font-black text-cyan-400 mt-0.5">0đ</p></div>
                     <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-855"><p class="text-[10px] text-slate-400 font-bold uppercase">Tổng chi ngày</p><p id="stat-day-expense" class="font-black text-slate-400 mt-0.5">0đ</p></div>
                     <div class="bg-emerald-950/30 p-2.5 rounded-lg border border-emerald-900/30 col-span-2 md:col-span-1"><p class="text-[10px] text-emerald-400 font-bold uppercase">LÃI THÁNG NÀY</p><p id="stat-month-total" class="font-black text-emerald-400 mt-0.5">0đ</p></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-2 text-center text-xs bg-slate-950/60 p-3 rounded-xl border border-slate-800">
+                    <div class="bg-slate-950 p-2 rounded-lg border border-slate-800"><p class="text-[10px] text-slate-400 font-bold uppercase">📈 Tổng doanh thu tuần này</p><p id="stat-week-total" class="font-black text-white text-sm mt-0.5">0đ</p></div>
+                    <div class="bg-rose-950/10 p-2 rounded-lg border border-rose-900/20"><p class="text-[10px] text-rose-400 font-bold uppercase">💵 Tổng tiền mặt tuần</p><p id="stat-week-cash" class="font-black text-rose-400 text-sm mt-0.5">0đ</p></div>
+                    <div class="bg-cyan-950/10 p-2 rounded-lg border border-cyan-900/20"><p class="text-[10px] text-cyan-400 font-bold uppercase">💳 Tổng chuyển khoản tuần</p><p id="stat-week-bank" class="font-black text-cyan-400 text-sm mt-0.5">0đ</p></div>
                 </div>
 
                 <div class="overflow-x-auto border border-slate-800 rounded-xl">
@@ -364,6 +369,13 @@ HTML
 
         function formatNum(num) { return (isNaN(num) || num === null) ? "0" : Number(Math.round(num * 100) / 100).toLocaleString('vi-VN'); }
 
+        function getWeekNumber(dateStr) {
+            const d = new Date(dateStr); if (isNaN(d.getTime())) return 0;
+            d.setHours(0, 0, 0, 0); d.setDate(d.getDate() + 4 - (d.getDay() || 7));
+            const yearStart = new Date(d.getFullYear(), 0, 1);
+            return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+        }
+
         function formatStockDisplay(prod) {
             if (prod.isShuttlecock) {
                 const target = prod.packSize === 12 ? globalInventory.find(p => p.id === prod.linkTo) : prod;
@@ -422,7 +434,7 @@ HTML
                 document.getElementById('menu-current-target').innerText = "VÃNG LAI";
             } else {
                 document.getElementById('time-config-section').style.display = 'block'; 
-                document.getElementById('section-court-bill').style.display = 'flex'; 
+                document.getElementById('section-court-bill').style.display = 'flex'; // ĐÃ FIX
                 document.getElementById('section-quick-sale').style.display = 'none';
                 document.getElementById('menu-current-target').innerText = "SÂN " + n; 
                 document.getElementById('bill-court-title').innerText = n;
@@ -621,17 +633,34 @@ HTML
         }
 
         function renderHistory() {
-            const fDate = document.getElementById('filter-date').value; const fMonth = fDate.substring(0, 7);
+            const fDate = document.getElementById('filter-date').value; 
+            const fMonth = fDate.substring(0, 7);
+            const targetWeek = getWeekNumber(fDate); 
+            const targetYear = new Date(fDate).getFullYear();
+
             const tbody = document.getElementById('history-tbody'); tbody.innerHTML = "";
-            let dayTot = 0, cash = 0, bank = 0, exp = 0, monthTot = 0, monthExp = 0;
+            
+            let dayTot = 0, cash = 0, bank = 0, exp = 0;
+            let weekTot = 0, weekCash = 0, weekBank = 0;
+            let monthTot = 0, monthExp = 0;
             
             paymentHistory.forEach(b => {
+                const bWeek = getWeekNumber(b.date);
+                const bYear = new Date(b.date).getFullYear();
+
                 if (b.date === fDate) {
                     dayTot += b.totalBill; cash += b.cashReceived; bank += b.bankReceived;
                     const tr = document.createElement('tr'); tr.className = "border-b border-slate-800/60 hover:bg-slate-800/30 font-semibold text-slate-300 transition text-[11px]";
                     tr.innerHTML = `<td class="p-2.5 text-slate-500">${b.time}</td><td class="p-2.5 font-bold ${b.courtNum==='Lẻ'?'text-rose-400':'text-cyan-400'}">${b.courtNum==='Lẻ'?'Bán lẻ':'Sân '+b.courtNum}</td><td class="p-2.5 max-w-[100px] truncate text-white">${b.customerName}</td><td class="p-2.5 text-slate-400">${b.timeRange}</td><td class="p-2.5 text-right">${formatNum(b.courtFee)}k</td><td class="p-2.5 text-right text-rose-400">${formatNum(b.serviceFee)}k</td><td class="p-2.5 text-right text-cyan-400">${formatNum(b.totalBill)}k</td><td class="p-2.5 text-right text-slate-500">${formatNum(b.profitGoods)}k</td><td class="p-2.5 text-rose-400">${formatNum(b.cashReceived)}k</td><td class="p-2.5 text-cyan-400">${formatNum(b.bankReceived)}k</td><td class="p-2.5 text-center"><button onclick="deleteBill('${b.id}', event)" class="text-slate-600 hover:text-red-400 font-bold p-1">✕</button></td>`;
                     tbody.appendChild(tr);
                 }
+
+                if (bWeek === targetWeek && bYear === targetYear) {
+                    weekTot += b.totalBill;
+                    weekCash += b.cashReceived;
+                    weekBank += b.bankReceived;
+                }
+
                 if (b.date.startsWith(fMonth)) monthTot += b.totalBill;
             });
             
@@ -641,7 +670,16 @@ HTML
             });
 
             document.getElementById('expense-list-container').innerHTML = expensesData.filter(e => e.date === fDate).map(e => `<div class="flex justify-between bg-slate-900 p-2 rounded-lg border border-slate-800"><span>• ${e.reason}</span><span class="text-rose-400 font-bold">-${e.amount}k</span></div>`).join("") || `<span class="text-slate-600 italic">Không có khoản chi nào...</span>`;
-            document.getElementById('stat-day-total').innerText = `${formatNum(dayTot)}k`; document.getElementById('stat-day-cash').innerText = `${formatNum(cash)}k`; document.getElementById('stat-day-bank').innerText = `${formatNum(bank)}k`; document.getElementById('stat-day-expense').innerText = `${formatNum(exp)}k`; document.getElementById('stat-month-total').innerText = `${formatNum(monthTot - monthExp)}k`;
+            
+            document.getElementById('stat-day-total').innerText = `${formatNum(dayTot)}k`; 
+            document.getElementById('stat-day-cash').innerText = `${formatNum(cash)}k`; 
+            document.getElementById('stat-day-bank').innerText = `${formatNum(bank)}k`; 
+            document.getElementById('stat-day-expense').innerText = `${formatNum(exp)}k`; 
+            document.getElementById('stat-month-total').innerText = `${formatNum(monthTot - monthExp)}k`;
+
+            document.getElementById('stat-week-total').innerText = `${formatNum(weekTot)}k`;
+            document.getElementById('stat-week-cash').innerText = `${formatNum(weekCash)}k`;
+            document.getElementById('stat-week-bank').innerText = `${formatNum(weekBank)}k`;
         }
 
         function deleteBill(id, e) { e.stopPropagation(); if (prompt("🔐 Vui lòng cung cấp mật khẩu quản trị cao cấp để XÓA đơn này:") === MASTER_PASSWORD) { window.fbListen('history', (snap) => { if(snap) Object.keys(snap).forEach(k => { if(snap[k].id === id) window.fbRemove(`history/${k}`); }); }); } }

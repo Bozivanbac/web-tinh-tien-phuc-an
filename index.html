@@ -4,7 +4,7 @@ HTML
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Phúc An Badminton - Premium Cloud POS v4.3</title>
+    <title>Phúc An Badminton - Premium Cloud POS v4.4</title>
     
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -75,7 +75,7 @@ HTML
                 </div>
                 <div>
                     <h1 class="text-base font-black tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500">PHÚC AN POS</h1>
-                    <p class="text-[10px] text-cyan-400 font-bold uppercase tracking-widest">Mobile Native App v4.3</p>
+                    <p class="text-[10px] text-cyan-400 font-bold uppercase tracking-widest">Mobile Native App v4.4</p>
                 </div>
             </div>
             
@@ -254,7 +254,7 @@ HTML
             <div class="bg-slate-950 px-4 py-2.5 flex flex-wrap justify-between items-center gap-2 border-b border-slate-800">
                 <div class="flex gap-4">
                     <button id="tab-btn-history" onclick="switchTab('history')" class="py-1 text-xs font-bold text-slate-500 border-b-2 border-transparent">📊 DOANH THU</button>
-                    <button id="tab-btn-inventory" onclick="switchTab('inventory')" class="py-1 text-xs font-bold text-slate-500 border-b-2 border-transparent">📦 KHO HÀNG CHUẨN v4.3</button>
+                    <button id="tab-btn-inventory" onclick="switchTab('inventory')" class="py-1 text-xs font-bold text-slate-500 border-b-2 border-transparent">📦 KHO HÀNG CHUẨN v4.4</button>
                 </div>
                 <div class="flex items-center gap-1.5 text-xs">
                     <input id="filter-date" type="date" onchange="renderHistory()" class="bg-slate-900 border border-slate-800 text-slate-200 rounded-lg px-2 py-0.5 font-bold focus:outline-none">
@@ -384,7 +384,7 @@ HTML
             return `<span class="font-bold text-slate-400">${prod.qty} chiếc</span>`;
         }
 
-        // ĐÃ NÂNG CẤP: Đọc dữ liệu tạm cũ từ localStorage lên nếu có
+        // ĐÃ SỬA LỖI: Đồng bộ thứ tự load Firebase và LocalStorage tránh xung đột thông tin hiển thị bill
         function initSystem() {
             try {
                 const tzOffset = (new Date()).getTimezoneOffset() * 60000;
@@ -392,29 +392,34 @@ HTML
                 document.getElementById('filter-date').value = localISOTime;
             } catch(e) { document.getElementById('filter-date').value = ""; }
 
-            const savedCourts = localStorage.getItem('pab_courts_draft');
-            if (savedCourts) {
-                try { courtsData = JSON.parse(savedCourts); } catch(e) { courtsData = null; }
-            }
-            
-            if (!courtsData || !courtsData[1] || !courtsData[2]) {
-                courtsData = { 1: getEmptyObj(), 2: getEmptyObj(), 'quick': { items: {} } };
-            }
+            switchTab('history');
 
-            switchTab('history'); switchCourt(1);
-
+            // 1. Lắng nghe dữ liệu kho hàng từ Cloud trước
             window.fbListen('inventory', (data) => {
                 globalInventory = data ? (Array.isArray(data) ? data : Object.values(data)) : JSON.parse(JSON.stringify(initialInventory));
                 if (!data) window.fbSet('inventory', globalInventory);
-                renderMenuDichVu(); renderInventoryTable(); calculateAll();
+                
+                // 2. Sau khi có Kho hàng mới load dữ liệu tạm nháp lên để không bị lỗi hiển thị
+                const savedCourts = localStorage.getItem('pab_courts_draft');
+                if (savedCourts) {
+                    try { courtsData = JSON.parse(savedCourts); } catch(e) { courtsData = null; }
+                }
+                
+                if (!courtsData || !courtsData[1] || !courtsData[2]) {
+                    courtsData = { 1: getEmptyObj(), 2: getEmptyObj(), 'quick': { items: {} } };
+                }
+
+                renderMenuDichVu(); 
+                renderInventoryTable(); 
+                switchCourt(currentCourt); // Cập nhật form và kích hoạt hàm tính tiền
             });
+
             window.fbListen('history', (data) => { paymentHistory = data ? Object.values(data) : []; renderHistory(); });
             window.fbListen('expenses', (data) => { expensesData = data ? Object.values(data) : []; renderHistory(); });
         }
 
         function getEmptyObj() { return { customerName: "", dayType: "weekday", startTime: "", endTime: "", discountType: "none", ownerDiscount: 0, cashUnits: 0, bankUnits: 0, items: {} }; }
 
-        // ĐÃ NÂNG CẤP: Lưu đệm trạng thái vào localStorage liên tục
         function saveState() {
             if (currentCourt === 'quick') {
                 courtsData['quick'].bankUnits = parseFloat(document.getElementById('quick-bank').value) || 0;
@@ -456,10 +461,13 @@ HTML
                 document.getElementById('bill-court-title').innerText = n;
                 
                 const c = courtsData[n];
-                document.getElementById('customer-name').value = c.customerName; document.getElementById('day-type').value = c.dayType;
-                document.getElementById('start-time').value = c.startTime; document.getElementById('end-time').value = c.endTime;
-                document.getElementById('discount-select').value = c.discountType;
-                document.getElementById('owner-discount').value = c.ownerDiscount || ""; document.getElementById('bank-units').value = c.bankUnits || "";
+                document.getElementById('customer-name').value = c.customerName || ""; 
+                document.getElementById('day-type').value = c.dayType || "weekday";
+                document.getElementById('start-time').value = c.startTime || ""; 
+                document.getElementById('end-time').value = c.endTime || "";
+                document.getElementById('discount-select').value = c.discountType || "none";
+                document.getElementById('owner-discount').value = c.ownerDiscount || ""; 
+                document.getElementById('bank-units').value = c.bankUnits || "";
                 renderShortcuts();
             }
             calculateAll();
@@ -501,6 +509,7 @@ HTML
         function updateItemQty(pId, delta) {
             const c = courtsData[currentCourt]; const cur = c.items[pId] || 0;
             const p = globalInventory.find(x => x.id === pId);
+            if(!p) return;
             let maxVal = p.qty; 
             
             if (p.isShuttlecock && p.packSize === 12) { 
@@ -525,14 +534,13 @@ HTML
                 c.bankUnits = parseFloat(document.getElementById('quick-bank').value) || 0;
             }
 
-            // Đồng bộ bộ nhớ tạm liên tục khi có thay đổi số liệu
             localStorage.setItem('pab_courts_draft', JSON.stringify(courtsData));
 
             globalInventory.forEach(p => { const el = document.getElementById(`qty-view-${p.id}`); if (el) el.innerText = c.items[p.id] || 0; });
 
             if (currentCourt === 'quick') {
                 let total = 0, html = "";
-                Object.keys(c.items).forEach(id => { const p = globalInventory.find(x => x.id === id); total += (p.price * c.items[id]); html += `<div class="flex justify-between"><span>• ${p.name} (x${c.items[id]})</span><span>${p.price*c.items[id]}k</span></div>`; });
+                Object.keys(c.items).forEach(id => { const p = globalInventory.find(x => x.id === id); if(p){ total += (p.price * c.items[id]); html += `<div class="flex justify-between"><span>• ${p.name} (x${c.items[id]})</span><span>${p.price*c.items[id]}k</span></div>`; } });
                 c.cashUnits = Math.max(0, total - c.bankUnits);
                 document.getElementById('quick-items-list').innerHTML = html || `<span class="text-slate-600 italic">Giỏ hàng trống...</span>`;
                 document.getElementById('quick-total-fee').innerText = `${total}k`; return;
@@ -564,9 +572,12 @@ HTML
 
             let dFee = 0, gFee = 0, dHtml = ""; let gHtml = "";
             Object.keys(c.items).forEach(id => {
-                const p = globalInventory.find(x => x.id === id); const totalItem = p.price * c.items[id];
-                if (p.type === 'drinks') { dFee += totalItem; dHtml += `<div>• ${p.name} (x${c.items[id]})</div>`; }
-                else { gFee += totalItem; gHtml += `<div>• ${p.name} (x${c.items[id]})</div>`; }
+                const p = globalInventory.find(x => x.id === id); 
+                if(p) {
+                    const totalItem = p.price * c.items[id];
+                    if (p.type === 'drinks') { dFee += totalItem; dHtml += `<div>• ${p.name} (x${c.items[id]})</div>`; }
+                    else { gFee += totalItem; gHtml += `<div>• ${p.name} (x${c.items[id]})</div>`; }
+                }
             });
 
             document.getElementById('drinks-fee-display').innerText = `${dFee}k`; document.getElementById('drinks-list-note').innerHTML = dHtml || "Chưa gọi nước";
@@ -592,24 +603,26 @@ HTML
             let cost = 0;
             for (let id in cart) {
                 const q = cart[id]; const p = globalInventory.find(x => x.id === id);
-                if (p.isShuttlecock) {
-                    const totalUnits = q * p.packSize;
-                    const le = p.packSize === 1 ? p : globalInventory.find(x => x.id === p.linkTo);
-                    const ong = p.packSize === 12 ? p : globalInventory.find(x => x.id === p.linkTo);
-                    le.qty -= totalUnits; ong.qty = Math.floor(le.qty / 12); cost += (le.cost * totalUnits);
-                } else { p.qty -= q; cost += (p.cost * q); }
+                if(p) {
+                    if (p.isShuttlecock) {
+                        const totalUnits = q * p.packSize;
+                        const le = p.packSize === 1 ? p : globalInventory.find(x => x.id === p.linkTo);
+                        const ong = p.packSize === 12 ? p : globalInventory.find(x => x.id === p.linkTo);
+                        if(le) { le.qty -= totalUnits; cost += (le.cost * totalUnits); }
+                        if(ong && le) { ong.qty = Math.floor(le.qty / 12); }
+                    } else { p.qty -= q; cost += (p.cost * q); }
+                }
             }
             return cost;
         }
 
         function checkoutQuickSale() {
             const c = courtsData['quick']; if (Object.keys(c.items).length === 0) return;
-            let serv = 0; Object.keys(c.items).forEach(id => { const p = globalInventory.find(x => x.id === id); serv += (p.price * c.items[id]); });
+            let serv = 0; Object.keys(c.items).forEach(id => { const p = globalInventory.find(x => x.id === id); if(p) serv += (p.price * c.items[id]); });
             let costGoods = deductInv(c.items);
             const r = { id: 'PAB-Q-'+Date.now(), date: document.getElementById('filter-date').value, time: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}), courtNum: "Lẻ", customerName: "Khách lẻ vãng lai", timeRange: "Bán lẻ", courtFee: 0, serviceFee: serv, totalBill: serv, profitGoods: serv - costGoods, cashReceived: c.cashUnits, bankReceived: c.bankUnits, rawDetails: { items: c.items } };
             window.fbPush('history', r); window.fbSet('inventory', globalInventory); 
             
-            // Thành công thì xóa cache giỏ lẻ
             c.items = {}; document.getElementById('quick-bank').value = ""; 
             saveState(); 
             triggerToast("Đã chốt bán lẻ!");
@@ -631,7 +644,7 @@ HTML
             }
             if (mins === 0 && Object.keys(c.items).length === 0) { alert("Sân hiện tại đang trống, vui lòng kiểm tra lại dữ liệu!"); return; }
             let finalCourtFee = c.discountType === "fixed" ? fee * 0.85 : fee;
-            let serv = 0; Object.keys(c.items).forEach(id => { const p = globalInventory.find(x => x.id === id); serv += (p.price * c.items[id]); });
+            let serv = 0; Object.keys(c.items).forEach(id => { const p = globalInventory.find(x => x.id === id); if(p) serv += (p.price * c.items[id]); });
             let costGoods = deductInv(c.items);
             let tot = Math.max(0, finalCourtFee + serv - c.ownerDiscount);
 
@@ -651,7 +664,7 @@ HTML
                 document.getElementById('discount-select').value="none"; document.getElementById('owner-discount').value=""; 
                 document.getElementById('bank-units').value=""; 
             } 
-            saveState(); // Cập nhật lại bộ nhớ trống sau khi xóa trắng
+            saveState(); 
             calculateAll(); 
         }
         

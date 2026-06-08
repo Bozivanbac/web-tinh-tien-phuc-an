@@ -4,7 +4,7 @@ HTML
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Phúc An Badminton - Premium Cloud POS v4.4</title>
+    <title>Phúc An Badminton - Premium Cloud POS v4.4.1</title>
     
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -36,6 +36,7 @@ HTML
         ::-webkit-scrollbar-track { background: #0f172a; }
         ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
         input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(0.6) sepia(1) saturate(5) hue-rotate(175deg); cursor: pointer; }
+        .row-expanded { background-color: rgba(30, 41, 59, 0.5) !important; }
     </style>
 
     <script type="module">
@@ -75,7 +76,7 @@ HTML
                 </div>
                 <div>
                     <h1 class="text-base font-black tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500">PHÚC AN POS</h1>
-                    <p class="text-[10px] text-cyan-400 font-bold uppercase tracking-widest">Mobile Native App v4.4</p>
+                    <p class="text-[10px] text-cyan-400 font-bold uppercase tracking-widest">Mobile Native App v4.4.1</p>
                 </div>
             </div>
             
@@ -253,8 +254,8 @@ HTML
         <div class="bg-slate-900 rounded-xl overflow-hidden border border-slate-800 shadow-2xl">
             <div class="bg-slate-950 px-4 py-2.5 flex flex-wrap justify-between items-center gap-2 border-b border-slate-800">
                 <div class="flex gap-4">
-                    <button id="tab-btn-history" onclick="switchTab('history')" class="py-1 text-xs font-bold text-slate-500 border-b-2 border-transparent">📊 DOANH THU</button>
-                    <button id="tab-btn-inventory" onclick="switchTab('inventory')" class="py-1 text-xs font-bold text-slate-500 border-b-2 border-transparent">📦 KHO HÀNG CHUẨN v4.4</button>
+                    <button id="tab-btn-history" onclick="switchTab('history')" class="py-1 text-xs font-bold text-slate-500 border-b-2 border-transparent">📊 DOANH THU (Bấm đơn để xem chi tiết)</button>
+                    <button id="tab-btn-inventory" onclick="switchTab('inventory')" class="py-1 text-xs font-bold text-slate-500 border-b-2 border-transparent">📦 KHO HÀNG CHUẨN v4.4.1</button>
                 </div>
                 <div class="flex items-center gap-1.5 text-xs">
                     <input id="filter-date" type="date" onchange="renderHistory()" class="bg-slate-900 border border-slate-800 text-slate-200 rounded-lg px-2 py-0.5 font-bold focus:outline-none">
@@ -384,7 +385,6 @@ HTML
             return `<span class="font-bold text-slate-400">${prod.qty} chiếc</span>`;
         }
 
-        // ĐÃ SỬA LỖI: Đồng bộ thứ tự load Firebase và LocalStorage tránh xung đột thông tin hiển thị bill
         function initSystem() {
             try {
                 const tzOffset = (new Date()).getTimezoneOffset() * 60000;
@@ -394,24 +394,19 @@ HTML
 
             switchTab('history');
 
-            // 1. Lắng nghe dữ liệu kho hàng từ Cloud trước
             window.fbListen('inventory', (data) => {
                 globalInventory = data ? (Array.isArray(data) ? data : Object.values(data)) : JSON.parse(JSON.stringify(initialInventory));
                 if (!data) window.fbSet('inventory', globalInventory);
                 
-                // 2. Sau khi có Kho hàng mới load dữ liệu tạm nháp lên để không bị lỗi hiển thị
                 const savedCourts = localStorage.getItem('pab_courts_draft');
-                if (savedCourts) {
-                    try { courtsData = JSON.parse(savedCourts); } catch(e) { courtsData = null; }
-                }
-                
+                if (savedCourts) { try { courtsData = JSON.parse(savedCourts); } catch(e) { courtsData = null; } }
                 if (!courtsData || !courtsData[1] || !courtsData[2]) {
                     courtsData = { 1: getEmptyObj(), 2: getEmptyObj(), 'quick': { items: {} } };
                 }
 
                 renderMenuDichVu(); 
                 renderInventoryTable(); 
-                switchCourt(currentCourt); // Cập nhật form và kích hoạt hàm tính tiền
+                switchCourt(currentCourt);
             });
 
             window.fbListen('history', (data) => { paymentHistory = data ? Object.values(data) : []; renderHistory(); });
@@ -682,6 +677,63 @@ HTML
             else { invBtn.className = "py-1 text-xs font-bold border-b-2 border-cyan-400 text-cyan-400 transition"; histBtn.className = "py-1 text-xs font-bold text-slate-500 hover:text-slate-300 transition border-b-2 border-transparent"; invContent.style.display = 'block'; histContent.style.display = 'none'; }
         }
 
+        // ĐÃ BỔ SUNG: Hàm click vào dòng hóa đơn sẽ bung ra chi tiết danh sách đồ dùng
+        window.toggleRowDetail = function(rowId, billDataStr) {
+            const currentSubRow = document.getElementById(`detail-row-${rowId}`);
+            const mainRow = document.getElementById(`main-row-${rowId}`);
+            
+            if (currentSubRow) {
+                currentSubRow.remove();
+                if(mainRow) mainRow.classList.remove('row-expanded');
+                return;
+            }
+            
+            try {
+                const bill = JSON.parse(decodeURIComponent(billDataStr));
+                const itemsObj = bill.rawDetails ? bill.rawDetails.items : (bill.items || {});
+                
+                let detailsHtml = "";
+                if (bill.courtFee > 0) {
+                    detailsHtml += `<div class="text-slate-400">• Tiền giờ sân: <span class="text-white font-bold">${formatNum(bill.courtFee)}k</span> (${bill.timeRange || ''})</div>`;
+                }
+                
+                let listItems = [];
+                Object.keys(itemsObj).forEach(id => {
+                    const prod = globalInventory.find(x => x.id === id);
+                    const name = prod ? prod.name : id;
+                    listItems.push(`<span class="text-cyan-400 font-bold">${name}</span> (x${itemsObj[id]})`);
+                });
+                
+                if (listItems.length > 0) {
+                    detailsHtml += `<div class="text-slate-400">• Mặt hàng đã sử dụng: ${listItems.join(', ')}</div>`;
+                } else if (bill.courtFee == 0) {
+                    detailsHtml += `<div class="text-slate-500 italic">• Đơn rỗng không có chi tiết dịch vụ.</div>`;
+                }
+                
+                if (bill.rawDetails && bill.rawDetails.ownerDiscount > 0) {
+                    detailsHtml += `<div class="text-rose-400 font-medium">• Đã giảm thêm trừ trực tiếp: -${bill.rawDetails.ownerDiscount}k</div>`;
+                }
+
+                const detailRow = document.createElement('tr');
+                detailRow.id = `detail-row-${rowId}`;
+                detailRow.className = "bg-slate-950/80 text-[11px] border-b border-slate-800";
+                detailRow.innerHTML = `
+                    <td colspan="11" class="p-3 pl-6 bg-slate-950/60 border-l-4 border-cyan-500 transition-all">
+                        <div class="space-y-1 py-1 text-slate-300">
+                            <div class="text-[10px] font-extrabold uppercase text-cyan-400 tracking-wider mb-1 flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                                CHI TIẾT SỬ DỤNG CỦA ĐƠN HÀNG:
+                            </div>
+                            ${detailsHtml}
+                        </div>
+                    </td>
+                `;
+                
+                mainRow.parentNode.insertBefore(detailRow, mainRow.nextSibling);
+                mainRow.classList.add('row-expanded');
+            } catch(err) { console.error("Lỗi parse dữ liệu hóa đơn:", err); }
+        };
+
         function renderHistory() {
             const fDate = document.getElementById('filter-date').value; 
             const fMonth = fDate.substring(0, 7);
@@ -694,23 +746,25 @@ HTML
             let weekTot = 0, weekCash = 0, weekBank = 0;
             let monthTot = 0, monthExp = 0;
             
-            paymentHistory.forEach(b => {
+            paymentHistory.forEach((b, index) => {
                 const bWeek = getWeekNumber(b.date);
                 const bYear = new Date(b.date).getFullYear();
 
                 if (b.date === fDate) {
                     dayTot += b.totalBill; cash += b.cashReceived; bank += b.bankReceived;
-                    const tr = document.createElement('tr'); tr.className = "border-b border-slate-800/60 hover:bg-slate-800/30 font-semibold text-slate-300 transition text-[11px]";
-                    tr.innerHTML = `<td class="p-2.5 text-slate-500">${b.time}</td><td class="p-2.5 font-bold ${b.courtNum==='Lẻ'?'text-rose-400':'text-cyan-400'}">${b.courtNum==='Lẻ'?'Bán lẻ':'Sân '+b.courtNum}</td><td class="p-2.5 max-w-[100px] truncate text-white">${b.customerName}</td><td class="p-2.5 text-slate-400">${b.timeRange}</td><td class="p-2.5 text-right">${formatNum(b.courtFee)}k</td><td class="p-2.5 text-right text-rose-400">${formatNum(b.serviceFee)}k</td><td class="p-2.5 text-right text-cyan-400">${formatNum(b.totalBill)}k</td><td class="p-2.5 text-right text-slate-500">${formatNum(b.profitGoods)}k</td><td class="p-2.5 text-rose-400">${formatNum(b.cashReceived)}k</td><td class="p-2.5 text-cyan-400">${formatNum(b.bankReceived)}k</td><td class="p-2.5 text-center"><button onclick="deleteBill('${b.id}', event)" class="text-slate-600 hover:text-red-400 font-bold p-1">✕</button></td>`;
+                    const tr = document.createElement('tr'); 
+                    tr.id = `main-row-${index}`;
+                    tr.className = "border-b border-slate-800/60 hover:bg-slate-800/30 font-semibold text-slate-300 transition text-[11px] cursor-pointer";
+                    
+                    // Mã hóa dữ liệu hóa đơn truyền vào hàm click
+                    const billDataStr = encodeURIComponent(JSON.stringify(b));
+                    tr.setAttribute('onclick', `toggleRowDetail('${index}', '${billDataStr}')`);
+                    
+                    tr.innerHTML = `<td class="p-2.5 text-slate-500">${b.time}</td><td class="p-2.5 font-bold ${b.courtNum==='Lẻ'?'text-rose-400':'text-cyan-400'}">${b.courtNum==='Lẻ'?'Bán lẻ':'Sân '+b.courtNum}</td><td class="p-2.5 max-w-[100px] truncate text-white">${b.customerName}</td><td class="p-2.5 text-slate-400">${b.timeRange}</td><td class="p-2.5 text-right">${formatNum(b.courtFee)}k</td><td class="p-2.5 text-right text-rose-400">${formatNum(b.serviceFee)}k</td><td class="p-2.5 text-right text-cyan-400">${formatNum(b.totalBill)}k</td><td class="p-2.5 text-right text-slate-500">${formatNum(b.profitGoods)}k</td><td class="p-2.5 text-rose-400">${formatNum(b.cashReceived)}k</td><td class="p-2.5 text-cyan-400">${formatNum(b.bankReceived)}k</td><td class="p-2.5 text-center" onclick="event.stopPropagation();"><button onclick="deleteBill('${b.id}', event)" class="text-slate-600 hover:text-red-400 font-bold p-1">✕</button></td>`;
                     tbody.appendChild(tr);
                 }
 
-                if (bWeek === targetWeek && bYear === targetYear) {
-                    weekTot += b.totalBill;
-                    weekCash += b.cashReceived;
-                    weekBank += b.bankReceived;
-                }
-
+                if (bWeek === targetWeek && bYear === targetYear) { weekTot += b.totalBill; weekCash += b.cashReceived; weekBank += b.bankReceived; }
                 if (b.date.startsWith(fMonth)) monthTot += b.totalBill;
             });
             
@@ -732,7 +786,7 @@ HTML
             document.getElementById('stat-week-bank').innerText = `${formatNum(weekBank)}k`;
         }
 
-        function deleteBill(id, e) { e.stopPropagation(); if (prompt("🔐 Vui lòng cung cấp mật khẩu quản trị cao cấp để XÓA đơn này:") === MASTER_PASSWORD) { window.fbListen('history', (snap) => { if(snap) Object.keys(snap).forEach(k => { if(snap[k].id === id) window.fbRemove(`history/${k}`); }); }); } }
+        function deleteBill(id, e) { if (prompt("🔐 Vui lòng cung cấp mật khẩu quản trị cao cấp để XÓA đơn này:") === MASTER_PASSWORD) { window.fbListen('history', (snap) => { if(snap) Object.keys(snap).forEach(k => { if(snap[k].id === id) window.fbRemove(`history/${k}`); }); }); } }
         function addNewExpense() { const r = document.getElementById('exp-add-reason').value.trim(); const a = parseFloat(document.getElementById('exp-add-amount').value); if (r && a > 0) { window.fbPush('expenses', { id: 'EXP-'+Date.now(), date: document.getElementById('filter-date').value, time: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}), reason: r, amount: a }); document.getElementById('exp-add-reason').value=""; document.getElementById('exp-add-amount').value=""; } }
 
         window.addNewProduct = function() {

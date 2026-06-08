@@ -4,7 +4,7 @@ HTML
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Phúc An Badminton - Premium Cloud POS v4.2</title>
+    <title>Phúc An Badminton - Premium Cloud POS v4.3</title>
     
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -75,7 +75,7 @@ HTML
                 </div>
                 <div>
                     <h1 class="text-base font-black tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500">PHÚC AN POS</h1>
-                    <p class="text-[10px] text-cyan-400 font-bold uppercase tracking-widest">Mobile Native App v4.2</p>
+                    <p class="text-[10px] text-cyan-400 font-bold uppercase tracking-widest">Mobile Native App v4.3</p>
                 </div>
             </div>
             
@@ -254,7 +254,7 @@ HTML
             <div class="bg-slate-950 px-4 py-2.5 flex flex-wrap justify-between items-center gap-2 border-b border-slate-800">
                 <div class="flex gap-4">
                     <button id="tab-btn-history" onclick="switchTab('history')" class="py-1 text-xs font-bold text-slate-500 border-b-2 border-transparent">📊 DOANH THU</button>
-                    <button id="tab-btn-inventory" onclick="switchTab('inventory')" class="py-1 text-xs font-bold text-slate-500 border-b-2 border-transparent">📦 KHO HÀNG CHUẨN v4.2</button>
+                    <button id="tab-btn-inventory" onclick="switchTab('inventory')" class="py-1 text-xs font-bold text-slate-500 border-b-2 border-transparent">📦 KHO HÀNG CHUẨN v4.3</button>
                 </div>
                 <div class="flex items-center gap-1.5 text-xs">
                     <input id="filter-date" type="date" onchange="renderHistory()" class="bg-slate-900 border border-slate-800 text-slate-200 rounded-lg px-2 py-0.5 font-bold focus:outline-none">
@@ -384,6 +384,7 @@ HTML
             return `<span class="font-bold text-slate-400">${prod.qty} chiếc</span>`;
         }
 
+        // ĐÃ NÂNG CẤP: Đọc dữ liệu tạm cũ từ localStorage lên nếu có
         function initSystem() {
             try {
                 const tzOffset = (new Date()).getTimezoneOffset() * 60000;
@@ -391,7 +392,15 @@ HTML
                 document.getElementById('filter-date').value = localISOTime;
             } catch(e) { document.getElementById('filter-date').value = ""; }
 
-            courtsData = { 1: getEmptyObj(), 2: getEmptyObj(), 'quick': { items: {} } };
+            const savedCourts = localStorage.getItem('pab_courts_draft');
+            if (savedCourts) {
+                try { courtsData = JSON.parse(savedCourts); } catch(e) { courtsData = null; }
+            }
+            
+            if (!courtsData || !courtsData[1] || !courtsData[2]) {
+                courtsData = { 1: getEmptyObj(), 2: getEmptyObj(), 'quick': { items: {} } };
+            }
+
             switchTab('history'); switchCourt(1);
 
             window.fbListen('inventory', (data) => {
@@ -405,13 +414,19 @@ HTML
 
         function getEmptyObj() { return { customerName: "", dayType: "weekday", startTime: "", endTime: "", discountType: "none", ownerDiscount: 0, cashUnits: 0, bankUnits: 0, items: {} }; }
 
+        // ĐÃ NÂNG CẤP: Lưu đệm trạng thái vào localStorage liên tục
         function saveState() {
-            if (currentCourt === 'quick') return; const c = courtsData[currentCourt]; if (!c) return;
-            c.customerName = document.getElementById('customer-name').value; c.dayType = document.getElementById('day-type').value;
-            c.startTime = document.getElementById('start-time').value; c.endTime = document.getElementById('end-time').value;
-            c.discountType = document.getElementById('discount-select').value;
-            c.ownerDiscount = parseFloat(document.getElementById('owner-discount').value) || 0;
-            c.bankUnits = parseFloat(document.getElementById('bank-units').value) || 0;
+            if (currentCourt === 'quick') {
+                courtsData['quick'].bankUnits = parseFloat(document.getElementById('quick-bank').value) || 0;
+            } else {
+                const c = courtsData[currentCourt]; if (!c) return;
+                c.customerName = document.getElementById('customer-name').value; c.dayType = document.getElementById('day-type').value;
+                c.startTime = document.getElementById('start-time').value; c.endTime = document.getElementById('end-time').value;
+                c.discountType = document.getElementById('discount-select').value;
+                c.ownerDiscount = parseFloat(document.getElementById('owner-discount').value) || 0;
+                c.bankUnits = parseFloat(document.getElementById('bank-units').value) || 0;
+            }
+            localStorage.setItem('pab_courts_draft', JSON.stringify(courtsData));
         }
 
         function triggerToast(m) {
@@ -432,9 +447,10 @@ HTML
                 document.getElementById('section-court-bill').style.display = 'none'; 
                 document.getElementById('section-quick-sale').style.display = 'block';
                 document.getElementById('menu-current-target').innerText = "VÃNG LAI";
+                document.getElementById('quick-bank').value = courtsData['quick'].bankUnits || "";
             } else {
                 document.getElementById('time-config-section').style.display = 'block'; 
-                document.getElementById('section-court-bill').style.display = 'flex'; // ĐÃ FIX
+                document.getElementById('section-court-bill').style.display = 'flex';
                 document.getElementById('section-quick-sale').style.display = 'none';
                 document.getElementById('menu-current-target').innerText = "SÂN " + n; 
                 document.getElementById('bill-court-title').innerText = n;
@@ -505,14 +521,18 @@ HTML
                 c.discountType = document.getElementById('discount-select').value;
                 c.ownerDiscount = parseFloat(document.getElementById('owner-discount').value) || 0;
                 c.bankUnits = parseFloat(document.getElementById('bank-units').value) || 0;
+            } else {
+                c.bankUnits = parseFloat(document.getElementById('quick-bank').value) || 0;
             }
+
+            // Đồng bộ bộ nhớ tạm liên tục khi có thay đổi số liệu
+            localStorage.setItem('pab_courts_draft', JSON.stringify(courtsData));
 
             globalInventory.forEach(p => { const el = document.getElementById(`qty-view-${p.id}`); if (el) el.innerText = c.items[p.id] || 0; });
 
             if (currentCourt === 'quick') {
                 let total = 0, html = "";
                 Object.keys(c.items).forEach(id => { const p = globalInventory.find(x => x.id === id); total += (p.price * c.items[id]); html += `<div class="flex justify-between"><span>• ${p.name} (x${c.items[id]})</span><span>${p.price*c.items[id]}k</span></div>`; });
-                c.bankUnits = parseFloat(document.getElementById('quick-bank').value) || 0;
                 c.cashUnits = Math.max(0, total - c.bankUnits);
                 document.getElementById('quick-items-list').innerHTML = html || `<span class="text-slate-600 italic">Giỏ hàng trống...</span>`;
                 document.getElementById('quick-total-fee').innerText = `${total}k`; return;
@@ -587,7 +607,12 @@ HTML
             let serv = 0; Object.keys(c.items).forEach(id => { const p = globalInventory.find(x => x.id === id); serv += (p.price * c.items[id]); });
             let costGoods = deductInv(c.items);
             const r = { id: 'PAB-Q-'+Date.now(), date: document.getElementById('filter-date').value, time: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}), courtNum: "Lẻ", customerName: "Khách lẻ vãng lai", timeRange: "Bán lẻ", courtFee: 0, serviceFee: serv, totalBill: serv, profitGoods: serv - costGoods, cashReceived: c.cashUnits, bankReceived: c.bankUnits, rawDetails: { items: c.items } };
-            window.fbPush('history', r); window.fbSet('inventory', globalInventory); c.items = {}; document.getElementById('quick-bank').value = ""; triggerToast("Đã chốt bán lẻ!");
+            window.fbPush('history', r); window.fbSet('inventory', globalInventory); 
+            
+            // Thành công thì xóa cache giỏ lẻ
+            c.items = {}; document.getElementById('quick-bank').value = ""; 
+            saveState(); 
+            triggerToast("Đã chốt bán lẻ!");
         }
 
         function saveAndCheckout() {
@@ -611,19 +636,31 @@ HTML
             let tot = Math.max(0, finalCourtFee + serv - c.ownerDiscount);
 
             const r = { id: 'PAB-'+Date.now(), date: document.getElementById('filter-date').value, time: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}), courtNum: currentCourt, customerName: c.customerName || "Khách lẻ", timeRange: `${c.startTime}-${c.endTime} (${mins} ph)`, courtFee: finalCourtFee, serviceFee: serv, totalBill: tot, profitGoods: serv - costGoods, cashReceived: c.cashUnits, bankReceived: c.bankUnits, rawDetails: JSON.parse(JSON.stringify(c)) };
-            window.fbPush('history', r); window.fbSet('inventory', globalInventory); triggerToast("Đã xuất đơn & đồng bộ lên Cloud!"); resetCurrentCourt();
+            
+            window.fbPush('history', r); 
+            window.fbSet('inventory', globalInventory); 
+            triggerToast("Đã xuất đơn & đồng bộ lên Cloud!"); 
+            resetCurrentCourt();
         }
 
         function resetCurrentCourt() { 
             courtsData[currentCourt] = getEmptyObj(); 
             if(currentCourt!=='quick') { 
-                document.getElementById('customer-name').value=""; document.getElementById('start-time').value=""; 
-                document.getElementById('end-time').value=""; document.getElementById('discount-select').value="none"; 
-                document.getElementById('owner-discount').value=""; document.getElementById('bank-units').value=""; 
+                document.getElementById('customer-name').value=""; document.getElementById('day-type').value="weekday";
+                document.getElementById('start-time').value=""; document.getElementById('end-time').value=""; 
+                document.getElementById('discount-select').value="none"; document.getElementById('owner-discount').value=""; 
+                document.getElementById('bank-units').value=""; 
             } 
+            saveState(); // Cập nhật lại bộ nhớ trống sau khi xóa trắng
             calculateAll(); 
         }
-        function resetQuickSaleCart() { courtsData['quick'].items = {}; document.getElementById('quick-bank').value=""; calculateAll(); }
+        
+        function resetQuickSaleCart() { 
+            courtsData['quick'].items = {}; 
+            document.getElementById('quick-bank').value=""; 
+            saveState();
+            calculateAll(); 
+        }
 
         function switchTab(t) {
             const histBtn = document.getElementById('tab-btn-history'); const invBtn = document.getElementById('tab-btn-inventory');

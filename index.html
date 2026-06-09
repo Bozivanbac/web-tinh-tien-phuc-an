@@ -4,7 +4,7 @@ HTML
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Phúc An Badminton - Premium Cloud POS v4.7.0</title>
+    <title>Phúc An Badminton - Premium Cloud POS v4.7.1</title>
     
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -78,7 +78,7 @@ HTML
                 </div>
                 <div>
                     <h1 class="text-base font-black tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500">PHÚC AN BADMINTON</h1>
-                    <p class="text-[10px] text-cyan-400 font-bold uppercase tracking-widest">Mobile Native App v4.7.0</p>
+                    <p class="text-[10px] text-cyan-400 font-bold uppercase tracking-widest">Mobile Native App v4.7.1</p>
                 </div>
             </div>
             
@@ -257,7 +257,7 @@ HTML
             <div class="bg-slate-950 px-4 py-2.5 flex flex-wrap justify-between items-center gap-2 border-b border-slate-800">
                 <div class="flex gap-4 items-center">
                     <button id="tab-btn-history" onclick="switchTab('history')" class="py-1 text-xs font-bold text-slate-500 border-b-2 border-transparent">📊 ĐỐI CHIẾU DOANH THU & DÒNG TIỀN KIỂM KÊ</button>
-                    <button id="tab-btn-inventory" onclick="switchTab('inventory')" class="py-1 text-xs font-bold text-slate-500 border-b-2 border-transparent">📦 KHO HÀNG CHUẨN v4.7.0</button>
+                    <button id="tab-btn-inventory" onclick="switchTab('inventory')" class="py-1 text-xs font-bold text-slate-500 border-b-2 border-transparent">📦 KHO HÀNG CHUẨN v4.7.1</button>
                 </div>
                 <div class="flex items-center gap-3 text-xs">
                     <input id="filter-date" type="date" onchange="renderHistory()" class="bg-slate-900 border border-slate-800 text-slate-200 rounded-lg px-2 py-0.5 font-bold focus:outline-none">
@@ -381,7 +381,7 @@ HTML
         };
 
         let globalInventory = []; let currentCourt = 1; let courtsData = {}; let paymentHistory = []; let expensesData = [];
-        let isSyncingFromFirebase = false; // Flag chống lặp vòng tuần hoàn dữ liệu khi đồng bộ nháp
+        let isSyncingFromFirebase = false;
 
         function formatNum(num) { return (isNaN(num) || num === null) ? "0" : Number(Math.round(num * 100) / 100).toLocaleString('vi-VN'); }
 
@@ -416,7 +416,6 @@ HTML
                 renderInventoryTable(); 
             });
 
-            // LẮNG NGHE BẢN NHÁP REALTIME TỪ FIREBASE ĐỂ ĐỒNG BỘ ĐỔI MÁY GIỮ NGUYÊN
             window.fbListen('courts_draft', (data) => {
                 isSyncingFromFirebase = true;
                 if (data) {
@@ -424,6 +423,13 @@ HTML
                 } else {
                     courtsData = { 1: getEmptyObj(), 2: getEmptyObj(), 'quick': { items: {} } };
                 }
+                
+                // Đảm bảo nhánh 'quick' và 'quick.items' luôn tồn tại khi kéo dữ liệu từ mây về
+                if (!courtsData['quick']) courtsData['quick'] = { items: {} };
+                if (!courtsData['quick'].items) courtsData['quick'].items = {};
+                if (!courtsData[1]) courtsData[1] = getEmptyObj();
+                if (!courtsData[2]) courtsData[2] = getEmptyObj();
+                
                 updateUIFromData();
                 calculateAll();
                 isSyncingFromFirebase = false;
@@ -442,17 +448,18 @@ HTML
 
         function getEmptyObj() { return { customerName: "", dayType: "weekday", startTime: "", endTime: "", discountType: "none", ownerDiscount: 0, cashUnits: 0, bankUnits: 0, items: {} }; }
 
-        // ĐỒNG BỘ THẲNG LÊN FIREBASE MỖI KHI CÓ THAY ĐỔI TRÊN GIAO DIỆN KHU VỰC ĐIỀN THÔNG TIN
         function saveStateFirebase() {
-            if (isSyncingFromFirebase) return; // Nếu dữ liệu đang load từ firebase xuống thì ko đẩy ngược lên lại
+            if (isSyncingFromFirebase) return;
             
             if (!courtsData[currentCourt]) courtsData[currentCourt] = getEmptyObj();
+            if (!courtsData['quick']) courtsData['quick'] = { items: {} };
+            if (!courtsData['quick'].items) courtsData['quick'].items = {};
 
             if (currentCourt === 'quick') {
-                if(!courtsData['quick']) courtsData['quick'] = { items: {} };
                 courtsData['quick'].bankUnits = parseFloat(document.getElementById('quick-bank').value) || 0;
             } else {
                 const c = courtsData[currentCourt];
+                if (!c.items) c.items = {};
                 c.customerName = document.getElementById('customer-name').value; 
                 c.dayType = document.getElementById('day-type').value;
                 c.startTime = document.getElementById('start-time').value; 
@@ -462,11 +469,9 @@ HTML
                 c.bankUnits = parseFloat(document.getElementById('bank-units').value) || 0;
             }
             
-            // Lưu dữ liệu mây thay vì bộ nhớ máy cục bộ
             window.fbSet('courts_draft', courtsData);
         }
 
-        // Cập nhật cấu hình lên ô nhập liệu hiển thị của Sân hiện tại
         function updateUIFromData() {
             if (currentCourt === 'quick') {
                 document.getElementById('time-config-section').style.display = 'none'; 
@@ -545,8 +550,13 @@ HTML
         }
 
         function updateItemQty(pId, delta) {
+            // SỬA LỖI ĐỊNH VỊ NHÁNH BÁN LẺ: Ép hệ thống tạo sẵn Object items nếu trống để tránh lỗi undefined
+            if (!courtsData[currentCourt]) courtsData[currentCourt] = getEmptyObj();
+            if (currentCourt === 'quick' && !courtsData['quick'].items) courtsData['quick'].items = {};
+            
             const c = courtsData[currentCourt]; 
-            if(!c.items) c.items = {};
+            if (!c.items) c.items = {};
+            
             const cur = c.items[pId] || 0;
             const p = globalInventory.find(x => x.id === pId);
             if(!p) return;
@@ -683,7 +693,7 @@ HTML
             let costGoods = deductInv(c.items);
             let tot = Math.max(0, finalCourtFee + serv - (c.ownerDiscount || 0));
 
-            const r = { id: 'PAB-'+Date.now(), date: document.getElementById('filter-date').value, time: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}), courtNum: currentCourt, customerName: c.customerName || "Khách lẻ", timeRange: `${c.startTime}-${c.endTime} (${mins} ph)`, courtFee: finalCourtFee, serviceFee: serv, totalBill: tot, profitGoods: serv - costGoods, cashReceived: c.cashUnits, bankReceived: c.bankUnits || 0, rawDetails: JSON.parse(JSON.stringify(c)), locked: false };
+            const r = { id: 'PAB-'+Date.now(), date: document.getElementById('filter-date').value, time: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}), courtNum: currentCourt, customerName: c.customerName || "Khách lẻ", timeRange: `${c.startTime}-${c.endTime} (${mins} ph)`, courtFee: finalCourtFee, serviceFee: serv, totalBill: tot, profitGoods: serv - costGoods, cashReceived: c.cashUnits, bankReceived: b.bankUnits || 0, rawDetails: JSON.parse(JSON.stringify(c)), locked: false };
             
             window.fbPush('history', r); 
             window.fbSet('inventory', globalInventory); 

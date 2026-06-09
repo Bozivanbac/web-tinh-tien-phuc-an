@@ -4,7 +4,7 @@ HTML
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Phúc An Badminton - Premium Cloud POS v4.7.2</title>
+    <title>Phúc An Badminton - Premium Cloud POS v4.7.3</title>
     
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -78,7 +78,7 @@ HTML
                 </div>
                 <div>
                     <h1 class="text-base font-black tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500">PHÚC AN BADMINTON</h1>
-                    <p class="text-[10px] text-cyan-400 font-bold uppercase tracking-widest">Mobile Native App v4.7.2</p>
+                    <p class="text-[10px] text-cyan-400 font-bold uppercase tracking-widest">Mobile Native App v4.7.3</p>
                 </div>
             </div>
             
@@ -257,7 +257,7 @@ HTML
             <div class="bg-slate-950 px-4 py-2.5 flex flex-wrap justify-between items-center gap-2 border-b border-slate-800">
                 <div class="flex gap-4 items-center">
                     <button id="tab-btn-history" onclick="switchTab('history')" class="py-1 text-xs font-bold text-slate-500 border-b-2 border-transparent">📊 ĐỐI CHIẾU DOANH THU & DÒNG TIỀN KIỂM KÊ</button>
-                    <button id="tab-btn-inventory" onclick="switchTab('inventory')" class="py-1 text-xs font-bold text-slate-500 border-b-2 border-transparent">📦 KHO HÀNG CHUẨN v4.7.2</button>
+                    <button id="tab-btn-inventory" onclick="switchTab('inventory')" class="py-1 text-xs font-bold text-slate-500 border-b-2 border-transparent">📦 KHO HÀNG CHUẨN v4.7.3</button>
                 </div>
                 <div class="flex items-center gap-3 text-xs">
                     <input id="filter-date" type="date" onchange="renderHistory()" class="bg-slate-900 border border-slate-800 text-slate-200 rounded-lg px-2 py-0.5 font-bold focus:outline-none">
@@ -294,7 +294,7 @@ HTML
                     <table class="w-full text-left text-xs font-medium text-slate-300">
                         <thead class="bg-slate-950 border-b border-slate-800 text-[10px] text-slate-400 uppercase tracking-wider">
                             <tr>
-                                <th class="p-2.5">Giờ</th><th class="p-2.5">Sân</th><th class="p-2.5">Khách hàng</th><th class="p-2.5">Thời gian chơi</th>
+                                <th class="p-2.5">Thời gian</th><th class="p-2.5">Sân</th><th class="p-2.5">Khách hàng</th><th class="p-2.5">Thời gian chơi</th>
                                 <th class="p-2.5 text-right">Tiền Sân</th><th class="p-2.5 text-right">Dịch vụ</th><th class="p-2.5 text-right text-cyan-400">Tổng</th>
                                 <th class="p-2.5 text-right text-slate-500">Lời gốc</th><th class="p-2.5 text-rose-400">Tiền mặt</th><th class="p-2.5 text-cyan-400">CK</th>
                                 <th class="p-2.5 text-center text-emerald-400">Chốt tiền</th><th class="p-2.5 text-center">Xóa</th>
@@ -660,7 +660,7 @@ HTML
             const c = courtsData['quick']; if (!c || !c.items || Object.keys(c.items).length === 0) return;
             let serv = 0; Object.keys(c.items).forEach(id => { const p = globalInventory.find(x => x.id === id); if(p) serv += (p.price * c.items[id]); });
             let costGoods = deductInv(c.items);
-            const r = { id: 'PAB-Q-'+Date.now(), date: document.getElementById('filter-date').value, time: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}), courtNum: "Lẻ", customerName: "Khách lẻ vãng lai", timeRange: "Bán lẻ", courtFee: 0, serviceFee: serv, totalBill: serv, profitGoods: serv - costGoods, cashReceived: c.cashUnits, bankReceived: c.bankUnits || 0, rawDetails: { items: c.items }, locked: false };
+            const r = { id: 'PAB-Q-'+Date.now(), date: document.getElementById('filter-date').value, time: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit',hour12:false}), courtNum: "Lẻ", customerName: "Khách lẻ vãng lai", timeRange: "Bán lẻ", courtFee: 0, serviceFee: serv, totalBill: serv, profitGoods: serv - costGoods, cashReceived: c.cashUnits, bankReceived: c.bankUnits || 0, rawDetails: { items: c.items }, locked: false };
             
             window.fbPush('history', r); 
             window.fbSet('inventory', globalInventory); 
@@ -680,9 +680,9 @@ HTML
             const tzOffset = now.getTimezoneOffset() * 60000;
             const todayStr = new Date(Date.now() - tzOffset).toISOString().slice(0, 10);
             
-            // 1. Cảnh báo không thể đặt sân khung giờ đã trôi qua trong ngày
+            // 1. Cảnh báo không thể đặt sân khung giờ đã trôi qua trong ngày (Định dạng 24h)
             if (fDate === todayStr && c.startTime) {
-                const currentTimeStr = now.toTimeString().slice(0, 5);
+                const currentTimeStr = now.toLocaleTimeString('vi-VN', {hour: '2-digit', minute: '2-digit', hour12: false});
                 if (c.startTime < currentTimeStr) {
                     alert(`⚠️ Cảnh báo: Không thể đặt sân ở khung giờ đã trôi qua (${c.startTime} < Hiện tại: ${currentTimeStr})!`);
                     return;
@@ -696,7 +696,7 @@ HTML
                     return;
                 }
 
-                // 2. Chỉnh sửa logic kiểm tra trùng lịch (Ví dụ: khách A đặt 17h-18h, khách B không thể đặt 17h59)
+                // 2. Chỉnh sửa kiểm tra trùng lịch chặt chẽ (Định dạng 24h)
                 const currentStartMin = c.startTime.split(':').map(Number)[0] * 60 + c.startTime.split(':').map(Number)[1];
                 const currentEndMin = c.endTime.split(':').map(Number)[0] * 60 + c.endTime.split(':').map(Number)[1];
 
@@ -748,11 +748,11 @@ HTML
             let costGoods = deductInv(c.items);
             let tot = Math.max(0, finalCourtFee + serv - (c.ownerDiscount || 0));
 
-            // SỬA LỖI ĐỨNG MÁY: Đổi từ biến lỗi b.bankUnits thành c.bankUnits chuẩn xác
+            // ĐỊNH DẠNG 24H: Ép hàm toLocaleTimeString xuất 24 giờ không AM/PM
             const r = { 
                 id: 'PAB-'+Date.now(), 
                 date: fDate, 
-                time: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}), 
+                time: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit',hour12:false}), 
                 courtNum: currentCourt, 
                 customerName: c.customerName || "Khách lẻ", 
                 timeRange: `${c.startTime || '00:00'} → ${c.endTime || '00:00'} (${mins} ph)`, 
@@ -950,8 +950,7 @@ HTML
                 return;
             }
 
-            // 3. Thông báo chỉ Admin hủy được & Khuyên cáo gọi hotline khi xảy ra sự cố
-            const promptPass = prompt("⚠️ KHUYÊN CÁO: Chỉ admin mới hủy được đơn hàng. Nếu có lỗi cấu hình hoặc sự cố trùng lịch, vui lòng gọi số điện thoại của sân để được hỗ trợ giải quyết!\n\nNhập mật khẩu Admin để xác nhận hủy:");
+            const promptPass = prompt("⚠️ KHUYÊN CÁO: Chỉ ADMIN mới hủy được đơn hàng này.\nNếu gặp sự cố hoặc cần đổi sân, vui lòng gọi số điện thoại của sân để giải quyết!\n\nNhập mật khẩu Admin để xác nhận hủy:");
             if (promptPass === null) return;
             
             if (promptPass === MASTER_PASSWORD) { 
@@ -972,7 +971,7 @@ HTML
             }
         }
         
-        function addNewExpense() { const r = document.getElementById('exp-add-reason').value.trim(); const a = parseFloat(document.getElementById('exp-add-amount').value); if (r && a > 0) { window.fbPush('expenses', { id: 'EXP-'+Date.now(), date: document.getElementById('filter-date').value, time: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}), reason: r, amount: a }); document.getElementById('exp-add-reason').value=""; document.getElementById('exp-add-amount').value=""; } }
+        function addNewExpense() { const r = document.getElementById('exp-add-reason').value.trim(); const a = parseFloat(document.getElementById('exp-add-amount').value); if (r && a > 0) { window.fbPush('expenses', { id: 'EXP-'+Date.now(), date: document.getElementById('filter-date').value, time: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit',hour12:false}), reason: r, amount: a }); document.getElementById('exp-add-reason').value=""; document.getElementById('exp-add-amount').value=""; } }
 
         window.addNewProduct = function() {
             if (prompt("🔐 Vui lòng nhập mật khẩu quản trị để thêm hàng mới:") !== MASTER_PASSWORD) { alert("⚠️ Sai mật khẩu quản trị!"); return; }

@@ -4,7 +4,7 @@ HTML
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Phúc An Badminton - Premium Cloud POS v4.7.2</title>
+    <title>Phúc An Badminton - Premium Cloud POS v4.8.0</title>
     
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -35,7 +35,6 @@ HTML
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #0f172a; }
         ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
-        input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(0.6) sepia(1) saturate(5) hue-rotate(175deg); cursor: pointer; }
         .row-expanded { background-color: rgba(30, 41, 59, 0.5) !important; }
     </style>
 
@@ -78,7 +77,7 @@ HTML
                 </div>
                 <div>
                     <h1 class="text-base font-black tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500">PHÚC AN BADMINTON</h1>
-                    <p class="text-[10px] text-cyan-400 font-bold uppercase tracking-widest">Mobile Native App v4.7.2</p>
+                    <p class="text-[10px] text-cyan-400 font-bold uppercase tracking-widest">Premium Cloud POS v4.8.0</p>
                 </div>
             </div>
             
@@ -98,56 +97,25 @@ HTML
     <main class="max-w-[1400px] mx-auto p-3 grid grid-cols-1 lg:grid-cols-12 gap-3">
         
         <div class="lg:col-span-7 space-y-3">
-            <section id="time-config-section" class="bg-gradient-to-br from-slate-900 to-slate-900/80 rounded-xl p-4 border border-slate-700/50 shadow-2xl relative overflow-hidden">
+            <section id="bill-config-section" class="bg-gradient-to-br from-slate-900 to-slate-900/80 rounded-xl p-4 border border-slate-700/50 shadow-2xl relative overflow-hidden">
                 <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-700/50 relative z-10">
                     <h2 class="text-xs font-extrabold text-slate-200 uppercase tracking-widest flex items-center gap-2">
-                        <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        Thời gian đặt sân
+                        <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                        Thông tin thu ngân
                     </h2>
                     <span id="live-status" class="text-[10px] text-cyan-400 font-bold bg-cyan-950/60 px-3 py-1 rounded-full border border-cyan-900/50 shadow-inner flex items-center gap-1.5">
-                        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span> Trống
+                        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span> Sẵn sàng
                     </span>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm relative z-10">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm relative z-10">
                     <div class="space-y-1">
                         <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">👤 Tên khách hàng</label>
                         <input id="customer-name" type="text" placeholder="Nhập tên khách..." oninput="saveStateFirebase()" class="w-full bg-slate-950/50 border border-slate-700/50 rounded-lg px-3 py-2 text-xs font-semibold text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-cyan-500 transition-all">
                     </div>
                     <div class="space-y-1">
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">📅 Áp dụng ngày</label>
-                        <select id="day-type" onchange="onDayTypeChange();" class="w-full bg-slate-950/50 border border-slate-700/50 rounded-lg px-3 py-2 text-xs font-semibold text-slate-200 focus:outline-none cursor-pointer">
-                            <option value="weekday">Ngày thường (T2 - T6)</option>
-                            <option value="weekend">Cuối tuần (T7 & CN)</option>
-                        </select>
-                    </div>
-                    <div class="space-y-1">
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">🎁 Chương trình ưu đãi</label>
-                        <select id="discount-select" onchange="saveStateFirebase(); calculateAll();" class="w-full bg-slate-950/50 border border-slate-700/50 rounded-lg px-3 py-2 text-xs font-semibold text-slate-200 focus:outline-none cursor-pointer">
-                            <option value="none">Không giảm giá</option>
-                            <option value="student">Học sinh / Sinh viên (39k/h)</option>
-                            <option value="fixed">Khách cố định (-15%)</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4 pt-4 border-t border-slate-700/50 relative z-10">
-                    <div class="flex gap-2 items-end">
-                        <div class="flex-1 space-y-1">
-                            <label class="block text-[10px] font-bold text-cyan-400 uppercase tracking-wider ml-1">⏰ Giờ vào</label>
-                            <input id="start-time" type="time" oninput="saveStateFirebase(); calculateAll();" class="w-full bg-slate-950/80 border border-slate-700/50 rounded-lg px-3 py-2 text-sm font-bold text-cyan-400 focus:outline-none">
-                        </div>
-                        <div class="flex items-center justify-center pb-2 text-slate-500">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                        </div>
-                        <div class="flex-1 space-y-1">
-                            <label class="block text-[10px] font-bold text-rose-400 uppercase tracking-wider ml-1">🏁 Giờ ra</label>
-                            <input id="end-time" type="time" oninput="saveStateFirebase(); calculateAll();" class="w-full bg-slate-950/80 border border-slate-700/50 rounded-lg px-3 py-2 text-sm font-bold text-rose-400 focus:outline-none">
-                        </div>
-                    </div>
-                    <div class="space-y-1">
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1 flex items-center gap-1"><svg class="w-3 h-3 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.381z"></path></svg> Chọn nhanh khung giờ</label>
-                        <div id="shortcut-container" class="grid grid-cols-3 gap-2 h-[40px]"></div>
+                        <label class="block text-[10px] font-bold text-cyan-400 uppercase tracking-wider ml-1">💰 Tiền sân phát sinh (k)</label>
+                        <input id="court-fee-input" type="number" placeholder="Nhập số tiền sân..." oninput="saveStateFirebase(); calculateAll();" class="w-full bg-slate-950/80 border border-slate-700/50 rounded-lg px-3 py-2 text-xs font-bold text-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-500">
                     </div>
                 </div>
             </section>
@@ -170,38 +138,21 @@ HTML
         </div>
 
         <div class="lg:col-span-5 space-y-3">
-            <section id="section-quick-sale" class="bg-slate-900 border border-rose-500/20 rounded-xl p-4 shadow-2xl hidden">
-                <span class="font-bold text-xs text-rose-400 tracking-wider block mb-2 border-b border-slate-800 pb-1.5">🛒 GIỎ HÀNG BÁN LẺ VÃNG LAI</span>
-                <div id="quick-items-list" class="text-xs space-y-1 bg-slate-950 p-2.5 rounded-lg border border-slate-855 max-h-[120px] overflow-y-auto mb-2 text-slate-400"></div>
-                <div class="flex justify-between items-center bg-slate-950 p-2.5 rounded-lg mb-2 border border-slate-855">
-                    <span class="text-[10px] font-bold text-slate-400">TỔNG THÀNH TIỀN:</span>
-                    <span id="quick-total-fee" class="text-lg font-black text-rose-400">0đ</span>
-                </div>
-                <div class="grid grid-cols-1 gap-1 mb-2">
-                    <label class="text-[10px] font-bold text-cyan-400">Khách chuyển khoản (k)</label>
-                    <input id="quick-bank" type="number" placeholder="Nhập số tiền CK..." oninput="saveStateFirebase(); calculateAll();" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs font-bold text-cyan-400 text-center focus:outline-none">
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <button onclick="resetQuickSaleCart()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 py-2 rounded-lg text-xs font-bold transition">Xóa</button>
-                    <button onclick="checkoutQuickSale()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 rounded-lg text-xs shadow-md transition">CHỐT ĐƠN</button>
-                </div>
-            </section>
-
             <section id="section-court-bill" class="bg-slate-900 rounded-xl p-4 border border-slate-800 shadow-2xl min-h-[380px] flex flex-col justify-between">
                 <div>
                     <div class="flex justify-between items-center mb-3 border-b border-slate-800 pb-2">
                         <span class="font-bold text-[10px] text-slate-400 uppercase tracking-wider">Chi tiết thanh toán</span>
-                        <span class="text-xs font-bold bg-cyan-950 text-cyan-400 px-3 py-0.5 rounded-md border border-cyan-900/50">SÂN <span id="bill-court-title">1</span></span>
+                        <span class="text-xs font-bold bg-cyan-950 text-cyan-400 px-3 py-0.5 rounded-md border border-cyan-900/50"><span id="bill-court-title">SÂN 1</span></span>
                     </div>
                     
                     <div class="space-y-2 text-xs">
                         <div class="flex justify-between bg-slate-950/80 p-3 rounded-xl border border-slate-800/80">
                             <div>
                                 <p class="font-bold text-slate-200" id="bill-customer-name">Khách lẻ</p>
-                                <p class="text-[11px] text-slate-500 mt-0.5" id="bill-time-range">00:00 → 00:00 (0 phút)</p>
+                                <p class="text-[11px] text-slate-500 mt-0.5" id="bill-type-label">Hóa đơn dịch vụ</p>
                             </div>
                             <div class="text-right">
-                                <p class="line-through text-slate-600 text-[10px]" id="court-fee-original">0đ</p>
+                                <p class="text-[10px] text-slate-500">Tiền sân gốc</p>
                                 <p class="font-extrabold text-cyan-400 text-sm" id="court-fee-display">0đ</p>
                             </div>
                         </div>
@@ -257,7 +208,7 @@ HTML
             <div class="bg-slate-950 px-4 py-2.5 flex flex-wrap justify-between items-center gap-2 border-b border-slate-800">
                 <div class="flex gap-4 items-center">
                     <button id="tab-btn-history" onclick="switchTab('history')" class="py-1 text-xs font-bold text-slate-500 border-b-2 border-transparent">📊 ĐỐI CHIẾU DOANH THU & DÒNG TIỀN KIỂM KÊ</button>
-                    <button id="tab-btn-inventory" onclick="switchTab('inventory')" class="py-1 text-xs font-bold text-slate-500 border-b-2 border-transparent">📦 KHO HÀNG CHUẨN v4.7.2</button>
+                    <button id="tab-btn-inventory" onclick="switchTab('inventory')" class="py-1 text-xs font-bold text-slate-500 border-b-2 border-transparent">📦 KHO HÀNG CHUẨN v4.8.0</button>
                 </div>
                 <div class="flex items-center gap-3 text-xs">
                     <input id="filter-date" type="date" onchange="renderHistory()" class="bg-slate-900 border border-slate-800 text-slate-200 rounded-lg px-2 py-0.5 font-bold focus:outline-none">
@@ -284,17 +235,11 @@ HTML
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-2 text-center text-xs bg-slate-950/60 p-3 rounded-xl border border-slate-800">
-                    <div class="bg-slate-950 p-2 rounded-lg border border-slate-800"><p class="text-[10px] text-slate-400 font-bold uppercase">📈 Tổng Doanh Thu Tuần</p><p id="stat-week-total" class="font-black text-white text-sm mt-0.5">0đ</p></div>
-                    <div class="bg-rose-950/10 p-2 rounded-lg border border-rose-900/20"><p class="text-[10px] text-rose-400 font-bold uppercase">💵 Tổng Tiền Mặt Tuần</p><p id="stat-week-cash" class="font-black text-rose-400 text-sm mt-0.5">0đ</p></div>
-                    <div class="bg-cyan-950/10 p-2 rounded-lg border border-cyan-900/20"><p class="text-[10px] text-cyan-400 font-bold uppercase">💳 Tổng Chuyển Khoản Tuần</p><p id="stat-week-bank" class="font-black text-cyan-400 text-sm mt-0.5">0đ</p></div>
-                </div>
-
                 <div class="overflow-x-auto border border-slate-800 rounded-xl">
                     <table class="w-full text-left text-xs font-medium text-slate-300">
                         <thead class="bg-slate-950 border-b border-slate-800 text-[10px] text-slate-400 uppercase tracking-wider">
                             <tr>
-                                <th class="p-2.5">Giờ</th><th class="p-2.5">Sân</th><th class="p-2.5">Khách hàng</th><th class="p-2.5">Thời gian chơi</th>
+                                <th class="p-2.5">Thời gian</th><th class="p-2.5">Sân / Loại</th><th class="p-2.5">Khách hàng</th>
                                 <th class="p-2.5 text-right">Tiền Sân</th><th class="p-2.5 text-right">Dịch vụ</th><th class="p-2.5 text-right text-cyan-400">Tổng</th>
                                 <th class="p-2.5 text-right text-slate-500">Lời gốc</th><th class="p-2.5 text-rose-400">Tiền mặt</th><th class="p-2.5 text-cyan-400">CK</th>
                                 <th class="p-2.5 text-center text-emerald-400">Chốt tiền</th><th class="p-2.5 text-center">Xóa</th>
@@ -375,11 +320,6 @@ HTML
             { id: 'vo_dai', name: 'Vớ dài', type: 'gear', qty: 20, cost: 30, price: 50 }
         ];
 
-        const PRICING = {
-            weekday: [{ start: "05:00", end: "09:00", price: 70 }, { start: "09:00", end: "16:00", price: 60 }, { start: "16:00", end: "22:00", price: 70 }],
-            weekend: [{ start: "05:00", end: "22:00", price: 70 }]
-        };
-
         let globalInventory = []; let currentCourt = 1; let courtsData = {}; let paymentHistory = []; let expensesData = [];
         let isSyncingFromFirebase = false;
 
@@ -421,11 +361,10 @@ HTML
                 if (data) {
                     courtsData = data;
                 } else {
-                    courtsData = { 1: getEmptyObj(), 2: getEmptyObj(), 'quick': { items: {} } };
+                    courtsData = { 1: getEmptyObj(), 2: getEmptyObj(), 'quick': getEmptyObj() };
                 }
                 
-                if (!courtsData['quick']) courtsData['quick'] = { items: {} };
-                if (!courtsData['quick'].items) courtsData['quick'].items = {};
+                if (!courtsData['quick']) courtsData['quick'] = getEmptyObj();
                 if (!courtsData[1]) courtsData[1] = getEmptyObj();
                 if (!courtsData[2]) courtsData[2] = getEmptyObj();
                 
@@ -445,55 +384,49 @@ HTML
             window.fbListen('expenses', (data) => { expensesData = data ? Object.values(data) : []; renderHistory(); });
         }
 
-        function getEmptyObj() { return { customerName: "", dayType: "weekday", startTime: "", endTime: "", discountType: "none", ownerDiscount: 0, cashUnits: 0, bankUnits: 0, items: {} }; }
+        function getEmptyObj() { return { customerName: "", courtFee: 0, ownerDiscount: 0, cashUnits: 0, bankUnits: 0, items: {} }; }
 
         function saveStateFirebase() {
             if (isSyncingFromFirebase) return;
             
             if (!courtsData[currentCourt]) courtsData[currentCourt] = getEmptyObj();
-            if (!courtsData['quick']) courtsData['quick'] = { items: {} };
-            if (!courtsData['quick'].items) courtsData['quick'].items = {};
 
+            const c = courtsData[currentCourt];
+            if (!c.items) c.items = {};
+            c.customerName = document.getElementById('customer-name').value; 
+            
             if (currentCourt === 'quick') {
-                courtsData['quick'].bankUnits = parseFloat(document.getElementById('quick-bank').value) || 0;
+                c.courtFee = 0; // Bán lẻ vãng lai không có tiền sân
             } else {
-                const c = courtsData[currentCourt];
-                if (!c.items) c.items = {};
-                c.customerName = document.getElementById('customer-name').value; 
-                c.dayType = document.getElementById('day-type').value;
-                c.startTime = document.getElementById('start-time').value; 
-                c.endTime = document.getElementById('end-time').value;
-                c.discountType = document.getElementById('discount-select').value;
-                c.ownerDiscount = parseFloat(document.getElementById('owner-discount').value) || 0;
-                c.bankUnits = parseFloat(document.getElementById('bank-units').value) || 0;
+                c.courtFee = parseFloat(document.getElementById('court-fee-input').value) || 0;
             }
+            
+            c.ownerDiscount = parseFloat(document.getElementById('owner-discount').value) || 0;
+            c.bankUnits = parseFloat(document.getElementById('bank-units').value) || 0;
             
             window.fbSet('courts_draft', courtsData);
         }
 
         function updateUIFromData() {
+            const c = courtsData[currentCourt] || getEmptyObj();
+            document.getElementById('customer-name').value = c.customerName || ""; 
+            document.getElementById('owner-discount').value = c.ownerDiscount || ""; 
+            document.getElementById('bank-units').value = c.bankUnits || "";
+
             if (currentCourt === 'quick') {
-                document.getElementById('time-config-section').style.display = 'none'; 
-                document.getElementById('section-court-bill').style.display = 'none'; 
-                document.getElementById('section-quick-sale').style.display = 'block';
+                document.getElementById('court-fee-input').value = "";
+                document.getElementById('court-fee-input').disabled = true;
+                document.getElementById('court-fee-input').placeholder = "Không áp dụng";
                 document.getElementById('menu-current-target').innerText = "VÃNG LAI";
-                document.getElementById('quick-bank').value = (courtsData['quick'] && courtsData['quick'].bankUnits) ? courtsData['quick'].bankUnits : "";
+                document.getElementById('bill-court-title').innerText = "🛒 BÁN LẺ VÃNG LAI";
+                document.getElementById('bill-type-label').innerText = "Khách mua lẻ";
             } else {
-                document.getElementById('time-config-section').style.display = 'block'; 
-                document.getElementById('section-court-bill').style.display = 'flex';
-                document.getElementById('section-quick-sale').style.display = 'none';
+                document.getElementById('court-fee-input').disabled = false;
+                document.getElementById('court-fee-input').placeholder = "Nhập số tiền sân...";
+                document.getElementById('court-fee-input').value = c.courtFee || "";
                 document.getElementById('menu-current-target').innerText = "SÂN " + currentCourt; 
-                document.getElementById('bill-court-title').innerText = currentCourt;
-                
-                const c = courtsData[currentCourt] || getEmptyObj();
-                document.getElementById('customer-name').value = c.customerName || ""; 
-                document.getElementById('day-type').value = c.dayType || "weekday";
-                document.getElementById('start-time').value = c.startTime || ""; 
-                document.getElementById('end-time').value = c.endTime || "";
-                document.getElementById('discount-select').value = c.discountType || "none";
-                document.getElementById('owner-discount').value = c.ownerDiscount || ""; 
-                document.getElementById('bank-units').value = c.bankUnits || "";
-                renderShortcuts();
+                document.getElementById('bill-court-title').innerText = "SÂN " + currentCourt;
+                document.getElementById('bill-type-label').innerText = "Hóa đơn dịch vụ";
             }
         }
 
@@ -513,19 +446,6 @@ HTML
             });
             updateUIFromData();
             calculateAll();
-        }
-
-        function onDayTypeChange() { saveStateFirebase(); renderShortcuts(); calculateAll(); }
-
-        function renderShortcuts() {
-            const container = document.getElementById('shortcut-container'); container.innerHTML = "";
-            PRICING[document.getElementById('day-type').value].forEach(slot => {
-                const btn = document.createElement('button');
-                btn.className = "flex flex-col items-center justify-center bg-slate-950/60 border border-slate-700/50 text-slate-300 font-bold rounded-lg hover:bg-slate-800 hover:border-cyan-500/50 hover:text-cyan-400 transition-all h-full shadow-sm";
-                btn.innerHTML = `<span class="text-[10px]">${slot.start}-${slot.end}</span><span class="text-cyan-500 text-[9px]">${slot.price}k/h</span>`;
-                btn.onclick = () => { document.getElementById('start-time').value = slot.start; document.getElementById('end-time').value = slot.end; saveStateFirebase(); calculateAll(); };
-                container.appendChild(btn);
-            });
         }
 
         function renderMenuDichVu() {
@@ -550,8 +470,6 @@ HTML
 
         function updateItemQty(pId, delta) {
             if (!courtsData[currentCourt]) courtsData[currentCourt] = getEmptyObj();
-            if (currentCourt === 'quick' && !courtsData['quick'].items) courtsData['quick'].items = {};
-            
             const c = courtsData[currentCourt]; 
             if (!c.items) c.items = {};
             
@@ -578,37 +496,10 @@ HTML
 
             globalInventory.forEach(p => { const el = document.getElementById(`qty-view-${p.id}`); if (el) el.innerText = c.items[p.id] || 0; });
 
-            if (currentCourt === 'quick') {
-                let total = 0, html = "";
-                Object.keys(c.items).forEach(id => { const p = globalInventory.find(x => x.id === id); if(p){ total += (p.price * c.items[id]); html += `<div class="flex justify-between"><span>• ${p.name} (x${c.items[id]})</span><span>${p.price*c.items[id]}k</span></div>`; } });
-                c.cashUnits = Math.max(0, total - (c.bankUnits || 0));
-                document.getElementById('quick-items-list').innerHTML = html || `<span class="text-slate-600 italic">Giỏ hàng trống...</span>`;
-                document.getElementById('quick-total-fee').innerText = `${total}k`; return;
-            }
-
-            let mins = 0, fee = 0;
-            if (c.startTime && c.endTime) {
-                const [sh, sm] = c.startTime.split(':').map(Number); const [eh, em] = c.endTime.split(':').map(Number);
-                mins = (eh * 60 + em) - (sh * 60 + sm);
-                if (mins > 0) {
-                    for (let m = sh * 60 + sm; m < eh * 60 + em; m++) {
-                        if (c.dayType === 'weekday' && c.discountType === 'student' && m >= 300 && m < 1020) fee += (39 / 60);
-                        else {
-                            let slotPrice = 70;
-                            for (let slot of PRICING[c.dayType]) {
-                                const [sth, stm] = slot.start.split(':').map(Number); const [eth, etm] = slot.end.split(':').map(Number);
-                                if (m >= (sth*60+stm) && m < (eth*60+etm)) { slotPrice = slot.price; break; }
-                            }
-                            fee += (slotPrice / 60);
-                        }
-                    }
-                }
-            }
-            let finalCourtFee = c.discountType === "fixed" ? fee * 0.85 : fee;
             document.getElementById('bill-customer-name').innerText = c.customerName || "Khách lẻ";
-            document.getElementById('bill-time-range').innerText = `${c.startTime || '00:00'} → ${c.endTime || '00:00'} (${mins} phút)`;
-            document.getElementById('court-fee-original').innerText = `${formatNum(fee)}k`;
-            document.getElementById('court-fee-display').innerText = `${formatNum(finalCourtFee)}k`;
+            
+            let finalCourtFee = currentCourt === 'quick' ? 0 : (c.courtFee || 0);
+            document.getElementById('court-fee-display').innerText = `${finalCourtFee}k`;
 
             let dFee = 0, gFee = 0, dHtml = ""; let gHtml = "";
             Object.keys(c.items).forEach(id => {
@@ -620,7 +511,7 @@ HTML
                 }
             });
 
-            document.getElementById('drinks-fee-display').innerText = `${dFee}k`; document.getElementById('drinks-list-note').innerHTML = dHtml || "Chưa gọi nước";
+            document.getElementById('drinks-fee-display').innerText = `${dFee}k`; document.getElementById('drinks-list-note').innerHTML = dHtml || "Chưa chọn nước";
             document.getElementById('gear-fee-display').innerText = `${gFee}k`; document.getElementById('gear-list-note').innerHTML = gHtml || "Chưa có phụ kiện";
 
             let grandTotal = Math.max(0, finalCourtFee + dFee + gFee - (c.ownerDiscount || 0));
@@ -630,11 +521,11 @@ HTML
             document.getElementById('text-bank-real').innerText = `${formatNum(c.bankUnits || 0)}k`;
             
             const lbl = document.getElementById('live-status');
-            if (mins > 0 || Object.keys(c.items).length > 0) { 
-                lbl.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-400 animate-pulse"></span> Sử dụng`; 
+            if (finalCourtFee > 0 || Object.keys(c.items).length > 0) { 
+                lbl.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-400 animate-pulse"></span> Đang nhập đơn`; 
                 lbl.className = "text-[10px] text-rose-400 font-bold bg-rose-950/60 px-3 py-1 rounded-full border border-rose-900/50 flex items-center gap-1.5"; 
             } else { 
-                lbl.innerHTML = `<span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span> Trống`; 
+                lbl.innerHTML = `<span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span> Sẵn sàng`; 
                 lbl.className = "text-[10px] text-cyan-400 font-bold bg-cyan-950/60 px-3 py-1 rounded-full border border-cyan-900/50 flex items-center gap-1.5"; 
             }
         }
@@ -656,104 +547,32 @@ HTML
             return cost;
         }
 
-        function checkoutQuickSale() {
-            const c = courtsData['quick']; if (!c || !c.items || Object.keys(c.items).length === 0) return;
-            let serv = 0; Object.keys(c.items).forEach(id => { const p = globalInventory.find(x => x.id === id); if(p) serv += (p.price * c.items[id]); });
-            let costGoods = deductInv(c.items);
-            const r = { id: 'PAB-Q-'+Date.now(), date: document.getElementById('filter-date').value, time: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}), courtNum: "Lẻ", customerName: "Khách lẻ vãng lai", timeRange: "Bán lẻ", courtFee: 0, serviceFee: serv, totalBill: serv, profitGoods: serv - costGoods, cashReceived: c.cashUnits, bankReceived: c.bankUnits || 0, rawDetails: { items: c.items }, locked: false };
-            
-            window.fbPush('history', r); 
-            window.fbSet('inventory', globalInventory); 
-            
-            c.items = {}; 
-            document.getElementById('quick-bank').value = ""; 
-            window.fbSet('courts_draft', courtsData);
-            triggerToast("Đã chốt bán lẻ & làm mới giỏ hàng!");
-        }
-
         function saveAndCheckout() {
             const c = courtsData[currentCourt]; 
             if (!c) return;
 
-            const fDate = document.getElementById('filter-date').value;
-            const now = new Date();
-            const tzOffset = now.getTimezoneOffset() * 60000;
-            const todayStr = new Date(Date.now() - tzOffset).toISOString().slice(0, 10);
-            
-            if (fDate === todayStr && c.startTime) {
-                const currentTimeStr = now.toTimeString().slice(0, 5);
-                if (c.startTime < currentTimeStr) {
-                    alert(`⚠️ Cảnh báo: Không thể đặt sân ở khung giờ đã trôi qua (${c.startTime} < Hiện tại: ${currentTimeStr})!`);
-                    return;
-                }
-            }
-
-            let mins = 0, fee = 0;
-            if (c.startTime && c.endTime) {
-                if (c.startTime >= c.endTime) {
-                    alert("⚠️ Thời gian ra phải lớn hơn thời gian vào!");
-                    return;
-                }
-
-                const currentStartMin = c.startTime.split(':').map(Number)[0] * 60 + c.startTime.split(':').map(Number)[1];
-                const currentEndMin = c.endTime.split(':').map(Number)[0] * 60 + c.endTime.split(':').map(Number)[1];
-
-                const isOverlapped = paymentHistory.some(b => {
-                    if (b.date === fDate && b.courtNum.toString() === currentCourt.toString() && b.timeRange.includes('→')) {
-                        const cleanTime = b.timeRange.split(' ')[0];
-                        const cleanEndTime = b.timeRange.split(' ')[2];
-                        if(cleanTime && cleanEndTime) {
-                            const bStart = cleanTime.split(':').map(Number)[0] * 60 + cleanTime.split(':').map(Number)[1];
-                            const bEnd = cleanEndTime.split(':').map(Number)[0] * 60 + cleanEndTime.split(':').map(Number)[1];
-                            return (currentStartMin < bEnd && currentEndMin > bStart);
-                        }
-                    }
-                    return false;
-                });
-
-                if (isOverlapped) {
-                    alert(`❌ Không thể đặt! Khung giờ ${c.startTime} - ${c.endTime} đã bị trùng với lịch đặt trước đó của Sân ${currentCourt}!`);
-                    return;
-                }
-
-                const [sh, sm] = c.startTime.split(':').map(Number); 
-                const [eh, em] = c.endTime.split(':').map(Number);
-                mins = (eh * 60 + em) - (sh * 60 + sm);
-                for (let m = sh * 60 + sm; m < eh * 60 + em; m++) {
-                    if (c.dayType === 'weekday' && c.discountType === 'student' && m >= 300 && m < 1020) fee += (39 / 60);
-                    else {
-                        let sp = 70; 
-                        for (let slot of PRICING[c.dayType]) { 
-                            const [sth, stm] = slot.start.split(':').map(Number); 
-                            const [eth, etm] = slot.end.split(':').map(Number); 
-                            if (m >= (sth*60+stm) && m < (eth*60+etm)) { sp = slot.price; break; } 
-                        }
-                        fee += (sp / 60);
-                    }
-                }
-            }
-
-            if (mins === 0 && (!c.items || Object.keys(c.items).length === 0)) { 
-                alert("Sân hiện tại đang trống, vui lòng kiểm tra lại dữ liệu!"); 
-                return; 
-            }
-
-            let finalCourtFee = c.discountType === "fixed" ? fee * 0.85 : fee;
+            let courtFeeVal = currentCourt === 'quick' ? 0 : (c.courtFee || 0);
             let serv = 0; 
             if(c.items) { 
                 Object.keys(c.items).forEach(id => { const p = globalInventory.find(x => x.id === id); if(p) serv += (p.price * c.items[id]); }); 
             }
+            
+            if (courtFeeVal === 0 && serv === 0) { 
+                alert("Hóa đơn hiện tại đang trống, vui lòng kiểm tra lại dữ liệu!"); 
+                return; 
+            }
+
             let costGoods = deductInv(c.items);
-            let tot = Math.max(0, finalCourtFee + serv - (c.ownerDiscount || 0));
+            let tot = Math.max(0, courtFeeVal + serv - (c.ownerDiscount || 0));
+            const fDate = document.getElementById('filter-date').value;
 
             const r = { 
                 id: 'PAB-'+Date.now(), 
                 date: fDate, 
                 time: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}), 
-                courtNum: currentCourt, 
+                courtNum: currentCourt === 'quick' ? 'Lẻ' : currentCourt, 
                 customerName: c.customerName || "Khách lẻ", 
-                timeRange: `${c.startTime || '00:00'} → ${c.endTime || '00:00'} (${mins} ph)`, 
-                courtFee: finalCourtFee, 
+                courtFee: courtFeeVal, 
                 serviceFee: serv, 
                 totalBill: tot, 
                 profitGoods: serv - costGoods, 
@@ -771,18 +590,10 @@ HTML
 
         function resetCurrentCourt() { 
             courtsData[currentCourt] = getEmptyObj(); 
-            if(currentCourt!=='quick') { 
-                document.getElementById('customer-name').value=""; document.getElementById('day-type').value="weekday";
-                document.getElementById('start-time').value=""; document.getElementById('end-time').value=""; 
-                document.getElementById('discount-select').value="none"; document.getElementById('owner-discount').value=""; 
-                document.getElementById('bank-units').value=""; 
-            } 
-            window.fbSet('courts_draft', courtsData);
-        }
-        
-        function resetQuickSaleCart() { 
-            if(courtsData['quick']) courtsData['quick'].items = {}; 
-            document.getElementById('quick-bank').value=""; 
+            document.getElementById('customer-name').value=""; 
+            document.getElementById('court-fee-input').value=""; 
+            document.getElementById('owner-discount').value=""; 
+            document.getElementById('bank-units').value=""; 
             window.fbSet('courts_draft', courtsData);
         }
 
@@ -806,7 +617,7 @@ HTML
                 
                 let detailsHtml = "";
                 if (bill.courtFee > 0) {
-                    detailsHtml += `<div class="text-slate-400">• Tiền giờ sân: <span class="text-white font-bold">${formatNum(bill.courtFee)}k</span> (${bill.timeRange || ''})</div>`;
+                    detailsHtml += `<div class="text-slate-400">• Tiền giờ sân thu trực tiếp: <span class="text-white font-bold">${formatNum(bill.courtFee)}k</span></div>`;
                 }
                 
                 let listItems = [];
@@ -819,13 +630,11 @@ HTML
                 }
                 
                 if (listItems.length > 0) {
-                    detailsHtml += `<div class="text-slate-400">• Mặt hàng đã sử dụng: ${listItems.join(', ')}</div>`;
-                } else if (bill.courtFee == 0) {
-                    detailsHtml += `<div class="text-slate-500 italic">• Đơn rỗng không có chi tiết dịch vụ.</div>`;
+                    detailsHtml += `<div class="text-slate-400">• Mặt hàng dịch vụ: ${listItems.join(', ')}</div>`;
                 }
                 
                 if (bill.rawDetails && bill.rawDetails.ownerDiscount > 0) {
-                    detailsHtml += `<div class="text-rose-400 font-medium">• Đã giảm thêm trừ trực tiếp: -${bill.rawDetails.ownerDiscount}k</div>`;
+                    detailsHtml += `<div class="text-rose-400 font-medium">• Đã giảm trừ: -${bill.rawDetails.ownerDiscount}k</div>`;
                 }
 
                 const detailRow = document.createElement('tr');
@@ -836,30 +645,28 @@ HTML
                         <div class="space-y-1 py-1 text-slate-300">
                             <div class="text-[10px] font-extrabold uppercase text-cyan-400 tracking-wider mb-1 flex items-center gap-1">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
-                                CHI TIẾT SỬ DỤNG CỦA ĐƠN HÀNG:
+                                CHI TIẾT SỬ DỤNG:
                             </div>
                             ${detailsHtml}
                         </div>
                     </td>
                 `;
                 mainRow.parentNode.insertBefore(detailRow, mainRow.nextSibling); mainRow.classList.add('row-expanded');
-            } catch(err) { console.error("Lỗi parse dữ liệu hóa đơn:", err); }
+            } catch(err) { console.error("Lỗi xem chi tiết đơn:", err); }
         };
 
         window.lockAndFreezeRevenue = function() {
             const fDate = document.getElementById('filter-date').value;
             if(!fDate) { alert("⚠️ Vui lòng chọn một ngày cụ thể trước khi thực hiện khóa sổ."); return; }
             
-            const confirmPass = prompt(`⚠️ HỆ THỐNG KHÓA SỔ DOANH THU THÁNG:\nNhập mật khẩu để CHỐT TIỀN và cố định tất cả đơn hàng từ ngày ${fDate} trở về trước:`);
+            const confirmPass = prompt(`⚠️ HỆ THỐNG KHÓA SỔ DOANH THU THÁNG:\nNhập mật khẩu để CHỐT TIỀN tất cả đơn hàng từ ngày ${fDate} trở về trước:`);
             if (confirmPass !== MASTER_PASSWORD) { alert("⚠️ Mật khẩu quản trị không chính xác!"); return; }
 
             window.fbOnce('history').then((snapshot) => {
                 const snap = snapshot.val();
-                if(!snap) { alert("Không tìm thấy dữ liệu hóa đơn nào để chốt."); return; }
+                if(!snap) { alert("Không tìm thấy dữ liệu hóa đơn."); return; }
                 
-                let updates = {};
-                let count = 0;
-                
+                let updates = {}; let count = 0;
                 Object.keys(snap).forEach(k => {
                     if (snap[k].date <= fDate && !snap[k].locked) {
                         updates[`history/${k}/locked`] = true;
@@ -869,31 +676,24 @@ HTML
 
                 if(count > 0) {
                     window.fbUpdate('/', updates).then(() => {
-                        triggerToast(`Đã đóng băng & chốt tiền thành công ${count} đơn hàng!`);
+                        triggerToast(`Đã đóng băng thành công ${count} hóa đơn!`);
                     });
                 } else {
-                    alert("Tất cả đơn hàng trong giai đoạn này đều đã ở trạng thái Chốt tiền.");
+                    alert("Tất cả đơn hàng đều đã ở trạng thái Chốt tiền.");
                 }
-            }).catch(err => alert("Lỗi khi đồng bộ khóa sổ: " + err));
+            }).catch(err => alert("Lỗi chốt sổ: " + err));
         }
 
         function renderHistory() {
             const fDate = document.getElementById('filter-date').value; 
             if(!fDate) return;
             const fMonth = fDate.substring(0, 7);
-            const targetWeek = getWeekNumber(fDate); 
-            const targetYear = new Date(fDate).getFullYear();
 
             const tbody = document.getElementById('history-tbody'); tbody.innerHTML = "";
-            
             let dayTot = 0, cash = 0, bank = 0, exp = 0;
-            let weekTot = 0, weekCash = 0, weekBank = 0;
             let monthBank = 0, monthCash = 0, monthExp = 0;
             
             paymentHistory.forEach((b, index) => {
-                const bWeek = getWeekNumber(b.date);
-                const bYear = new Date(b.date).getFullYear();
-
                 if (b.date === fDate) {
                     dayTot += b.totalBill; cash += b.cashReceived; bank += b.bankReceived;
                     const tr = document.createElement('tr'); 
@@ -910,11 +710,10 @@ HTML
                         ? `<span class="text-slate-600 italic">Khóa</span>`
                         : `<button onclick="deleteBill('${b.id}', event)" class="text-slate-600 hover:text-red-400 font-bold p-1">✕</button>`;
 
-                    tr.innerHTML = `<td class="p-2.5 text-slate-500">${b.time}</td><td class="p-2.5 font-bold ${b.courtNum==='Lẻ'?'text-rose-400':'text-cyan-400'}">${b.courtNum==='Lẻ'?'Bán lẻ':'Sân '+b.courtNum}</td><td class="p-2.5 max-w-[100px] truncate text-white">${b.customerName}</td><td class="p-2.5 text-slate-400">${b.timeRange}</td><td class="p-2.5 text-right">${formatNum(b.courtFee)}k</td><td class="p-2.5 text-right text-rose-400">${formatNum(b.serviceFee)}k</td><td class="p-2.5 text-right text-cyan-400">${formatNum(b.totalBill)}k</td><td class="p-2.5 text-right text-slate-500">${formatNum(b.profitGoods)}k</td><td class="p-2.5 text-rose-400">${formatNum(b.cashReceived)}k</td><td class="p-2.5 text-cyan-400">${formatNum(b.bankReceived)}k</td><td class="p-2.5 text-center">${lockStatusHtml}</td><td class="p-2.5 text-center" onclick="event.stopPropagation();">${deleteBtnHtml}</td>`;
+                    tr.innerHTML = `<td class="p-2.5 text-slate-500">${b.time}</td><td class="p-2.5 font-bold ${b.courtNum==='Lẻ'?'text-rose-400':'text-cyan-400'}">${b.courtNum==='Lẻ'?'Bán lẻ':'Sân '+b.courtNum}</td><td class="p-2.5 max-w-[100px] truncate text-white">${b.customerName}</td><td class="p-2.5 text-right">${formatNum(b.courtFee)}k</td><td class="p-2.5 text-right text-rose-400">${formatNum(b.serviceFee)}k</td><td class="p-2.5 text-right text-cyan-400">${formatNum(b.totalBill)}k</td><td class="p-2.5 text-right text-slate-500">${formatNum(b.profitGoods)}k</td><td class="p-2.5 text-rose-400">${formatNum(b.cashReceived)}k</td><td class="p-2.5 text-cyan-400">${formatNum(b.bankReceived)}k</td><td class="p-2.5 text-center">${lockStatusHtml}</td><td class="p-2.5 text-center" onclick="event.stopPropagation();">${deleteBtnHtml}</td>`;
                     tbody.appendChild(tr);
                 }
 
-                if (bWeek === targetWeek && bYear === targetYear) { weekTot += b.totalBill; weekCash += b.cashReceived; weekBank += b.bankReceived; }
                 if (b.date.startsWith(fMonth)) { monthCash += b.cashReceived; monthBank += b.bankReceived; }
             });
             
@@ -933,10 +732,6 @@ HTML
             let finalRealCashBox = monthCash - monthExp;
             document.getElementById('stat-real-cash-box').innerText = `${formatNum(finalRealCashBox)}k`;
             document.getElementById('stat-month-bank').innerText = `${formatNum(monthBank)}k`;
-
-            document.getElementById('stat-week-total').innerText = `${formatNum(weekTot)}k`;
-            document.getElementById('stat-week-cash').innerText = `${formatNum(weekCash)}k`;
-            document.getElementById('stat-week-bank').innerText = `${formatNum(weekBank)}k`;
         }
 
         function deleteBill(id, e) { 
@@ -948,7 +743,6 @@ HTML
             }
 
             const promptPass = prompt("⚠️ KHUYÊN CÁO: Chỉ ADMIN mới hủy được đơn hàng này.\nNếu gặp sự cố hoặc cần đổi sân, vui lòng gọi số điện thoại của sân để giải quyết!\n\nNhập mật khẩu Admin để xác nhận hủy:");
-            
             if (promptPass === null) return;
             
             if (promptPass === MASTER_PASSWORD) { 

@@ -4,7 +4,7 @@ HTML
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Phúc An Badminton - Premium Cloud POS v4.7.5</title>
+    <title>Phúc An Badminton - Premium Cloud POS v4.7.8</title>
     
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -78,7 +78,7 @@ HTML
                 </div>
                 <div>
                     <h1 class="text-base font-black tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500">PHÚC AN BADMINTON</h1>
-                    <p class="text-[10px] text-cyan-400 font-bold uppercase tracking-widest">Mobile Native App v4.7.5</p>
+                    <p class="text-[10px] text-cyan-400 font-bold uppercase tracking-widest">Mobile Native App v4.7.8</p>
                 </div>
             </div>
             
@@ -257,7 +257,7 @@ HTML
             <div class="bg-slate-950 px-4 py-2.5 flex flex-wrap justify-between items-center gap-2 border-b border-slate-800">
                 <div class="flex gap-4 items-center">
                     <button id="tab-btn-history" onclick="switchTab('history')" class="py-1 text-xs font-bold text-slate-500 border-b-2 border-transparent">📊 ĐỐI CHIẾU DOANH THU & DÒNG TIỀN KIỂM KÊ</button>
-                    <button id="tab-btn-inventory" onclick="switchTab('inventory')" class="py-1 text-xs font-bold text-slate-500 border-b-2 border-transparent">📦 KHO HÀNG CHUẨN v4.7.5</button>
+                    <button id="tab-btn-inventory" onclick="switchTab('inventory')" class="py-1 text-xs font-bold text-slate-500 border-b-2 border-transparent">📦 KHO HÀNG CHUẨN v4.7.8</button>
                 </div>
                 <div class="flex items-center gap-3 text-xs">
                     <input id="filter-date" type="date" onchange="renderHistory()" class="bg-slate-900 border border-slate-800 text-slate-200 rounded-lg px-2 py-0.5 font-bold focus:outline-none">
@@ -684,28 +684,6 @@ HTML
                     return;
                 }
 
-                // KIỂM TRA TRÙNG LỊCH CHẶT CHẼ TRÊN ĐỊNH DẠNG 24H
-                const currentStartMin = c.startTime.split(':').map(Number)[0] * 60 + c.startTime.split(':').map(Number)[1];
-                const currentEndMin = c.endTime.split(':').map(Number)[0] * 60 + c.endTime.split(':').map(Number)[1];
-
-                const isOverlapped = paymentHistory.some(b => {
-                    if (b.date === fDate && b.courtNum.toString() === currentCourt.toString() && b.timeRange.includes('→')) {
-                        const cleanTime = b.timeRange.split(' ')[0];
-                        const cleanEndTime = b.timeRange.split(' ')[2];
-                        if(cleanTime && cleanEndTime) {
-                            const bStart = cleanTime.split(':').map(Number)[0] * 60 + cleanTime.split(':').map(Number)[1];
-                            const bEnd = cleanEndTime.split(':').map(Number)[0] * 60 + cleanEndTime.split(':').map(Number)[1];
-                            return (currentStartMin < bEnd && currentEndMin > bStart);
-                        }
-                    }
-                    return false;
-                });
-
-                if (isOverlapped) {
-                    alert(`❌ Không thể đặt! Khung giờ ${c.startTime} - ${c.endTime} đã bị trùng lịch với khách khác ở Sân ${currentCourt}!`);
-                    return;
-                }
-
                 const [sh, sm] = c.startTime.split(':').map(Number); 
                 const [eh, em] = c.endTime.split(':').map(Number);
                 mins = (eh * 60 + em) - (sh * 60 + sm);
@@ -736,7 +714,6 @@ HTML
             let costGoods = deductInv(c.items);
             let tot = Math.max(0, finalCourtFee + serv - (c.ownerDiscount || 0));
 
-            // SỬA LỖI ĐỨNG MÁY CHÍNH XÁC: Đã đổi b.bankUnits thành c.bankUnits
             const r = { 
                 id: 'PAB-'+Date.now(), 
                 date: fDate, 
@@ -897,9 +874,7 @@ HTML
                         ? `<span class="text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-500/30 font-bold flex items-center justify-center gap-1">✔ Đã chốt</span>`
                         : `<span class="text-rose-400 bg-rose-950/80 px-2 py-0.5 rounded border border-rose-500/30 font-bold flex items-center justify-center gap-1">● Chưa chốt</span>`;
                     
-                    const deleteBtnHtml = b.locked 
-                        ? `<span class="text-slate-600 italic">Khóa</span>`
-                        : `<button onclick="deleteBill('${b.id}', event)" class="text-slate-600 hover:text-red-400 font-bold p-1">✕</button>`;
+                    const deleteBtnHtml = `<button onclick="deleteBill('${b.id}', event)" class="text-slate-600 hover:text-red-400 font-bold p-1">✕</button>`;
 
                     tr.innerHTML = `<td class="p-2.5 text-slate-500">${b.time}</td><td class="p-2.5 font-bold ${b.courtNum==='Lẻ'?'text-rose-400':'text-cyan-400'}">${b.courtNum==='Lẻ'?'Bán lẻ':'Sân '+b.courtNum}</td><td class="p-2.5 max-w-[100px] truncate text-white">${b.customerName}</td><td class="p-2.5 text-slate-400">${b.timeRange}</td><td class="p-2.5 text-right">${formatNum(b.courtFee)}k</td><td class="p-2.5 text-right text-rose-400">${formatNum(b.serviceFee)}k</td><td class="p-2.5 text-right text-cyan-400">${formatNum(b.totalBill)}k</td><td class="p-2.5 text-right text-slate-500">${formatNum(b.profitGoods)}k</td><td class="p-2.5 text-rose-400">${formatNum(b.cashReceived)}k</td><td class="p-2.5 text-cyan-400">${formatNum(b.bankReceived)}k</td><td class="p-2.5 text-center">${lockStatusHtml}</td><td class="p-2.5 text-center" onclick="event.stopPropagation();">${deleteBtnHtml}</td>`;
                     tbody.appendChild(tr);
@@ -930,16 +905,12 @@ HTML
             document.getElementById('stat-week-bank').innerText = `${formatNum(weekBank)}k`;
         }
 
+        // BẮT BUỘC NHẬP MẬT KHẨU KHI XÓA CHO CẢ ĐƠN THƯỜNG VÀ ĐƠN KHÓA SỔ
         function deleteBill(id, e) { 
             if(e) e.stopPropagation();
-            const targetBill = paymentHistory.find(b => b.id === id);
-            if(targetBill && targetBill.locked) {
-                alert("⛔ Không thể xóa! Hóa đơn này đã được kiểm toán khóa sổ.");
-                return;
-            }
 
-            const promptPass = prompt("⚠️ KHUYÊN CÁO: Chỉ ADMIN mới hủy được đơn hàng này.\nNếu gặp sự cố hoặc cần đổi sân, vui lòng gọi số điện thoại của sân để giải quyết!\n\nNhập mật khẩu Admin để xác nhận hủy:");
-            if (promptPass === null) return;
+            const promptPass = prompt("⚠️ KHUYÊN CÁO BẢO MẬT: Chỉ ADMIN mới có quyền hủy đơn hàng.\nNếu có sự cố nhầm lẫn, vui lòng liên hệ hotline của sân để được xử lý.\n\nNhập mật khẩu Admin để xác nhận xóa đơn:");
+            if (promptPass === null) return; // Bấm hủy ngang
             
             if (promptPass === MASTER_PASSWORD) { 
                 window.fbOnce('history').then((snapshot) => {
@@ -947,15 +918,14 @@ HTML
                     if(snap) {
                         Object.keys(snap).forEach(k => { 
                             if(snap[k].id === id) {
-                                if(snap[k].locked) { alert("⛔ Hệ thống bảo mật: Đơn hàng đã chốt tiền!"); return; }
                                 window.fbRemove(`history/${k}`); 
-                                triggerToast("Đã hủy đơn hàng thành công!");
+                                triggerToast("Hệ thống quản trị: Đã hủy đơn hàng thành công!");
                             }
                         }); 
                     }
-                }).catch(err => console.error("Lỗi xóa đơn:", err));
+                }).catch(err => console.error("Lỗi kết nối Firebase:", err));
             } else {
-                alert("⚠️ Mật khẩu quản trị không chính xác!");
+                alert("❌ Mật khẩu admin không chính xác! Thao tác xóa bị từ chối.");
             }
         }
         

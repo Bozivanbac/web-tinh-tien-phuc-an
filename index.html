@@ -4,7 +4,7 @@ HTML
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Phúc An Badminton - Premium Cloud POS v4.7.1</title>
+    <title>Phúc An Badminton - Premium Cloud POS v4.7.2</title>
     
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -78,7 +78,7 @@ HTML
                 </div>
                 <div>
                     <h1 class="text-base font-black tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500">PHÚC AN BADMINTON</h1>
-                    <p class="text-[10px] text-cyan-400 font-bold uppercase tracking-widest">Mobile Native App v4.7.1</p>
+                    <p class="text-[10px] text-cyan-400 font-bold uppercase tracking-widest">Mobile Native App v4.7.2</p>
                 </div>
             </div>
             
@@ -116,14 +116,14 @@ HTML
                     </div>
                     <div class="space-y-1">
                         <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">📅 Áp dụng ngày</label>
-                        <select id="day-type" onchange="saveStateFirebase(); renderShortcuts();" class="w-full bg-slate-950/50 border border-slate-700/50 rounded-lg px-3 py-2 text-xs font-semibold text-slate-200 focus:outline-none cursor-pointer">
+                        <select id="day-type" onchange="onDayTypeChange();" class="w-full bg-slate-950/50 border border-slate-700/50 rounded-lg px-3 py-2 text-xs font-semibold text-slate-200 focus:outline-none cursor-pointer">
                             <option value="weekday">Ngày thường (T2 - T6)</option>
                             <option value="weekend">Cuối tuần (T7 & CN)</option>
                         </select>
                     </div>
                     <div class="space-y-1">
                         <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">🎁 Chương trình ưu đãi</label>
-                        <select id="discount-select" onchange="saveStateFirebase()" class="w-full bg-slate-950/50 border border-slate-700/50 rounded-lg px-3 py-2 text-xs font-semibold text-slate-200 focus:outline-none cursor-pointer">
+                        <select id="discount-select" onchange="saveStateFirebase(); calculateAll();" class="w-full bg-slate-950/50 border border-slate-700/50 rounded-lg px-3 py-2 text-xs font-semibold text-slate-200 focus:outline-none cursor-pointer">
                             <option value="none">Không giảm giá</option>
                             <option value="student">Học sinh / Sinh viên (39k/h)</option>
                             <option value="fixed">Khách cố định (-15%)</option>
@@ -135,14 +135,14 @@ HTML
                     <div class="flex gap-2 items-end">
                         <div class="flex-1 space-y-1">
                             <label class="block text-[10px] font-bold text-cyan-400 uppercase tracking-wider ml-1">⏰ Giờ vào</label>
-                            <input id="start-time" type="time" oninput="saveStateFirebase()" class="w-full bg-slate-950/80 border border-slate-700/50 rounded-lg px-3 py-2 text-sm font-bold text-cyan-400 focus:outline-none">
+                            <input id="start-time" type="time" oninput="saveStateFirebase(); calculateAll();" class="w-full bg-slate-950/80 border border-slate-700/50 rounded-lg px-3 py-2 text-sm font-bold text-cyan-400 focus:outline-none">
                         </div>
                         <div class="flex items-center justify-center pb-2 text-slate-500">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                         </div>
                         <div class="flex-1 space-y-1">
                             <label class="block text-[10px] font-bold text-rose-400 uppercase tracking-wider ml-1">🏁 Giờ ra</label>
-                            <input id="end-time" type="time" oninput="saveStateFirebase()" class="w-full bg-slate-950/80 border border-slate-700/50 rounded-lg px-3 py-2 text-sm font-bold text-rose-400 focus:outline-none">
+                            <input id="end-time" type="time" oninput="saveStateFirebase(); calculateAll();" class="w-full bg-slate-950/80 border border-slate-700/50 rounded-lg px-3 py-2 text-sm font-bold text-rose-400 focus:outline-none">
                         </div>
                     </div>
                     <div class="space-y-1">
@@ -179,7 +179,7 @@ HTML
                 </div>
                 <div class="grid grid-cols-1 gap-1 mb-2">
                     <label class="text-[10px] font-bold text-cyan-400">Khách chuyển khoản (k)</label>
-                    <input id="quick-bank" type="number" placeholder="Nhập số tiền CK..." oninput="saveStateFirebase()" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs font-bold text-cyan-400 text-center focus:outline-none">
+                    <input id="quick-bank" type="number" placeholder="Nhập số tiền CK..." oninput="saveStateFirebase(); calculateAll();" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs font-bold text-cyan-400 text-center focus:outline-none">
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <button onclick="resetQuickSaleCart()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 py-2 rounded-lg text-xs font-bold transition">Xóa</button>
@@ -224,11 +224,11 @@ HTML
                         <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800/60">
                             <div>
                                 <label class="block text-[10px] font-bold text-rose-400 mb-1">Giảm thêm (k)</label>
-                                <input id="owner-discount" type="number" placeholder="0" oninput="saveStateFirebase()" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2 py-1.5 text-xs font-bold text-rose-400 text-center focus:outline-none">
+                                <input id="owner-discount" type="number" placeholder="0" oninput="saveStateFirebase(); calculateAll();" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2 py-1.5 text-xs font-bold text-rose-400 text-center focus:outline-none">
                             </div>
                             <div>
                                 <label class="block text-[10px] font-bold text-cyan-400 mb-1">Khách CK (k)</label>
-                                <input id="bank-units" type="number" placeholder="0" oninput="saveStateFirebase()" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2 py-1.5 text-xs font-bold text-cyan-400 text-center focus:outline-none">
+                                <input id="bank-units" type="number" placeholder="0" oninput="saveStateFirebase(); calculateAll();" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2 py-1.5 text-xs font-bold text-cyan-400 text-center focus:outline-none">
                             </div>
                         </div>
                     </div>
@@ -257,7 +257,7 @@ HTML
             <div class="bg-slate-950 px-4 py-2.5 flex flex-wrap justify-between items-center gap-2 border-b border-slate-800">
                 <div class="flex gap-4 items-center">
                     <button id="tab-btn-history" onclick="switchTab('history')" class="py-1 text-xs font-bold text-slate-500 border-b-2 border-transparent">📊 ĐỐI CHIẾU DOANH THU & DÒNG TIỀN KIỂM KÊ</button>
-                    <button id="tab-btn-inventory" onclick="switchTab('inventory')" class="py-1 text-xs font-bold text-slate-500 border-b-2 border-transparent">📦 KHO HÀNG CHUẨN v4.7.1</button>
+                    <button id="tab-btn-inventory" onclick="switchTab('inventory')" class="py-1 text-xs font-bold text-slate-500 border-b-2 border-transparent">📦 KHO HÀNG CHUẨN v4.7.2</button>
                 </div>
                 <div class="flex items-center gap-3 text-xs">
                     <input id="filter-date" type="date" onchange="renderHistory()" class="bg-slate-900 border border-slate-800 text-slate-200 rounded-lg px-2 py-0.5 font-bold focus:outline-none">
@@ -424,7 +424,6 @@ HTML
                     courtsData = { 1: getEmptyObj(), 2: getEmptyObj(), 'quick': { items: {} } };
                 }
                 
-                // Đảm bảo nhánh 'quick' và 'quick.items' luôn tồn tại khi kéo dữ liệu từ mây về
                 if (!courtsData['quick']) courtsData['quick'] = { items: {} };
                 if (!courtsData['quick'].items) courtsData['quick'].items = {};
                 if (!courtsData[1]) courtsData[1] = getEmptyObj();
@@ -550,7 +549,6 @@ HTML
         }
 
         function updateItemQty(pId, delta) {
-            // SỬA LỖI ĐỊNH VỊ NHÁNH BÁN LẺ: Ép hệ thống tạo sẵn Object items nếu trống để tránh lỗi undefined
             if (!courtsData[currentCourt]) courtsData[currentCourt] = getEmptyObj();
             if (currentCourt === 'quick' && !courtsData['quick'].items) courtsData['quick'].items = {};
             
@@ -674,26 +672,96 @@ HTML
         }
 
         function saveAndCheckout() {
-            const c = courtsData[currentCourt]; if (!c) return;
+            const c = courtsData[currentCourt]; 
+            if (!c) return;
+
+            const fDate = document.getElementById('filter-date').value;
+            const now = new Date();
+            const tzOffset = now.getTimezoneOffset() * 60000;
+            const todayStr = new Date(Date.now() - tzOffset).toISOString().slice(0, 10);
+            
+            if (fDate === todayStr && c.startTime) {
+                const currentTimeStr = now.toTimeString().slice(0, 5);
+                if (c.startTime < currentTimeStr) {
+                    alert(`⚠️ Cảnh báo: Không thể đặt sân ở khung giờ đã trôi qua (${c.startTime} < Hiện tại: ${currentTimeStr})!`);
+                    return;
+                }
+            }
+
             let mins = 0, fee = 0;
             if (c.startTime && c.endTime) {
-                const [sh, sm] = c.startTime.split(':').map(Number); const [eh, em] = c.endTime.split(':').map(Number);
+                if (c.startTime >= c.endTime) {
+                    alert("⚠️ Thời gian ra phải lớn hơn thời gian vào!");
+                    return;
+                }
+
+                const currentStartMin = c.startTime.split(':').map(Number)[0] * 60 + c.startTime.split(':').map(Number)[1];
+                const currentEndMin = c.endTime.split(':').map(Number)[0] * 60 + c.endTime.split(':').map(Number)[1];
+
+                const isOverlapped = paymentHistory.some(b => {
+                    if (b.date === fDate && b.courtNum.toString() === currentCourt.toString() && b.timeRange.includes('→')) {
+                        const cleanTime = b.timeRange.split(' ')[0];
+                        const cleanEndTime = b.timeRange.split(' ')[2];
+                        if(cleanTime && cleanEndTime) {
+                            const bStart = cleanTime.split(':').map(Number)[0] * 60 + cleanTime.split(':').map(Number)[1];
+                            const bEnd = cleanEndTime.split(':').map(Number)[0] * 60 + cleanEndTime.split(':').map(Number)[1];
+                            return (currentStartMin < bEnd && currentEndMin > bStart);
+                        }
+                    }
+                    return false;
+                });
+
+                if (isOverlapped) {
+                    alert(`❌ Không thể đặt! Khung giờ ${c.startTime} - ${c.endTime} đã bị trùng với lịch đặt trước đó của Sân ${currentCourt}!`);
+                    return;
+                }
+
+                const [sh, sm] = c.startTime.split(':').map(Number); 
+                const [eh, em] = c.endTime.split(':').map(Number);
                 mins = (eh * 60 + em) - (sh * 60 + sm);
                 for (let m = sh * 60 + sm; m < eh * 60 + em; m++) {
                     if (c.dayType === 'weekday' && c.discountType === 'student' && m >= 300 && m < 1020) fee += (39 / 60);
                     else {
-                        let sp = 70; for (let slot of PRICING[c.dayType]) { const [sth, stm] = slot.start.split(':').map(Number); const [eth, etm] = slot.end.split(':').map(Number); if (m >= (sth*60+stm) && m < (eth*60+etm)) { sp = slot.price; break; } }
+                        let sp = 70; 
+                        for (let slot of PRICING[c.dayType]) { 
+                            const [sth, stm] = slot.start.split(':').map(Number); 
+                            const [eth, etm] = slot.end.split(':').map(Number); 
+                            if (m >= (sth*60+stm) && m < (eth*60+etm)) { sp = slot.price; break; } 
+                        }
                         fee += (sp / 60);
                     }
                 }
             }
-            if (mins === 0 && (!c.items || Object.keys(c.items).length === 0)) { alert("Sân hiện tại đang trống, vui lòng kiểm tra lại dữ liệu!"); return; }
+
+            if (mins === 0 && (!c.items || Object.keys(c.items).length === 0)) { 
+                alert("Sân hiện tại đang trống, vui lòng kiểm tra lại dữ liệu!"); 
+                return; 
+            }
+
             let finalCourtFee = c.discountType === "fixed" ? fee * 0.85 : fee;
-            let serv = 0; if(c.items) { Object.keys(c.items).forEach(id => { const p = globalInventory.find(x => x.id === id); if(p) serv += (p.price * c.items[id]); }); }
+            let serv = 0; 
+            if(c.items) { 
+                Object.keys(c.items).forEach(id => { const p = globalInventory.find(x => x.id === id); if(p) serv += (p.price * c.items[id]); }); 
+            }
             let costGoods = deductInv(c.items);
             let tot = Math.max(0, finalCourtFee + serv - (c.ownerDiscount || 0));
 
-            const r = { id: 'PAB-'+Date.now(), date: document.getElementById('filter-date').value, time: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}), courtNum: currentCourt, customerName: c.customerName || "Khách lẻ", timeRange: `${c.startTime}-${c.endTime} (${mins} ph)`, courtFee: finalCourtFee, serviceFee: serv, totalBill: tot, profitGoods: serv - costGoods, cashReceived: c.cashUnits, bankReceived: b.bankUnits || 0, rawDetails: JSON.parse(JSON.stringify(c)), locked: false };
+            const r = { 
+                id: 'PAB-'+Date.now(), 
+                date: fDate, 
+                time: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}), 
+                courtNum: currentCourt, 
+                customerName: c.customerName || "Khách lẻ", 
+                timeRange: `${c.startTime || '00:00'} → ${c.endTime || '00:00'} (${mins} ph)`, 
+                courtFee: finalCourtFee, 
+                serviceFee: serv, 
+                totalBill: tot, 
+                profitGoods: serv - costGoods, 
+                cashReceived: c.cashUnits, 
+                bankReceived: c.bankUnits || 0, 
+                rawDetails: JSON.parse(JSON.stringify(c)), 
+                locked: false 
+            };
             
             window.fbPush('history', r); 
             window.fbSet('inventory', globalInventory); 
@@ -879,7 +947,11 @@ HTML
                 return;
             }
 
-            if (prompt("🔐 Vui lòng cung cấp mật khẩu quản trị cao cấp để XÓA đơn này:") === MASTER_PASSWORD) { 
+            const promptPass = prompt("⚠️ KHUYÊN CÁO: Chỉ ADMIN mới hủy được đơn hàng này.\nNếu gặp sự cố hoặc cần đổi sân, vui lòng gọi số điện thoại của sân để giải quyết!\n\nNhập mật khẩu Admin để xác nhận hủy:");
+            
+            if (promptPass === null) return;
+            
+            if (promptPass === MASTER_PASSWORD) { 
                 window.fbOnce('history').then((snapshot) => {
                     const snap = snapshot.val();
                     if(snap) {
@@ -887,12 +959,14 @@ HTML
                             if(snap[k].id === id) {
                                 if(snap[k].locked) { alert("⛔ Hệ thống bảo mật: Đơn hàng đã chốt tiền!"); return; }
                                 window.fbRemove(`history/${k}`); 
-                                triggerToast("Đã xóa đơn hàng thành công!");
+                                triggerToast("Đã hủy đơn hàng thành công!");
                             }
                         }); 
                     }
                 }).catch(err => console.error("Lỗi xóa đơn:", err));
-            } 
+            } else {
+                alert("⚠️ Mật khẩu quản trị không chính xác!");
+            }
         }
         
         function addNewExpense() { const r = document.getElementById('exp-add-reason').value.trim(); const a = parseFloat(document.getElementById('exp-add-amount').value); if (r && a > 0) { window.fbPush('expenses', { id: 'EXP-'+Date.now(), date: document.getElementById('filter-date').value, time: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}), reason: r, amount: a }); document.getElementById('exp-add-reason').value=""; document.getElementById('exp-add-amount').value=""; } }

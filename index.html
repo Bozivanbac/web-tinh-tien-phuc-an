@@ -4,7 +4,7 @@ HTML
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Phúc An Badminton - Premium Cloud POS v4.7.3</title>
+    <title>Phúc An Badminton - Premium Cloud POS v4.7.4</title>
     
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -78,7 +78,7 @@ HTML
                 </div>
                 <div>
                     <h1 class="text-base font-black tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500">PHÚC AN BADMINTON</h1>
-                    <p class="text-[10px] text-cyan-400 font-bold uppercase tracking-widest">Mobile Native App v4.7.3</p>
+                    <p class="text-[10px] text-cyan-400 font-bold uppercase tracking-widest">Mobile Native App v4.7.4</p>
                 </div>
             </div>
             
@@ -257,7 +257,7 @@ HTML
             <div class="bg-slate-950 px-4 py-2.5 flex flex-wrap justify-between items-center gap-2 border-b border-slate-800">
                 <div class="flex gap-4 items-center">
                     <button id="tab-btn-history" onclick="switchTab('history')" class="py-1 text-xs font-bold text-slate-500 border-b-2 border-transparent">📊 ĐỐI CHIẾU DOANH THU & DÒNG TIỀN KIỂM KÊ</button>
-                    <button id="tab-btn-inventory" onclick="switchTab('inventory')" class="py-1 text-xs font-bold text-slate-500 border-b-2 border-transparent">📦 KHO HÀNG CHUẨN v4.7.3</button>
+                    <button id="tab-btn-inventory" onclick="switchTab('inventory')" class="py-1 text-xs font-bold text-slate-500 border-b-2 border-transparent">📦 KHO HÀNG CHUẨN v4.7.4</button>
                 </div>
                 <div class="flex items-center gap-3 text-xs">
                     <input id="filter-date" type="date" onchange="renderHistory()" class="bg-slate-900 border border-slate-800 text-slate-200 rounded-lg px-2 py-0.5 font-bold focus:outline-none">
@@ -676,18 +676,6 @@ HTML
             if (!c) return;
 
             const fDate = document.getElementById('filter-date').value;
-            const now = new Date();
-            const tzOffset = now.getTimezoneOffset() * 60000;
-            const todayStr = new Date(Date.now() - tzOffset).toISOString().slice(0, 10);
-            
-            // 1. Cảnh báo không thể đặt sân khung giờ đã trôi qua trong ngày (Định dạng 24h)
-            if (fDate === todayStr && c.startTime) {
-                const currentTimeStr = now.toLocaleTimeString('vi-VN', {hour: '2-digit', minute: '2-digit', hour12: false});
-                if (c.startTime < currentTimeStr) {
-                    alert(`⚠️ Cảnh báo: Không thể đặt sân ở khung giờ đã trôi qua (${c.startTime} < Hiện tại: ${currentTimeStr})!`);
-                    return;
-                }
-            }
 
             let mins = 0, fee = 0;
             if (c.startTime && c.endTime) {
@@ -696,7 +684,7 @@ HTML
                     return;
                 }
 
-                // 2. Chỉnh sửa kiểm tra trùng lịch chặt chẽ (Định dạng 24h)
+                // KIỂM TRA TRÙNG LỊCH (Định dạng 24h chặt chẽ)
                 const currentStartMin = c.startTime.split(':').map(Number)[0] * 60 + c.startTime.split(':').map(Number)[1];
                 const currentEndMin = c.endTime.split(':').map(Number)[0] * 60 + c.endTime.split(':').map(Number)[1];
 
@@ -748,7 +736,6 @@ HTML
             let costGoods = deductInv(c.items);
             let tot = Math.max(0, finalCourtFee + serv - (c.ownerDiscount || 0));
 
-            // ĐỊNH DẠNG 24H: Ép hàm toLocaleTimeString xuất 24 giờ không AM/PM
             const r = { 
                 id: 'PAB-'+Date.now(), 
                 date: fDate, 

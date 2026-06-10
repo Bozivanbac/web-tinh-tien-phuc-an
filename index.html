@@ -4,7 +4,7 @@ HTML
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Phúc An Badminton - Premium Cloud POS v4.8.9</title>
+    <title>Phúc An Badminton - Premium Cloud POS v4.9.1</title>
     
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -77,7 +77,7 @@ HTML
                 </div>
                 <div>
                     <h1 class="text-base font-black tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500">PHÚC AN BADMINTON</h1>
-                    <p class="text-[10px] text-cyan-400 font-bold uppercase tracking-widest">Mobile Premium Cloud POS v4.8.9</p>
+                    <p class="text-[10px] text-cyan-400 font-bold uppercase tracking-widest">Mobile Premium Cloud POS v4.9.1</p>
                 </div>
             </div>
             
@@ -299,7 +299,8 @@ HTML
                             <tr>
                                 <th class="p-2.5">Thời gian</th><th class="p-2.5">Sân</th><th class="p-2.5">Khách hàng</th><th class="p-2.5">Khung giờ chơi</th>
                                 <th class="p-2.5 text-right">Tiền Sân</th><th class="p-2.5 text-right">Dịch vụ</th>
-                                <th class="p-2.5 text-right text-rose-400">Giảm thêm</th> <th class="p-2.5 text-left text-amber-400 pl-4">Chi tiết vật phẩm/món nước (Bấm dòng để xem kỹ)</th>
+                                <th class="p-2.5 text-right text-rose-400">Giảm thêm</th>
+                                <th class="p-2.5 text-left text-amber-400 pl-4">Chi tiết vật phẩm/món nước (Bấm dòng để xem kỹ)</th>
                                 <th class="p-2.5 text-right text-emerald-400 font-bold">Tổng đơn</th>
                                 <th class="p-2.5 text-rose-400">Tiền mặt</th><th class="p-2.5 text-cyan-400">CK</th>
                                 <th class="p-2.5 text-center text-emerald-400">Trạng thái</th><th class="p-2.5 text-center">Xóa</th>
@@ -421,11 +422,28 @@ HTML
 
         function formatNum(num) { return (isNaN(num) || num === null) ? "0" : Number(Math.round(num * 100) / 100).toLocaleString('vi-VN'); }
 
-        function getWeekNumber(dateStr) {
-            const d = new Date(dateStr); if (isNaN(d.getTime())) return 0;
-            d.setHours(0, 0, 0, 0); d.setDate(d.getDate() + 4 - (d.getDay() || 7));
-            const yearStart = new Date(d.getFullYear(), 0, 1);
-            return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+        // HÀM CHUYỂN ĐỔI CHUỖI GIỜ BẤT KỲ THÀNH ĐỊNH DẠNG SỐ PHÚT CHUẨN 24 GIỜ TOÀN CẦU ĐỂ VÁ LỖI AM/PM
+        function parseTimeToMinutes(timeStr) {
+            if (!timeStr) return 0;
+            let cleaned = timeStr.trim().toUpperCase();
+            let hours = 0, minutes = 0;
+            
+            // Xử lý nếu chuỗi có định dạng tiếng việt hoặc tiếng anh AM/PM (CH/SA)
+            let isPM = cleaned.includes("CH") || cleaned.includes("PM");
+            let isAM = cleaned.includes("SA") || cleaned.includes("AM");
+            
+            cleaned = cleaned.replace(/(CH|SA|AM|PM)/g, '').trim();
+            const parts = cleaned.split(':');
+            hours = parseInt(parts[0], 10) || 0;
+            minutes = parseInt(parts[1], 10) || 0;
+            
+            if ((isPM || isAM) && hours === 12) {
+                hours = 0;
+            }
+            if (isPM) {
+                hours += 12;
+            }
+            return hours * 60 + minutes;
         }
 
         function formatStockDisplay(prod) {
@@ -582,6 +600,7 @@ HTML
             saveStateFirebase(); calculateAll();
         }
 
+        // HÀM TÍNH TIỀN CHÍNH XÁC SỬ DỤNG PARSETIMETOMINUTES ĐỂ KHÔNG BỊ SAI GIỜ LỆCH CA SAU SÁNG
         function calculateAll() {
             const c = courtsData[currentCourt]; if (!c) return;
             if(!c.items) c.items = {};
@@ -597,16 +616,24 @@ HTML
 
             let mins = 0, fee = 0;
             if (c.startTime && c.endTime) {
-                const [sh, sm] = c.startTime.split(':').map(Number); const [eh, em] = c.endTime.split(':').map(Number);
-                mins = (eh * 60 + em) - (sh * 60 + sm);
+                // Áp dụng bộ chuyển đổi giờ 24h Quốc tế
+                const startMins = parseTimeToMinutes(c.startTime);
+                const endMins = parseTimeToMinutes(c.endTime);
+                mins = endMins - startMins;
+                
                 if (mins > 0) {
-                    for (let m = sh * 60 + sm; m < eh * 60 + em; m++) {
-                        if (c.dayType === 'weekday' && c.discountType === 'student' && m >= 300 && m < 1020) fee += (39 / 60);
-                        else {
+                    for (let m = startMins; m < endMins; m++) {
+                        if (c.dayType === 'weekday' && c.discountType === 'student' && m >= 300 && m < 1020) {
+                            fee += (39 / 60);
+                        } else {
                             let slotPrice = 70;
                             for (let slot of PRICING[c.dayType]) {
-                                const [sth, stm] = slot.start.split(':').map(Number); const [eth, etm] = slot.end.split(':').map(Number);
-                                if (m >= (sth*60+stm) && m < (eth*60+etm)) { slotPrice = slot.price; break; }
+                                const slotStart = parseTimeToMinutes(slot.start);
+                                const slotEnd = parseTimeToMinutes(slot.end);
+                                if (m >= slotStart && m < slotEnd) { 
+                                    slotPrice = slot.price; 
+                                    break; 
+                                }
                             }
                             fee += (slotPrice / 60);
                         }
@@ -672,13 +699,22 @@ HTML
             const fDate = document.getElementById('filter-date').value;
             let mins = 0, fee = 0;
             if (c.startTime && c.endTime) {
-                if (c.startTime >= c.endTime) { alert("⚠️ Thời gian ra phải lớn hơn thời gian vào!"); return; }
-                const [sh, sm] = c.startTime.split(':').map(Number); const [eh, em] = c.endTime.split(':').map(Number);
-                mins = (eh * 60 + em) - (sh * 60 + sm);
-                for (let m = sh * 60 + sm; m < eh * 60 + em; m++) {
+                const startMins = parseTimeToMinutes(c.startTime);
+                const endMins = parseTimeToMinutes(c.endTime);
+                if (startMins >= endMins) { alert("⚠️ Thời gian ra phải lớn hơn thời gian vào!"); return; }
+                mins = endMins - startMins;
+                for (let m = startMins; m < endMins; m++) {
                     if (c.dayType === 'weekday' && c.discountType === 'student' && m >= 300 && m < 1020) fee += (39 / 60);
                     else {
-                        let sp = 70; for (let slot of PRICING[c.dayType]) { const [sth, stm] = slot.start.split(':').map(Number); const [eth, etm] = slot.end.split(':').map(Number); if (m >= (sth*60+stm) && m < (eth*60+etm)) { sp = slot.price; break; } }
+                        let sp = 70; 
+                        for (let slot of PRICING[c.dayType]) { 
+                            const slotStart = parseTimeToMinutes(slot.start);
+                            const slotEnd = parseTimeToMinutes(slot.end);
+                            if (m >= slotStart && m < slotEnd) { 
+                                sp = slot.price; 
+                                break; 
+                            } 
+                        }
                         fee += (sp / 60);
                     }
                 }
@@ -903,7 +939,6 @@ HTML
                         });
                     }
 
-                    // ĐÃ ĐƯA CỘT OWNER_DISCOUNT QUAY TRỞ LẠI DƯỚI LỊCH SỬ BẢNG ĐỐI CHIẾU
                     tr.innerHTML = `
                         <td class="p-2.5 text-slate-500">${b.time}</td>
                         <td class="p-2.5 font-bold ${b.courtNum==='Lẻ'?'text-rose-400':'text-cyan-400'}">${b.courtNum==='Lẻ'?'Bán lẻ':'Sân '+b.courtNum}</td>
@@ -934,7 +969,7 @@ HTML
             document.getElementById('stat-day-bank').innerText = `${formatNum(bank)}k`; 
 
             document.getElementById('stat-month-bank-total').innerText = `${formatNum(monthBankAccumulate)}k`;
-            document.getElementById('stat-month-cash-total').innerText = `${formatNum(Math.max(0, monthCashAccumulate - monthExpAccumulate))}k`;
+            document.getElementById('stat-month-cash-total').innerText = `${formatNum(monthCashAccumulate - monthExpAccumulate)}k`;
         }
 
         function renderFreezeTable() {
@@ -981,7 +1016,23 @@ HTML
             } else if (promptPass !== null) { alert("❌ Mật khẩu sai!"); }
         }
         
-        function addNewExpense() { const r = document.getElementById('exp-add-reason').value.trim(); const a = parseFloat(document.getElementById('exp-add-amount').value); if (r && a > 0) { window.fbPush('expenses', { id: 'EXP-'+Date.now(), date: document.getElementById('filter-date').value, time: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit',hour12:false}), reason: r, amount: a }); document.getElementById('exp-add-reason').value=""; document.getElementById('exp-add-amount').value=""; } }
+        function addNewExpense() { 
+            const r = document.getElementById('exp-add-reason').value.trim(); 
+            const a = parseFloat(document.getElementById('exp-add-amount').value); 
+            if (r && a > 0) { 
+                window.fbPush('expenses', { 
+                    id: 'EXP-'+Date.now(), 
+                    date: document.getElementById('filter-date').value, 
+                    time: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit',hour12:false}), 
+                    reason: r, 
+                    amount: a 
+                }).then(() => {
+                    document.getElementById('exp-add-reason').value=""; 
+                    document.getElementById('exp-add-amount').value="";
+                    renderHistory(); 
+                });
+            } 
+        }
 
         window.addNewProduct = function() {
             if (prompt("🔐 Mật khẩu quản trị:") !== MASTER_PASSWORD) { alert("⚠️ Sai mật khẩu!"); return; }

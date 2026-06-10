@@ -4,7 +4,7 @@ HTML
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Phúc An Badminton - Premium Cloud POS v4.8.2</title>
+    <title>Phúc An Badminton - Premium Cloud POS v4.8.3</title>
     
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -36,7 +36,6 @@ HTML
         ::-webkit-scrollbar-track { background: #0f172a; }
         ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
         input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(0.6) sepia(1) saturate(5) hue-rotate(175deg); cursor: pointer; }
-        .row-expanded { background-color: rgba(30, 41, 59, 0.5) !important; }
     </style>
 
     <script type="module">
@@ -78,7 +77,7 @@ HTML
                 </div>
                 <div>
                     <h1 class="text-base font-black tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500">PHÚC AN BADMINTON</h1>
-                    <p class="text-[10px] text-cyan-400 font-bold uppercase tracking-widest">Mobile Premium Cloud POS v4.8.2</p>
+                    <p class="text-[10px] text-cyan-400 font-bold uppercase tracking-widest">Mobile Premium Cloud POS v4.8.3</p>
                 </div>
             </div>
             
@@ -262,7 +261,7 @@ HTML
                 </div>
                 <div class="flex items-center gap-3 text-xs">
                     <input id="filter-date" type="date" onchange="renderHistory()" class="bg-slate-900 border border-slate-800 text-slate-200 rounded-lg px-2 py-0.5 font-bold focus:outline-none">
-                    <button onclick="lockAndFreezeRevenue()" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold px-3 py-1 rounded-lg text-[11px] shadow-md transition">🔒 KHÓA SỔ & CHỐT TIỀN THÁNG</button>
+                    <button onclick="lockAndFreezeRevenue()" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold px-3 py-1 rounded-lg text-[11px] shadow-md transition">🔒 KHÓA SỔ GỘP GIAI ĐOẠN</button>
                 </div>
             </div>
 
@@ -317,49 +316,25 @@ HTML
             </div>
 
             <div id="tab-content-freeze" class="p-3 space-y-4 block-state-control hidden">
-                <div class="bg-gradient-to-br from-slate-950 to-slate-900 border-2 border-emerald-500/30 p-4 rounded-xl shadow-2xl">
-                    <div class="flex items-center gap-2 pb-2 border-b border-slate-800 mb-3">
-                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                        <h4 class="text-xs font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400 uppercase tracking-widest">
-                            📊 BẢNG DOANH THU TỔNG HỢP GOM (CỘNG DỒN TẤT CẢ CÁC NGÀY ĐÃ CHỐT)
-                        </h4>
-                    </div>
-                    
-                    <div class="grid grid-cols-2 md:grid-cols-5 gap-2 text-center text-xs mb-4">
-                        <div class="bg-slate-900 p-2 border border-slate-800 rounded-lg"><p class="text-[10px] text-slate-400 font-bold uppercase">Tổng Sân Chốt Gom</p><p id="sum-freeze-court" class="font-black text-cyan-400 text-sm mt-0.5">0đ</p></div>
-                        <div class="bg-slate-900 p-2 border border-slate-800 rounded-lg"><p class="text-[10px] text-slate-400 font-bold uppercase">Tổng Dịch Vụ Chốt Gom</p><p id="sum-freeze-service" class="font-black text-amber-400 text-sm mt-0.5">0đ</p></div>
-                        <div class="bg-slate-900 p-2 border border-slate-800 rounded-lg"><p class="text-[10px] text-rose-400 font-bold uppercase">Tổng Tiền Mặt Chốt Gom</p><p id="sum-freeze-cash" class="font-black text-rose-400 text-sm mt-0.5">0đ</p></div>
-                        <div class="bg-slate-900 p-2 border border-slate-800 rounded-lg"><p class="text-[10px] text-cyan-400 font-bold uppercase">Tổng CK Chốt Gom</p><p id="sum-freeze-bank" class="font-black text-cyan-400 text-sm mt-0.5">0đ</p></div>
-                        <div class="bg-emerald-950/40 p-2 border border-emerald-500/30 rounded-lg"><p class="text-[10px] text-emerald-400 font-black uppercase">TỔNG THỰC NHẬN GOM</p><p id="sum-freeze-net" class="font-black text-emerald-300 text-sm mt-0.5">0đ</p></div>
-                    </div>
-
-                    <div class="bg-slate-950 p-3 rounded-lg border border-slate-855">
-                        <span class="text-[10px] font-bold text-amber-400 uppercase tracking-wider block mb-2">📦 CHI TIẾT SỐ LƯỢNG VẬT PHẨM & DỊCH VỤ ĐÃ TIÊU THỤ (TỔNG HỢP GOM):</span>
-                        <div id="freeze-compiled-items" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2 text-xs">
-                            <span class="text-slate-600 italic col-span-full">Chưa có dữ liệu tiêu thụ dịch vụ...</span>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="bg-slate-950/40 border border-slate-800 p-3 rounded-xl">
-                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-2">📜 CHI TIẾT LỊCH SỬ KHÓA SỔ THEO TỪNG NGÀY RIÊNG BIỆT</span>
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-400 block mb-2">📜 NHẬT KÝ CHI TIẾT CÁC LẦN KHÓA SỔ GOM ĐỒNG BỘ</span>
                     <div class="overflow-x-auto border border-slate-800 rounded-xl">
                         <table class="w-full text-left text-xs font-medium text-slate-300">
                             <thead class="bg-slate-950 text-[10px] text-slate-400 uppercase border-b border-slate-800 tracking-wider">
                                 <tr>
-                                    <th class="p-3">Ngày chốt số</th>
-                                    <th class="p-3">Thời điểm khóa</th>
-                                    <th class="p-3 text-right text-cyan-400">🏟️ Tiền sân chốt</th>
-                                    <th class="p-3 text-right text-amber-400">🥤 Tiền dịch vụ chốt</th>
-                                    <th class="p-3 text-right text-rose-400">💵 Tiền mặt chốt</th>
-                                    <th class="p-3 text-right text-cyan-400">💳 Chuyển khoản chốt</th>
-                                    <th class="p-3 text-right text-orange-400">💸 Khoản Chi</th>
-                                    <th class="p-3 text-right text-emerald-400">💰 Thực nhận thực tế</th>
-                                    <th class="p-3 text-center">Mã lệnh</th>
+                                    <th class="p-3">Mốc Chốt Sổ</th>
+                                    <th class="p-3">Thời điểm bấm</th>
+                                    <th class="p-3 text-right text-cyan-400">🏟️ Tổng tiền sân</th>
+                                    <th class="p-3 text-right text-amber-400">🥤 Tổng dịch vụ</th>
+                                    <th class="p-3 text-left pl-6 text-amber-400 w-1/4">Chi tiết hàng hóa đã tiêu thụ</th>
+                                    <th class="p-3 text-right text-rose-400">💵 Tổng tiền mặt</th>
+                                    <th class="p-3 text-right text-cyan-400">💳 Tổng chuyển khoản</th>
+                                    <th class="p-3 text-right text-orange-400">💸 Tổng Chi</th>
+                                    <th class="p-3 text-right text-emerald-400">💰 Tổng thực nhận</th>
                                 </tr>
                             </thead>
                             <tbody id="freeze-tbody" class="divide-y divide-slate-800/60 bg-slate-900/10">
-                                <tr><td colspan="9" class="p-4 text-center text-slate-500 italic">Chưa có ngày nào được khóa sổ...</td></tr>
+                                <tr><td colspan="9" class="p-4 text-center text-slate-500 italic">Chưa có bản ghi khóa sổ gộp nào được tạo...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -473,21 +448,20 @@ HTML
                 if (!courtsData[1]) courtsData[1] = getEmptyObj();
                 if (!courtsData[2]) courtsData[2] = getEmptyObj();
                 
-                updateUIFromData();
-                calculateAll();
+                updateUIFromData(); calculateAll();
                 isSyncingFromFirebase = false;
             });
 
             window.fbListen('history', (data) => { 
                 if (data) paymentHistory = Object.keys(data).map(key => ({ ...data[key], _fbKey: key }));
                 else paymentHistory = [];
-                renderHistory(); 
+                renderHistory(); if(freezeHistory.length > 0) renderFreezeTable();
             });
 
             window.fbListen('expenses', (data) => { expensesData = data ? Object.values(data) : []; renderHistory(); });
 
             window.fbListen('freeze_log', (data) => {
-                freezeHistory = data ? Object.values(data).sort((a,b) => b.date.localeCompare(a.date)) : [];
+                freezeHistory = data ? Object.values(data).sort((a,b) => b.timestamp - a.timestamp) : [];
                 renderFreezeTable();
             });
         }
@@ -498,13 +472,11 @@ HTML
             if (isSyncingFromFirebase) return;
             if (!courtsData[currentCourt]) courtsData[currentCourt] = getEmptyObj();
             if (!courtsData['quick']) courtsData['quick'] = { items: {} };
-            if (!courtsData['quick'].items) courtsData['quick'].items = {};
 
             if (currentCourt === 'quick') {
                 courtsData['quick'].bankUnits = parseFloat(document.getElementById('quick-bank').value) || 0;
             } else {
-                const c = courtsData[currentCourt];
-                if (!c.items) c.items = {};
+                const c = courtsData[currentCourt]; if (!c.items) c.items = {};
                 c.customerName = document.getElementById('customer-name').value; 
                 c.dayType = document.getElementById('day-type').value;
                 c.startTime = document.getElementById('start-time').value; 
@@ -554,8 +526,7 @@ HTML
                 const btn = document.getElementById(`btn-court-${id}`);
                 if (btn) btn.className = id === n.toString() ? `px-4 py-1.5 rounded-lg font-bold text-xs transition ${id==='quick'?'bg-rose-600':'bg-cyan-600'} text-white shadow-md` : `px-4 py-1.5 rounded-lg font-bold text-xs transition text-slate-400 hover:bg-slate-900`;
             });
-            updateUIFromData();
-            calculateAll();
+            updateUIFromData(); calculateAll();
         }
 
         function onDayTypeChange() { saveStateFirebase(); renderShortcuts(); calculateAll(); }
@@ -711,7 +682,7 @@ HTML
             let costGoods = deductInv(c.items);
             let tot = Math.max(0, finalCourtFee + serv - (c.ownerDiscount || 0));
 
-            const r = { id: 'PAB-'+Date.now(), date: fDate, time: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit',hour12:false}), courtNum: currentCourt, customerName: c.customerName || "Khách lẻ", timeRange: `${c.startTime || '00:00'} → ${c.endTime || '00:00'} (${mins} ph)`, courtFee: finalCourtFee, serviceFee: serv, totalBill: tot, profitGoods: serv - costGoods, cashReceived: c.cashUnits, bankReceived: b.bankUnits || 0, rawDetails: JSON.parse(JSON.stringify(c)), locked: false };
+            const r = { id: 'PAB-'+Date.now(), date: fDate, time: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit',hour12:false}), courtNum: currentCourt, customerName: c.customerName || "Khách lẻ", timeRange: `${c.startTime || '00:00'} → ${c.endTime || '00:00'} (${mins} ph)`, courtFee: finalCourtFee, serviceFee: serv, totalBill: tot, profitGoods: serv - costGoods, cashReceived: c.cashUnits, bankReceived: c.bankUnits || 0, rawDetails: JSON.parse(JSON.stringify(c)), locked: false };
             
             window.fbPush('history', r); window.fbSet('inventory', globalInventory); 
             triggerToast("Đã xuất đơn thành công!"); resetCurrentCourt();
@@ -741,90 +712,87 @@ HTML
             document.getElementById('tab-content-inventory').style.display = t === 'inventory' ? 'block' : 'none';
         }
 
-        // UPGRADE CHỐT SỔ THÔNG MINH V4.8.2: TỰ ĐỘNG GOM VÀ CHỐT HÀNG LOẠT NGÀY CHƯA CHỐT TRONG QUÁ KHỨ
+        // LOGIC CHỐT SỔ GỘP TOÀN BỘ GIAI ĐOẠN ĐÚNG 1 DÒNG DUY NHẤT (V4.8.3 CHUẨN)
         window.lockAndFreezeRevenue = function() {
             const fDate = document.getElementById('filter-date').value;
-            if(!fDate) { alert("⚠️ Vui lòng chọn một mốc ngày cụ thể cần chốt sổ."); return; }
+            if(!fDate) { alert("⚠️ Vui lòng chọn một ngày mốc."); return; }
             
-            const confirmPass = prompt(`⚠️ HỆ THỐNG QUÉT & CHỐT SỔ TOÀN BỘ NGÀY TRỐNG:\nHệ thống sẽ chốt toàn bộ các ngày chưa chốt từ trước đến ngày ${fDate}.\nNhập mật khẩu Admin để xác nhận lệnh:`);
+            const confirmPass = prompt(`⚠️ LỆNH KHÓA SỔ GỘP TOÀN BỘ GIAI ĐOẠN:\nHệ thống sẽ gom toàn bộ các đơn hàng chưa chốt từ trước đến ngày ${fDate} thành đúng 1 lần chốt.\nNhập mật khẩu Admin để xác nhận:`);
             if (confirmPass !== MASTER_PASSWORD) { alert("⚠️ Mật khẩu quản trị không chính xác!"); return; }
 
             window.fbOnce('history').then((snapshot) => {
                 const snap = snapshot.val();
-                if(!snap) { alert("Không có dữ liệu hóa đơn."); return; }
+                if(!snap) { alert("Không tìm thấy đơn hàng nào cần chốt."); return; }
                 
-                // Bước 1: Quét tìm tất cả các ngày duy nhất có đơn hàng tồn tại từ trước đến ngày được chọn
-                let uniqueDates = [];
+                let updates = {};
+                let countUnchoted = 0;
+                
+                // Khởi tạo các biến cộng dồn tổng gộp duy nhất
+                let totalCourt = 0, totalService = 0, totalCash = 0, totalBank = 0, totalExpense = 0;
+                let masterCompiledItems = {}; // Gom chi tiết kho vật phẩm tiêu thụ của cả giai đoạn
+                let minDate = fDate, maxDate = fDate;
+
+                // 1. Quét qua toàn bộ đơn hàng trong lịch sử hệ thống
                 Object.keys(snap).forEach(k => {
                     const d = snap[k].date;
-                    if (d <= fDate && !uniqueDates.includes(d)) {
-                        uniqueDates.push(d);
+                    if (d <= fDate && !snap[k].locked) {
+                        updates[`history/${k}/locked`] = true;
+                        countUnchoted++;
+
+                        if (d < minDate) minDate = d;
+
+                        totalCourt += (snap[k].courtFee || 0);
+                        totalService += (snap[k].serviceFee || 0);
+                        totalCash += (snap[k].cashReceived || 0);
+                        totalBank += (snap[k].bankReceived || 0);
+
+                        // Gom chi tiết giỏ đồ bán ra
+                        const itemsObj = snap[k].rawDetails ? snap[k].rawDetails.items : (snap[k].items || {});
+                        if(itemsObj) {
+                            Object.keys(itemsObj).forEach(prodId => {
+                                masterCompiledItems[prodId] = (masterCompiledItems[prodId] || 0) + itemsObj[prodId];
+                            });
+                        }
                     }
                 });
-                uniqueDates.sort(); // Sắp xếp theo thứ tự thời gian tăng dần
 
-                if(uniqueDates.length === 0) {
-                    alert("Không tìm thấy ngày nào có dữ liệu cần chốt trong khoảng thời gian này.");
+                // 2. Gom tất cả chi phí phát sinh chưa chốt thuộc giai đoạn đó
+                expensesData.forEach(e => {
+                    if (e.date <= fDate) {
+                        totalExpense += (e.amount || 0);
+                    }
+                });
+
+                if (countUnchoted === 0) {
+                    alert("Tất cả đơn hàng từ trước đến ngày này đều đã được chốt từ trước rồi!");
                     return;
                 }
 
-                let updates = {};
-                let totalChotDays = 0;
+                // Định dạng hiển thị mốc giai đoạn chốt (ví dụ: "29/05 -> 09/06")
+                const dMinStr = minDate.split('-').reverse().slice(0,2).join('/');
+                const dMaxStr = maxDate.split('-').reverse().slice(0,2).join('/');
+                const rangeLabel = (minDate === maxDate) ? dMaxStr : `${dMinStr} ➔ ${dMaxStr}`;
 
-                // Bước 2: Duyệt qua từng ngày tìm được để đóng băng và gom số liệu riêng biệt tự động
-                uniqueDates.forEach(currentDate => {
-                    let dayCourt = 0, dayService = 0, dayCash = 0, dayBank = 0, dayExpense = 0;
-                    let dayCompiledItems = {};
-                    let activeDayCount = 0;
+                // 3. Tạo ĐÚNG 1 bản ghi nhật ký gộp đẩy lên Firebase
+                const logId = 'BATCH_' + Date.now();
+                updates[`freeze_log/${logId}`] = {
+                    id: logId,
+                    dateRange: rangeLabel,
+                    timestamp: Date.now(),
+                    freezeTime: new Date().toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'}) + ' ' + new Date().toLocaleDateString('vi-VN'),
+                    courtFrozen: totalCourt,
+                    serviceFrozen: totalService,
+                    cashFrozen: totalCash,
+                    bankFrozen: totalBank,
+                    expenseFrozen: totalExpense,
+                    netRevenue: (totalCash + totalBank) - totalExpense,
+                    itemsFrozen: masterCompiledItems // Danh sách tổng hợp vật phẩm của cả giai đoạn chốt
+                };
 
-                    Object.keys(snap).forEach(k => {
-                        if (snap[k].date === currentDate) {
-                            if (!snap[k].locked) {
-                                updates[`history/${k}/locked`] = true;
-                                activeDayCount++;
-                            }
-                            dayCourt += (snap[k].courtFee || 0);
-                            dayService += (snap[k].serviceFee || 0);
-                            dayCash += (snap[k].cashReceived || 0);
-                            dayBank += (snap[k].bankReceived || 0);
-
-                            const itemsObj = snap[k].rawDetails ? snap[k].rawDetails.items : (snap[k].items || {});
-                            if(itemsObj) {
-                                Object.keys(itemsObj).forEach(prodId => {
-                                    dayCompiledItems[prodId] = (dayCompiledItems[prodId] || 0) + itemsObj[prodId];
-                                });
-                            }
-                        }
-                    });
-
-                    expensesData.forEach(e => {
-                        if (e.date === currentDate) dayExpense += (e.amount || 0);
-                    });
-
-                    // Chỉ tạo bản ghi chốt sổ nếu ngày này chưa được tạo log chốt, hoặc có đơn hàng mới chốt thêm
-                    if (activeDayCount > 0 || !freezeHistory.some(f => f.date === currentDate)) {
-                        const logKey = currentDate.replace(/-/g, '_');
-                        updates[`freeze_log/${logKey}`] = {
-                            date: currentDate,
-                            freezeTime: new Date().toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'}) + ' ' + new Date().toLocaleDateString('vi-VN'),
-                            courtFrozen: dayCourt,
-                            serviceFrozen: dayService,
-                            cashFrozen: dayCash,
-                            bankFrozen: dayBank,
-                            expenseFrozen: dayExpense,
-                            netRevenue: (dayCash + dayBank) - dayExpense,
-                            itemsFrozen: dayCompiledItems,
-                            commandCode: 'AUTO_BATCH_' + Date.now().toString().slice(-4)
-                        };
-                        totalChotDays++;
-                    }
-                });
-
-                // Đồng bộ cập nhật đồng loạt lên Firebase Realtime Database
                 window.fbUpdate('/', updates).then(() => {
-                    triggerToast(`Hệ thống thông minh: Đã quét dồn & chốt thành công ${totalChotDays} ngày chưa chốt!`);
+                    triggerToast(`Đã gộp chốt thành công ${countUnchoted} hóa đơn vào 1 dòng duy nhất!`);
                 });
-            }).catch(err => alert("Lỗi quét chốt hàng loạt: " + err));
+            }).catch(err => alert("Lỗi hệ thống: " + err));
         }
 
         function renderHistory() {
@@ -902,68 +870,41 @@ HTML
             document.getElementById('stat-week-bank').innerText = `${formatNum(weekBank)}k`;
         }
 
+        // IN DỮ LIỆU NHẬT KÝ RA BẢNG TAB LỊCH SỬ KHÓA SỔ GỘP DUY NHẤT
         function renderFreezeTable() {
             const tbody = document.getElementById('freeze-tbody'); if(!tbody) return;
             if(freezeHistory.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-slate-500 italic">Chưa có dữ liệu chốt sổ nào được lưu...</td></tr>`;
-                document.getElementById('freeze-compiled-items').innerHTML = `<span class="text-slate-600 italic col-span-full">Chưa có dữ liệu vật phẩm tiêu thụ...</span>`;
+                tbody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-slate-500 italic">Chưa có dữ liệu chốt sổ gộp nào được lưu...</td></tr>`;
                 return;
             }
 
-            let sumCourt = 0, sumService = 0, sumCash = 0, sumBank = 0, sumExpense = 0, sumNet = 0;
-            let masterCompiledItems = {};
-
             tbody.innerHTML = freezeHistory.map(f => {
-                sumCourt += (f.courtFrozen || 0); sumService += (f.serviceFrozen || 0);
-                sumCash += (f.cashFrozen || 0); sumBank += (f.bankFrozen || 0);
-                sumExpense += (f.expenseFrozen || 0); sumNet += (f.netRevenue || 0);
-
+                // Tạo chuỗi danh sách hàng hóa tiêu thụ trong dòng chốt sổ đó
+                let itemsList = [];
                 if (f.itemsFrozen) {
                     Object.keys(f.itemsFrozen).forEach(pId => {
-                        masterCompiledItems[pId] = (masterCompiledItems[pId] || 0) + f.itemsFrozen[pId];
+                        const prod = globalInventory.find(x => x.id === pId);
+                        itemsList.push(`${prod ? prod.name : pId} (x${f.itemsFrozen[pId]})`);
                     });
                 }
+                const itemsStr = itemsList.length > 0 
+                    ? `<span class="text-amber-400 font-bold">${itemsList.join(', ')}</span>`
+                    : `<span class="text-slate-600 italic">Không bán được đồ</span>`;
 
                 return `
                     <tr class="border-b border-slate-800/60 bg-slate-950/20 hover:bg-slate-900/40 text-[11px] font-semibold transition">
-                        <td class="p-3 text-white font-bold">${f.date}</td>
+                        <td class="p-3 text-emerald-400 font-extrabold text-xs">${f.dateRange}</td>
                         <td class="p-3 text-slate-400">${f.freezeTime}</td>
                         <td class="p-3 text-right text-cyan-400 font-bold">${formatNum(f.courtFrozen)}k</td>
                         <td class="p-3 text-right text-amber-400 font-bold">${formatNum(f.serviceFrozen)}k</td>
+                        <td class="p-3 text-left pl-6 max-w-[280px] truncate">${itemsStr}</td>
                         <td class="p-3 text-right text-rose-400 font-bold">${formatNum(f.cashFrozen)}k</td>
                         <td class="p-3 text-right text-cyan-400 font-bold">${formatNum(f.bankFrozen)}k</td>
                         <td class="p-3 text-right text-orange-400 font-bold">-${formatNum(f.expenseFrozen)}k</td>
                         <td class="p-3 text-right text-emerald-400 font-black text-xs bg-emerald-950/20">${formatNum(f.netRevenue)}k</td>
-                        <td class="p-3 text-center text-slate-500 font-mono text-[10px] select-all">${f.commandCode || ''}</td>
                     </tr>
                 `;
             }).join("");
-
-            document.getElementById('sum-freeze-court').innerText = `${formatNum(sumCourt)}k`;
-            document.getElementById('sum-freeze-service').innerText = `${formatNum(sumService)}k`;
-            document.getElementById('sum-freeze-cash').innerText = `${formatNum(sumCash)}k`;
-            document.getElementById('sum-freeze-bank').innerText = `${formatNum(sumBank)}k`;
-            document.getElementById('sum-freeze-net').innerText = `${formatNum(sumNet)}k`;
-
-            const itemsContainer = document.getElementById('freeze-compiled-items');
-            itemsContainer.innerHTML = "";
-            const soldKeys = Object.keys(masterCompiledItems);
-            if (soldKeys.length === 0) {
-                itemsContainer.innerHTML = `<span class="text-slate-600 italic col-span-full">Không có vật phẩm nào tiêu thụ trong các ngày đã chốt.</span>`;
-            } else {
-                soldKeys.forEach(prodId => {
-                    const prod = globalInventory.find(x => x.id === prodId);
-                    const name = prod ? prod.name : prodId;
-                    const count = masterCompiledItems[prodId];
-                    const badge = document.createElement('div');
-                    badge.className = "bg-slate-900 border border-slate-800 p-2 rounded-lg flex flex-col justify-between items-center text-center shadow-inner";
-                    badge.innerHTML = `
-                        <span class="text-slate-400 text-[10px] truncate w-full font-bold">${name}</span>
-                        <span class="text-amber-400 text-xs font-black mt-1 bg-amber-950/60 px-2 py-0.5 rounded border border-amber-900/30">Đã bán: ${count}</span>
-                    `;
-                    itemsContainer.appendChild(badge);
-                });
-            }
         }
 
         function deleteBill(id, e) { 

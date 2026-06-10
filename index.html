@@ -4,12 +4,12 @@ HTML
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Phúc An Badminton - Premium Cloud POS v4.8.4</title>
+    <title>Phúc An Badminton - Premium Cloud POS v4.8.7</title>
     
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Phúc An POS">
+    <meta name="apple-mobile-web-app-title" content="Phúc An Badminton POS">
     <link class="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/5351/5351471.png">
     
     <link rel="manifest" href='data:application/json,{"name":"Phuc An Badminton POS","short_name":"PhucAn POS","start_url":".","display":"standalone","background_color":"#0b0f19","theme_color":"#0f172a","orientation":"portrait"}' />
@@ -77,7 +77,7 @@ HTML
                 </div>
                 <div>
                     <h1 class="text-base font-black tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500">PHÚC AN BADMINTON</h1>
-                    <p class="text-[10px] text-cyan-400 font-bold uppercase tracking-widest">Mobile Premium Cloud POS v4.8.4</p>
+                    <p class="text-[10px] text-cyan-400 font-bold uppercase tracking-widest">Mobile Premium Cloud POS v4.8.7</p>
                 </div>
             </div>
             
@@ -266,22 +266,18 @@ HTML
             </div>
 
             <div id="tab-content-history" class="p-3 space-y-3 block-state-control">
+                
                 <div class="grid grid-cols-2 md:grid-cols-5 gap-2 text-center text-xs">
-                    <div class="bg-slate-950 p-2 border border-slate-800 rounded-lg"><p class="text-[10px] text-slate-400 font-bold uppercase">Tổng Doanh Thu</p><p id="stat-day-total" class="font-black text-white text-sm mt-0.5">0đ</p></div>
-                    <div class="bg-cyan-950/20 p-2 border border-cyan-800/30 rounded-lg"><p class="text-[10px] text-cyan-400 font-bold uppercase">🏟️ Tổng Tiền Sân</p><p id="stat-day-court" class="font-black text-cyan-300 text-sm mt-0.5">0đ</p></div>
-                    <div class="bg-amber-950/20 p-2 border border-amber-800/30 rounded-lg"><p class="text-[10px] text-amber-400 font-bold uppercase">🥤 Tổng Dịch Vụ</p><p id="stat-day-service" class="font-black text-amber-300 text-sm mt-0.5">0đ</p></div>
-                    <div class="bg-rose-950/10 p-2 border border-rose-900/20 rounded-lg"><p class="text-[10px] text-rose-400 font-bold uppercase">💵 Khách Trả Tiền Mặt</p><p id="stat-day-cash" class="font-black text-rose-400 text-sm mt-0.5">0đ</p></div>
-                    <div class="bg-cyan-950/10 p-2 border border-cyan-900/20 rounded-lg"><p class="text-[10px] text-cyan-400 font-bold uppercase">💳 Khách Chuyển Khoản</p><p id="stat-day-bank" class="font-black text-cyan-400 text-sm mt-0.5">0đ</p></div>
+                    <div class="bg-slate-950 p-2 border border-slate-800 rounded-lg"><p class="text-[10px] text-slate-400 font-bold uppercase">Tổng Doanh Thu Ngày</p><p id="stat-day-total" class="font-black text-white text-sm mt-0.5">0đ</p></div>
+                    <div class="bg-cyan-950/20 p-2 border border-cyan-800/30 rounded-lg"><p class="text-[10px] text-cyan-400 font-bold uppercase">🏟️ Tổng Tiền Sân Ngày</p><p id="stat-day-court" class="font-black text-cyan-300 text-sm mt-0.5">0đ</p></div>
+                    <div class="bg-amber-950/20 p-2 border border-amber-800/30 rounded-lg"><p class="text-[10px] text-amber-400 font-bold uppercase">🥤 Tổng Dịch Vụ Ngày</p><p id="stat-day-service" class="font-black text-amber-300 text-sm mt-0.5">0đ</p></div>
+                    <div class="bg-rose-950/10 p-2 border border-rose-900/20 rounded-lg"><p class="text-[10px] text-rose-400 font-bold uppercase">💵 Tiền Mặt Nhận Ngày</p><p id="stat-day-cash" class="font-black text-rose-400 text-sm mt-0.5">0đ</p></div>
+                    <div class="bg-cyan-950/10 p-2 border border-cyan-900/20 rounded-lg"><p class="text-[10px] text-cyan-400 font-bold uppercase">💳 CK Nhận Ngày</p><p id="stat-day-bank" class="font-black text-cyan-400 text-sm mt-0.5">0đ</p></div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-2 text-center text-xs bg-slate-950/60 p-3 rounded-xl border border-slate-800">
-                    <div class="bg-slate-950 p-2 rounded-lg border border-slate-800"><p class="text-[10px] text-slate-400 font-bold uppercase">📈 Doanh Thu Tuần</p><p id="stat-week-total" class="font-black text-white text-sm mt-0.5">0đ</p></div>
-                    <div class="bg-rose-950/10 p-2 rounded-lg border border-rose-900/20"><p class="text-[10px] text-rose-400 font-bold uppercase">💵 Tiền Mặt Tuần</p><p id="stat-week-cash" class="font-black text-rose-400 text-sm mt-0.5">0đ</p></div>
-                    <div class="bg-cyan-950/10 p-2 rounded-lg border border-cyan-900/20"><p class="text-[10px] text-cyan-400 font-bold uppercase">💳 Chuyển Khoản Tuần</p><p id="stat-week-bank" class="font-black text-cyan-400 text-sm mt-0.5">0đ</p></div>
-                    <div class="bg-emerald-950/30 p-2 border border-emerald-500/20 rounded-lg flex flex-col justify-center">
-                        <p class="text-emerald-400 font-extrabold text-[10px] uppercase">💵 KÉT TIỀN MẶT THỰC TẾ</p>
-                        <p id="stat-real-cash-box" class="font-black text-emerald-300 mt-0.5 text-sm">0đ</p>
-                    </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-center text-xs bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">
+                    <div class="bg-cyan-950/20 p-2 rounded-lg border border-cyan-500/20"><p class="text-[10px] text-cyan-400 font-black uppercase">💳 TỔNG THU CK THÁNG (LŨY KẾ)</p><p id="stat-month-bank-total" class="font-black text-cyan-300 text-base mt-0.5">0đ</p></div>
+                    <div class="bg-rose-950/20 p-2 rounded-lg border border-rose-500/20"><p class="text-[10px] text-rose-400 font-black uppercase">💵 TỔNG THU TIỀN MẶT THÁNG (LŨY KẾ)</p><p id="stat-month-cash-total" class="font-black text-rose-300 text-base mt-0.5">0đ</p></div>
                 </div>
 
                 <div class="overflow-x-auto border border-slate-800 rounded-xl">
@@ -317,23 +313,23 @@ HTML
 
             <div id="tab-content-freeze" class="p-3 space-y-4 block-state-control hidden">
                 <div class="bg-slate-950/40 border border-slate-800 p-3 rounded-xl">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-400">📜 NHẬT KÝ CHI TIẾT CÁC LẦN KHÓA SỔ GOM ĐỒNG BỘ</span>
-                        <button onclick="clearAllFreezeLogs()" class="text-[10px] bg-red-950 text-red-400 font-bold px-2 py-1 rounded border border-red-900/40 hover:bg-red-900 hover:text-white transition">⚙ XÓA TOÀN BỘ LỊCH SỬ CHỐT SỔ</button>
+                    <div class="flex justify-between items-center mb-3 border-b border-slate-800 pb-2">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-400">📜 NHẬT KÝ CHI TIẾT CÁC LẦN KHÓA SỔ GOM ĐỒNG BỘ ĐÚNG 1 DÒNG</span>
+                        <button onclick="clearAllFreezeLogs()" class="text-[10px] bg-red-950 text-red-400 font-bold px-2 py-1 rounded border border-red-900/40 hover:bg-red-900 hover:text-white transition">⚙ LÀM LẠI HẾT LỊCH SỬ CHỐT SỔ</button>
                     </div>
                     <div class="overflow-x-auto border border-slate-800 rounded-xl">
                         <table class="w-full text-left text-xs font-medium text-slate-300">
                             <thead class="bg-slate-950 text-[10px] text-slate-400 uppercase border-b border-slate-800 tracking-wider">
                                 <tr>
-                                    <th class="p-3">Mốc Chốt Sổ</th>
+                                    <th class="p-3">Mốc Giai Đoạn Chốt</th>
                                     <th class="p-3">Thời điểm bấm</th>
-                                    <th class="p-3 text-right text-cyan-400">🏟️ Tổng tiền sân</th>
-                                    <th class="p-3 text-right text-amber-400">🥤 Tổng dịch vụ</th>
-                                    <th class="p-3 text-left pl-6 text-amber-400 w-1/3">Chi tiết hàng hóa đã tiêu thụ</th>
-                                    <th class="p-3 text-right text-rose-400">💵 Tổng tiền mặt</th>
-                                    <th class="p-3 text-right text-cyan-400">💳 Tổng chuyển khoản</th>
-                                    <th class="p-3 text-right text-orange-400">💸 Tổng Chi</th>
-                                    <th class="p-3 text-right text-emerald-400">💰 Tổng thực nhận</th>
+                                    <th class="p-3 text-right text-cyan-400">🏟️ Tiền Sân</th>
+                                    <th class="p-3 text-right text-amber-400">🥤 Tiền Dịch Vụ</th>
+                                    <th class="p-3 text-left pl-6 text-amber-400 w-1/4">Chi tiết vật phẩm bán được</th>
+                                    <th class="p-3 text-right text-rose-400">💵 Tiền Mặt</th>
+                                    <th class="p-3 text-right text-cyan-400">💳 Chuyển Khoản</th>
+                                    <th class="p-3 text-right text-orange-400">💸 Khoản Chi</th>
+                                    <th class="p-3 text-right text-emerald-400">💰 TỔNG TẤT CẢ =</th>
                                 </tr>
                             </thead>
                             <tbody id="freeze-tbody" class="divide-y divide-slate-800/60 bg-slate-900/10">
@@ -444,12 +440,6 @@ HTML
                 isSyncingFromFirebase = true;
                 if (data) courtsData = data;
                 else courtsData = { 1: getEmptyObj(), 2: getEmptyObj(), 'quick': { items: {} } };
-                
-                if (!courtsData['quick']) courtsData['quick'] = { items: {} };
-                if (!courtsData['quick'].items) courtsData['quick'].items = {};
-                if (!courtsData[1]) courtsData[1] = getEmptyObj();
-                if (!courtsData[2]) courtsData[2] = getEmptyObj();
-                
                 updateUIFromData(); calculateAll();
                 isSyncingFromFirebase = false;
             });
@@ -464,8 +454,7 @@ HTML
 
             window.fbListen('freeze_log', (data) => {
                 freezeHistory = data ? Object.values(data).sort((a,b) => b.timestamp - a.timestamp) : [];
-                renderFreezeTable();
-                renderHistory(); // Kích hoạt tính lại Két tiền mặt khi lịch sử chốt thay đổi
+                renderFreezeTable(); renderHistory(); 
             });
         }
 
@@ -715,12 +704,13 @@ HTML
             document.getElementById('tab-content-inventory').style.display = t === 'inventory' ? 'block' : 'none';
         }
 
-        // CHỐT SỔ GỘP GIAI ĐOẠN 
+        // LỆNH CHỐT SỔ GỘP MỚI V4.8.7 - ĐÓNG BĂNG ĐỒNG THỜI CẢ TỔNG THÁNG CK VÀ TIỀN MẶT CHUẨN XÁC CHUẨN CHỈNH
         window.lockAndFreezeRevenue = function() {
             const fDate = document.getElementById('filter-date').value;
             if(!fDate) { alert("⚠️ Vui lòng chọn một ngày mốc."); return; }
+            const fMonth = fDate.substring(0, 7);
             
-            const confirmPass = prompt(`⚠️ LỆNH KHÓA SỔ GỘP TOÀN BỘ GIAI ĐOẠN:\nHệ thống sẽ gom toàn bộ các đơn hàng chưa chốt từ trước đến ngày ${fDate} thành 1 dòng nhật ký.\nNhập mật khẩu Admin để xác nhận:`);
+            const confirmPass = prompt(`⚠️ LỆNH KHÓA SỔ GỘP TOÀN BỘ GIAI ĐOẠN:\nHệ thống sẽ gom toàn bộ dữ liệu chưa chốt đến ngày ${fDate}, đồng thời khóa luôn mốc Tổng thu CK Tháng và Tổng tiền mặt Tháng.\nNhập mật khẩu Admin để xác nhận:`);
             if (confirmPass !== MASTER_PASSWORD) { alert("⚠️ Mật khẩu quản trị không chính xác!"); return; }
 
             window.fbOnce('history').then((snapshot) => {
@@ -731,8 +721,20 @@ HTML
                 let totalCourt = 0, totalService = 0, totalCash = 0, totalBank = 0, totalExpense = 0;
                 let masterCompiledItems = {}; let minDate = fDate, maxDate = fDate;
 
+                // Các biến để nhặt lũy kế tháng tại đúng khoảnh khắc bấm chốt
+                let monthCashTotalAtClick = 0;
+                let monthBankTotalAtClick = 0;
+
                 Object.keys(snap).forEach(k => {
                     const d = snap[k].date;
+                    
+                    // Tính lũy kế tổng tháng của các đơn hàng thuộc tháng đó
+                    if (d.startsWith(fMonth)) {
+                        monthCashTotalAtClick += (snap[k].cashReceived || 0);
+                        monthBankTotalAtClick += (snap[k].bankReceived || 0);
+                    }
+
+                    // Gom các đơn hàng chưa chốt nằm trong giai đoạn
                     if (d <= fDate && !snap[k].locked) {
                         updates[`history/${k}/locked`] = true; countUnchoted++;
                         if (d < minDate) minDate = d;
@@ -748,55 +750,70 @@ HTML
                     }
                 });
 
-                expensesData.forEach(e => { if (e.date <= fDate) totalExpense += (e.amount || 0); });
+                let monthExpAccumulate = 0;
+                expensesData.forEach(e => { 
+                    if (e.date.startsWith(fMonth)) monthExpAccumulate += (e.amount || 0);
+                    if (e.date <= fDate) totalExpense += (e.amount || 0); 
+                });
+                
                 if (countUnchoted === 0) { alert("Tất cả dữ liệu giai đoạn này đều đã chốt trước đó!"); return; }
 
                 const dMinStr = minDate.split('-').reverse().slice(0,2).join('/');
                 const dMaxStr = maxDate.split('-').reverse().slice(0,2).join('/');
                 const rangeLabel = (minDate === maxDate) ? dMaxStr : `${dMinStr} ➔ ${dMaxStr}`;
 
+                // Trừ chi phí phát sinh tháng trực tiếp vào tổng tiền mặt tháng chốt
+                let finalMonthCashChot = monthCashTotalAtClick - monthExpAccumulate;
+
                 const logId = 'BATCH_' + Date.now();
                 updates[`freeze_log/${logId}`] = {
-                    id: logId, dateRange: rangeLabel, timestamp: Date.now(),
+                    id: logId, 
+                    dateRange: rangeLabel, 
+                    timestamp: Date.now(),
                     freezeTime: new Date().toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'}) + ' ' + new Date().toLocaleDateString('vi-VN'),
-                    courtFrozen: totalCourt, serviceFrozen: totalService, cashFrozen: totalCash, bankFrozen: totalBank, expenseFrozen: totalExpense,
-                    netRevenue: (totalCash + totalBank) - totalExpense, itemsFrozen: masterCompiledItems
+                    courtFrozen: totalCourt, 
+                    serviceFrozen: totalService, 
+                    cashFrozen: totalCash, 
+                    bankFrozen: totalBank, 
+                    expenseFrozen: totalExpense,
+                    netRevenue: (totalCash + totalBank) - totalExpense, 
+                    itemsFrozen: masterCompiledItems,
+                    
+                    // Nạp 2 biến tổng tháng thu mặt và thu ck vào dòng chốt vĩnh viễn
+                    monthCashSnapshot: finalMonthCashChot,
+                    monthBankSnapshot: monthBankTotalAtClick
                 };
 
                 window.fbUpdate('/', updates).then(() => { triggerToast(`Đã gộp khóa sổ thành công vĩnh viễn!`); });
             }).catch(err => alert("Lỗi hệ thống: " + err));
         }
 
-        // CÓ CHỨC NĂNG XÓA TOÀN BỘ LỊCH SỬ CHỐT SỔ ĐỂ LÀM LẠI THEO YÊU CẦU
         window.clearAllFreezeLogs = function() {
-            if (prompt("🔐 XÁC NHẬN ADMIN: Nhập mật khẩu để XÓA HOÀN TOÀN lịch sử chốt sổ để làm lại:") !== MASTER_PASSWORD) {
+            if (prompt("🔐 XÁC NHẬN ADMIN: Nhập mật khẩu để XÓA TOÀN BỘ lịch sử chốt sổ để làm lại:") !== MASTER_PASSWORD) {
                 alert("❌ Mật khẩu sai, hủy lệnh!"); return;
             }
             window.fbOnce('history').then((snapshot) => {
-                const snap = snapshot.val();
-                let updates = {};
-                if(snap) { Object.keys(snap).forEach(k => { updates[`history/${k}/locked`] = false; }); } // Mở khóa lại tất cả đơn
-                updates['freeze_log'] = null; // Xóa sạch lịch sử chốt sổ
+                const snap = snapshot.val(); let updates = {};
+                if(snap) { Object.keys(snap).forEach(k => { updates[`history/${k}/locked`] = false; }); } 
+                updates['freeze_log'] = null; 
                 window.fbUpdate('/', updates).then(() => { triggerToast("Đã xóa sạch lịch sử chốt sổ thành công!"); });
             });
         }
 
-        // CẬP NHẬT FIX TRIỆT ĐỂ LỖI ÂM KÉT DOANH THU VÔ LÝ
+        // RENDER ĐỘC LẬP HOÀN TOÀN TỪNG NGÀY TRỰC QUAN
         function renderHistory() {
             const fDate = document.getElementById('filter-date').value; if(!fDate) return;
             const fMonth = fDate.substring(0, 7);
-            const targetWeek = getWeekNumber(fDate); const targetYear = new Date(fDate).getFullYear();
 
             const tbody = document.getElementById('history-tbody'); tbody.innerHTML = "";
-            let dayTot = 0, dayCourt = 0, dayService = 0, cash = 0, bank = 0, exp = 0;
-            let weekTot = 0, weekCash = 0, weekBank = 0;
-            
-            // Tính toán két tiền mặt quản trị an toàn dựa trên bản ghi lịch sử chốt sổ thực tế
-            let frozenCashCumulative = 0;
-            freezeHistory.forEach(f => { frozenCashCumulative += (f.cashFrozen || 0); });
+            let dayTot = 0, dayCourt = 0, dayService = 0, cash = 0, bank = 0;
+            let monthCashAccumulate = 0, monthBankAccumulate = 0, monthExpAccumulate = 0;
 
-            paymentHistory.forEach((b, index) => {
-                const bWeek = getWeekNumber(b.date); const bYear = new Date(b.date).getFullYear();
+            paymentHistory.forEach((b) => {
+                if (b.date.startsWith(fMonth)) {
+                    monthCashAccumulate += (b.cashReceived || 0);
+                    monthBankAccumulate += (b.bankReceived || 0);
+                }
 
                 if (b.date === fDate) {
                     dayTot += b.totalBill; dayCourt += (b.courtFee || 0); dayService += (b.serviceFee || 0);
@@ -804,7 +821,7 @@ HTML
 
                     const tr = document.createElement('tr'); tr.className = "border-b border-slate-800/60 hover:bg-slate-800/30 font-semibold text-slate-300 transition text-[11px]";
                     const lockStatusHtml = b.locked 
-                        ? `<span class="text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-500/30 font-bold flex items-center justify-center gap-1">✔ Khóa sổ</span>`
+                        ? `<span class="text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-500/30 font-bold flex items-center justify-center gap-1">✔ Đã chốt</span>`
                         : `<span class="text-rose-400 bg-rose-950/80 px-2 py-0.5 rounded border border-rose-500/30 font-bold flex items-center justify-center gap-1">● Mở</span>`;
                     
                     let detailsList = []; const itemsObj = b.rawDetails ? b.rawDetails.items : (b.items || {});
@@ -830,18 +847,9 @@ HTML
                     `;
                     tbody.appendChild(tr);
                 }
-
-                // Thống kê theo tuần cho các hóa đơn chưa chốt hoặc hóa đơn thuộc ngày đang lọc
-                if (!b.locked || b.date === fDate) {
-                    if (bWeek === targetWeek && bYear === targetYear) { weekTot += b.totalBill; weekCash += b.cashReceived; weekBank += b.bankReceived; }
-                }
             });
             
-            let totalMonthExpense = 0;
-            expensesData.forEach(e => {
-                if (e.date === fDate) exp += e.amount;
-                if (e.date.startsWith(fMonth)) totalMonthExpense += e.amount;
-            });
+            expensesData.forEach(e => { if (e.date.startsWith(fMonth)) monthExpAccumulate += e.amount; });
 
             document.getElementById('expense-list-container').innerHTML = expensesData.filter(e => e.date === fDate).map(e => `<div class="flex justify-between bg-slate-900 p-2 rounded-lg border border-slate-800"><span>• ${e.reason}</span><span class="text-rose-400 font-bold">-${e.amount}k</span></div>`).join("") || `<span class="text-slate-600 italic">Không có khoản chi...</span>`;
             
@@ -851,15 +859,11 @@ HTML
             document.getElementById('stat-day-cash').innerText = `${formatNum(cash)}k`; 
             document.getElementById('stat-day-bank').innerText = `${formatNum(bank)}k`; 
 
-            // CÔNG THỨC FIX KÉT TIỀN MẶT THỰC TẾ: Lấy tổng tiền mặt đã chốt vĩnh viễn + tiền mặt của ngày hôm nay chưa chốt (nếu có) - Chi phí phát sinh. Bảo đảm ko bị âm sai lệch.
-            let finalRealCashBox = Math.max(0, frozenCashCumulative + (fDate ? cash : 0) - totalMonthExpense);
-            document.getElementById('stat-real-cash-box').innerText = `${formatNum(finalRealCashBox)}k`;
-
-            document.getElementById('stat-week-total').innerText = `${formatNum(weekTot)}k`;
-            document.getElementById('stat-week-cash').innerText = `${formatNum(weekCash)}k`;
-            document.getElementById('stat-week-bank').innerText = `${formatNum(weekBank)}k`;
+            document.getElementById('stat-month-bank-total').innerText = `${formatNum(monthBankAccumulate)}k`;
+            document.getElementById('stat-month-cash-total').innerText = `${formatNum(monthCashAccumulate - monthExpAccumulate)}k`;
         }
 
+        // BẢNG NHẬT KÝ KHÓA SỔ GỘP DUY NHẤT: THỂ HIỆN RÕ CẢ DOANH SỐ THÁNG TIỀN MẶT & CK ĐÓNG BĂNG CHUẨN XÁC
         function renderFreezeTable() {
             const tbody = document.getElementById('freeze-tbody'); if(!tbody) return;
             if(freezeHistory.length === 0) {
@@ -874,6 +878,11 @@ HTML
                         const prod = globalInventory.find(x => x.id === pId); itemsList.push(`${prod ? prod.name : pId} (x${f.itemsFrozen[pId]})`);
                     });
                 }
+                
+                // Hiển thị nhãn kèm theo số liệu tháng được khóa
+                const snapMonthCashText = f.monthCashSnapshot !== undefined ? `<div class="text-[9px] text-rose-500 mt-0.5">Tháng: ${formatNum(f.monthCashSnapshot)}k</div>` : '';
+                const snapMonthBankText = f.monthBankSnapshot !== undefined ? `<div class="text-[9px] text-cyan-500 mt-0.5">Tháng: ${formatNum(f.monthBankSnapshot)}k</div>` : '';
+
                 return `
                     <tr class="border-b border-slate-800/60 bg-slate-950/20 hover:bg-slate-900/40 text-[11px] font-semibold transition">
                         <td class="p-3 text-emerald-400 font-extrabold text-xs">${f.dateRange}</td>
@@ -881,8 +890,8 @@ HTML
                         <td class="p-3 text-right text-cyan-400 font-bold">${formatNum(f.courtFrozen)}k</td>
                         <td class="p-3 text-right text-amber-400 font-bold">${formatNum(f.serviceFrozen)}k</td>
                         <td class="p-3 text-left pl-6 max-w-[280px] truncate"><span class="text-amber-400 font-bold">${itemsList.join(', ') || 'Không bán đồ'}</span></td>
-                        <td class="p-3 text-right text-rose-400 font-bold">${formatNum(f.cashFrozen)}k</td>
-                        <td class="p-3 text-right text-cyan-400 font-bold">${formatNum(f.bankFrozen)}k</td>
+                        <td class="p-3 text-right text-rose-400 font-bold">${formatNum(f.cashFrozen)}k ${snapMonthCashText}</td>
+                        <td class="p-3 text-right text-cyan-400 font-bold">${formatNum(f.bankFrozen)}k ${snapMonthBankText}</td>
                         <td class="p-3 text-right text-orange-400 font-bold">-${formatNum(f.expenseFrozen)}k</td>
                         <td class="p-3 text-right text-emerald-400 font-black text-xs bg-emerald-950/20">${formatNum(f.netRevenue)}k</td>
                     </tr>

@@ -4,7 +4,7 @@ HTML
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Phúc An Badminton - Premium Cloud POS v4.9.1</title>
+    <title>Phúc An Badminton - Premium Cloud POS v4.9.2</title>
     
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -77,7 +77,7 @@ HTML
                 </div>
                 <div>
                     <h1 class="text-base font-black tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500">PHÚC AN BADMINTON</h1>
-                    <p class="text-[10px] text-cyan-400 font-bold uppercase tracking-widest">Mobile Premium Cloud POS v4.9.1</p>
+                    <p class="text-[10px] text-cyan-400 font-bold uppercase tracking-widest">Mobile Premium Cloud POS v4.9.2</p>
                 </div>
             </div>
             
@@ -409,7 +409,7 @@ HTML
             { id: 'cau_bm_le', name: 'Quả Cầu Bình Minh', type: 'gear', qty: 120, cost: 23, price: 30, isShuttlecock: true, linkTo: 'cau_bm_ong', packSize: 1 },
             { id: 'cau_bm_ong', name: 'Ống Cầu Bình Minh (12 Quả)', type: 'gear', qty: 10, cost: 276, price: 360, isShuttlecock: true, linkTo: 'cau_bm_le', packSize: 12 },
             { id: 'quan_can', name: 'Quấn cán', type: 'gear', qty: 80, cost: 5, price: 12 },
-            { id: 'vo_dai', name: 'Vớ dài', type: 'gear', qty: 20, cost: 30, price: 50 }
+            { id: 'vo_dial', name: 'Vớ dài', type: 'gear', qty: 20, cost: 30, price: 50 }
         ];
 
         const PRICING = {
@@ -422,27 +422,18 @@ HTML
 
         function formatNum(num) { return (isNaN(num) || num === null) ? "0" : Number(Math.round(num * 100) / 100).toLocaleString('vi-VN'); }
 
-        // HÀM CHUYỂN ĐỔI CHUỖI GIỜ BẤT KỲ THÀNH ĐỊNH DẠNG SỐ PHÚT CHUẨN 24 GIỜ TOÀN CẦU ĐỂ VÁ LỖI AM/PM
         function parseTimeToMinutes(timeStr) {
             if (!timeStr) return 0;
             let cleaned = timeStr.trim().toUpperCase();
             let hours = 0, minutes = 0;
-            
-            // Xử lý nếu chuỗi có định dạng tiếng việt hoặc tiếng anh AM/PM (CH/SA)
             let isPM = cleaned.includes("CH") || cleaned.includes("PM");
             let isAM = cleaned.includes("SA") || cleaned.includes("AM");
-            
             cleaned = cleaned.replace(/(CH|SA|AM|PM)/g, '').trim();
             const parts = cleaned.split(':');
             hours = parseInt(parts[0], 10) || 0;
             minutes = parseInt(parts[1], 10) || 0;
-            
-            if ((isPM || isAM) && hours === 12) {
-                hours = 0;
-            }
-            if (isPM) {
-                hours += 12;
-            }
+            if ((isPM || isAM) && hours === 12) hours = 0;
+            if (isPM) hours += 12;
             return hours * 60 + minutes;
         }
 
@@ -600,7 +591,6 @@ HTML
             saveStateFirebase(); calculateAll();
         }
 
-        // HÀM TÍNH TIỀN CHÍNH XÁC SỬ DỤNG PARSETIMETOMINUTES ĐỂ KHÔNG BỊ SAI GIỜ LỆCH CA SAU SÁNG
         function calculateAll() {
             const c = courtsData[currentCourt]; if (!c) return;
             if(!c.items) c.items = {};
@@ -616,11 +606,9 @@ HTML
 
             let mins = 0, fee = 0;
             if (c.startTime && c.endTime) {
-                // Áp dụng bộ chuyển đổi giờ 24h Quốc tế
                 const startMins = parseTimeToMinutes(c.startTime);
                 const endMins = parseTimeToMinutes(c.endTime);
                 mins = endMins - startMins;
-                
                 if (mins > 0) {
                     for (let m = startMins; m < endMins; m++) {
                         if (c.dayType === 'weekday' && c.discountType === 'student' && m >= 300 && m < 1020) {
@@ -630,10 +618,7 @@ HTML
                             for (let slot of PRICING[c.dayType]) {
                                 const slotStart = parseTimeToMinutes(slot.start);
                                 const slotEnd = parseTimeToMinutes(slot.end);
-                                if (m >= slotStart && m < slotEnd) { 
-                                    slotPrice = slot.price; 
-                                    break; 
-                                }
+                                if (m >= slotStart && m < slotEnd) { slotPrice = slot.price; break; }
                             }
                             fee += (slotPrice / 60);
                         }
@@ -710,10 +695,7 @@ HTML
                         for (let slot of PRICING[c.dayType]) { 
                             const slotStart = parseTimeToMinutes(slot.start);
                             const slotEnd = parseTimeToMinutes(slot.end);
-                            if (m >= slotStart && m < slotEnd) { 
-                                sp = slot.price; 
-                                break; 
-                            } 
+                            if (m >= slotStart && m < slotEnd) { sp = slot.price; break; } 
                         }
                         fee += (sp / 60);
                     }
@@ -771,7 +753,7 @@ HTML
                     <div class="font-bold border-b border-slate-800 pb-1 mb-2 text-cyan-400 uppercase tracking-wider text-[10px]">💰 Chi phí dịch vụ hóa đơn</div>
                     <div class="flex justify-between mb-1"><span>🏟️ Tiền giờ thuê sân:</span><span class="font-bold text-white">${formatNum(b.courtFee)}đ</span></div>
                     <div class="flex justify-between mb-1"><span>🥤 Tiền nước & Phụ kiện:</span><span class="font-bold text-white">${formatNum(b.serviceFee)}đ</span></div>
-                    <div class="flex justify-between mb-1 text-rose-400"><span>📉 Giảm thêm chủ sân:</span><span class="font-bold">-${formatNum(b.ownerDiscount || 0)}đ</span></div>
+                    <div class="flex justify-between mb-1 text-rose-400"><span>📉 Giảm thêm chủ sân:</span><span class="font-bold">${formatNum(b.ownerDiscount || 0)}đ</span></div>
                     <div class="flex justify-between pt-1 border-t border-slate-855 font-black text-emerald-400 text-sm">
                         <span>TỔNG ĐƠN PHẢI THU:</span><span>${formatNum(b.totalBill)}đ</span>
                     </div>
@@ -946,7 +928,7 @@ HTML
                         <td class="p-2.5 text-slate-400">${b.timeRange}</td>
                         <td class="p-2.5 text-right font-bold text-cyan-400">${formatNum(b.courtFee)}k</td>
                         <td class="p-2.5 text-right text-amber-400">${formatNum(b.serviceFee)}k</td>
-                        <td class="p-2.5 text-right text-rose-400 font-bold">-${formatNum(b.ownerDiscount || 0)}k</td>
+                        <td class="p-2.5 text-right text-rose-400 font-bold">${formatNum(b.ownerDiscount || 0)}k</td>
                         <td class="p-2.5 text-left pl-4 max-w-[220px] truncate"><span class="text-slate-400 font-medium">${detailsList.join(', ') || 'Không có'}</span></td>
                         <td class="p-2.5 text-right text-emerald-400 font-bold">${formatNum(b.totalBill)}k</td>
                         <td class="p-2.5 text-rose-400">${formatNum(b.cashReceived)}k</td>
@@ -958,9 +940,10 @@ HTML
                 }
             });
             
+            // TÍNH TOÀN BỘ CHI PHÍ THÁNG ĐỘC LẬP
             expensesData.forEach(e => { if (e.date.startsWith(fMonth)) monthExpAccumulate += e.amount; });
 
-            document.getElementById('expense-list-container').innerHTML = expensesData.filter(e => e.date === fDate).map(e => `<div class="flex justify-between bg-slate-900 p-2 rounded-lg border border-slate-800"><span>• ${e.reason}</span><span class="text-rose-400 font-bold">-${e.amount}k</span></div>`).join("") || `<span class="text-slate-600 italic">Không có khoản chi...</span>`;
+            document.getElementById('expense-list-container').innerHTML = expensesData.filter(e => e.date === fDate).map(e => `<div class="flex justify-between bg-slate-900 p-2 rounded-lg border border-slate-800"><span>• ${e.reason}</span><span class="text-rose-400 font-bold">${e.amount}k</span></div>`).join("") || `<span class="text-slate-600 italic">Không có khoản chi...</span>`;
             
             document.getElementById('stat-day-total').innerText = `${formatNum(dayTot)}k`; 
             document.getElementById('stat-day-court').innerText = `${formatNum(dayCourt)}k`; 
@@ -968,6 +951,7 @@ HTML
             document.getElementById('stat-day-cash').innerText = `${formatNum(cash)}k`; 
             document.getElementById('stat-day-bank').innerText = `${formatNum(bank)}k`; 
 
+            // FIX PHÉP TÍNH CHUẨN XÁC: CHỈ TRỪ TỔNG CHI PHÍ THÁNG MỘT LẦN DUY NHẤT Ở ĐÂY SAU KHI ĐÃ CỘNG XONG ĐƠN HÀNG
             document.getElementById('stat-month-bank-total').innerText = `${formatNum(monthBankAccumulate)}k`;
             document.getElementById('stat-month-cash-total').innerText = `${formatNum(monthCashAccumulate - monthExpAccumulate)}k`;
         }
@@ -996,7 +980,7 @@ HTML
                         <td class="p-3 text-left pl-6 max-w-[200px] truncate"><span class="text-amber-400 font-bold">${itemsList.join(', ') || 'Không bán đồ'}</span></td>
                         <td class="p-3 text-right text-rose-400 font-bold">${formatNum(f.cashFrozen)}k</td>
                         <td class="p-3 text-right text-cyan-400 font-bold">${formatNum(f.bankFrozen)}k</td>
-                        <td class="p-3 text-right text-orange-400 font-bold">-${formatNum(f.expenseFrozen)}k</td>
+                        <td class="p-3 text-right text-orange-400 font-bold">${formatNum(f.expenseFrozen)}k</td>
                         <td class="p-3 text-right text-emerald-400 font-black text-xs bg-slate-950/40">${formatNum(f.netRevenue)}k</td>
                         <td class="p-3 text-right text-cyan-300 font-semibold bg-cyan-950/20">${formatNum(f.monthBankSnapshot)}k</td>
                         <td class="p-3 text-right text-rose-300 font-semibold bg-rose-950/20">${formatNum(f.monthCashSnapshot)}k</td>

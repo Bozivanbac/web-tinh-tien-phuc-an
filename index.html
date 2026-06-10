@@ -4,7 +4,7 @@ HTML
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Phúc An Badminton - Premium Cloud POS v4.9.4</title>
+    <title>Phúc An Badminton - Premium Cloud POS v4.9.5</title>
     
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -77,7 +77,7 @@ HTML
                 </div>
                 <div>
                     <h1 class="text-base font-black tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500">PHÚC AN BADMINTON</h1>
-                    <p class="text-[10px] text-cyan-400 font-bold uppercase tracking-widest">Mobile Premium Cloud POS v4.9.4</p>
+                    <p class="text-[10px] text-cyan-400 font-bold uppercase tracking-widest">Mobile Premium Cloud POS v4.9.5</p>
                 </div>
             </div>
             
@@ -797,13 +797,13 @@ HTML
             setTimeout(() => { modal.classList.add('hidden'); }, 200);
         };
 
-        // FIX FIX VÁ LỖI LẬP TRÌNH KHÓA SỔ GỘP TOÀN GIAI ĐOẠN - TRỪ KHOẢN CHI CHUẨN XÁC
+        // CHỐT SỔ GỘP GIAI ĐOẠN HOÀN THIỆN: CHỐT LUÔN CẢ KHOẢN CHI & KHẤU TRỪ CHUẨN XÁC VÀO LŨY KẾ ĐÓNG BĂNG
         window.lockAndFreezeRevenue = function() {
             const fDate = document.getElementById('filter-date').value;
             if(!fDate) { alert("⚠️ Vui lòng chọn một ngày mốc."); return; }
             const fMonth = fDate.substring(0, 7);
             
-            const confirmPass = prompt(`⚠️ LỆNH KHÓA SỔ GỘP TOÀN BỘ GIAI ĐOẠN:\nHệ thống sẽ gom toàn bộ dữ liệu chưa chốt, đồng thời đóng băng doanh số tháng lập tức đưa tiền tháng về 0.\nNhập mật khẩu Admin để xác nhận:`);
+            const confirmPass = prompt(`⚠️ LỆNH KHÓA SỔ GỘP TOÀN BỘ GIAI ĐOẠN:\nHệ thống sẽ gom toàn bộ dữ liệu đơn hàng và khoản chi chưa chốt để đóng băng, đưa tiền tháng về 0.\nNhập mật khẩu Admin để xác nhận:`);
             if (confirmPass !== MASTER_PASSWORD) { alert("⚠️ Mật khẩu quản trị không chính xác!"); return; }
 
             window.fbOnce('history').then((snapshot) => {
@@ -817,6 +817,7 @@ HTML
                 let monthCashTotalAtClick = 0;
                 let monthBankTotalAtClick = 0;
 
+                // 1. Duyệt đơn hàng tính tổng lũy kế thu nhập
                 Object.keys(snap).forEach(k => {
                     const d = snap[k].date;
                     
@@ -840,19 +841,20 @@ HTML
                     }
                 });
 
+                // 2. Duyệt khoản chi độc lập, cấn trừ sạch sẽ vào cục lưu trữ nhật ký đóng băng
                 let monthExpAccumulate = 0;
                 expensesData.forEach(e => { 
                     if (e.date.startsWith(fMonth)) monthExpAccumulate += (e.amount || 0);
                     if (e.date <= fDate) totalExpense += (e.amount || 0); 
                 });
                 
-                if (countUnchoted === 0) { alert("Tất cả đơn hàng của giai đoạn này đều đã được chốt từ trước đó!"); return; }
+                if (countUnchoted === 0) { alert("Tất cả dữ liệu giai đoạn này đều đã được chốt khóa sổ!"); return; }
 
                 const dMinStr = minDate.split('-').reverse().slice(0,2).join('/');
                 const dMaxStr = maxDate.split('-').reverse().slice(0,2).join('/');
                 const rangeLabel = (minDate === maxDate) ? dMaxStr : `${dMinStr} ➔ ${dMaxStr}`;
 
-                // SỬA DẤU PHÉP TÍNH: TIỀN MẶT CHỐT SỔ LƯU TRỮ = TỔNG THU TIỀN MẶT ĐƠN HÀNG TRỪ ĐI TIỀN CHI PHÍ
+                // Phép tính gộp đóng băng đóng gói chuẩn: Thu - Chi
                 let finalMonthCashChot = monthCashTotalAtClick - monthExpAccumulate;
 
                 const logId = 'BATCH_' + Date.now();
@@ -872,7 +874,7 @@ HTML
                     monthBankSnapshot: monthBankTotalAtClick
                 };
 
-                window.fbUpdate('/', updates).then(() => { triggerToast(`Đã gộp khóa sổ thành công, lũy kế tháng đã được đưa về 0!`); });
+                window.fbUpdate('/', updates).then(() => { triggerToast(`Đã gộp khóa sổ thành công toàn bộ đơn hàng và khoản chi phát sinh!`); });
             }).catch(err => alert("Lỗi hệ thống: " + err));
         }
 
@@ -942,6 +944,7 @@ HTML
                 }
             });
             
+            // Hàm xử lý gom tổng chi độc lập hoàn toàn khỏi đơn hàng
             expensesData.forEach(e => { if (e.date.startsWith(fMonth)) monthExpAccumulate += e.amount; });
 
             document.getElementById('expense-list-container').innerHTML = expensesData.filter(e => e.date === fDate).map(e => `<div class="flex justify-between bg-slate-900 p-2 rounded-lg border border-slate-800"><span>• ${e.reason}</span><span class="text-rose-400 font-bold">${e.amount}k</span></div>`).join("") || `<span class="text-slate-600 italic">Không có khoản chi...</span>`;
@@ -952,6 +955,7 @@ HTML
             document.getElementById('stat-day-cash').innerText = `${formatNum(cash)}k`; 
             document.getElementById('stat-day-bank').innerText = `${formatNum(bank)}k`; 
 
+            // HIỂN THỊ CHUẨN XÁC: ĐƠN HÀNG TRỪ ĐI CHI PHÍ (RA TIỀN THỰC TẾ KÉT TIỀN MẶT)
             document.getElementById('stat-month-bank-total').innerText = `${formatNum(monthBankAccumulate)}k`;
             document.getElementById('stat-month-cash-total').innerText = `${formatNum(monthCashAccumulate - monthExpAccumulate)}k`;
         }

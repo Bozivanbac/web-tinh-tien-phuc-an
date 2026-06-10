@@ -4,7 +4,7 @@ HTML
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Phúc An Badminton - Premium Cloud POS v4.8.1</title>
+    <title>Phúc An Badminton - Premium Cloud POS v4.8.2</title>
     
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -78,7 +78,7 @@ HTML
                 </div>
                 <div>
                     <h1 class="text-base font-black tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500">PHÚC AN BADMINTON</h1>
-                    <p class="text-[10px] text-cyan-400 font-bold uppercase tracking-widest">Mobile Premium Cloud POS v4.8.1</p>
+                    <p class="text-[10px] text-cyan-400 font-bold uppercase tracking-widest">Mobile Premium Cloud POS v4.8.2</p>
                 </div>
             </div>
             
@@ -307,7 +307,6 @@ HTML
                         <div class="flex gap-2">
                             <input id="exp-add-reason" type="text" placeholder="Lý do chi..." class="flex-1 bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none">
                             <input id="exp-add-amount" type="number" placeholder="Số k..." class="w-16 bg-slate-900 border border-slate-800 rounded-lg px-2 py-1.5 text-xs text-center text-white focus:outline-none">
-                            <input type="hidden" id="raw-items-data-box">
                             <button onclick="addNewExpense()" class="bg-rose-600 text-white font-bold px-3 py-1.5 rounded-lg text-xs shadow-md">Thêm</button>
                         </div>
                     </div>
@@ -318,7 +317,6 @@ HTML
             </div>
 
             <div id="tab-content-freeze" class="p-3 space-y-4 block-state-control hidden">
-                
                 <div class="bg-gradient-to-br from-slate-950 to-slate-900 border-2 border-emerald-500/30 p-4 rounded-xl shadow-2xl">
                     <div class="flex items-center gap-2 pb-2 border-b border-slate-800 mb-3">
                         <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
@@ -713,7 +711,7 @@ HTML
             let costGoods = deductInv(c.items);
             let tot = Math.max(0, finalCourtFee + serv - (c.ownerDiscount || 0));
 
-            const r = { id: 'PAB-'+Date.now(), date: fDate, time: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit',hour12:false}), courtNum: currentCourt, customerName: c.customerName || "Khách lẻ", timeRange: `${c.startTime || '00:00'} → ${c.endTime || '00:00'} (${mins} ph)`, courtFee: finalCourtFee, serviceFee: serv, totalBill: tot, profitGoods: serv - costGoods, cashReceived: c.cashUnits, bankReceived: c.bankUnits || 0, rawDetails: JSON.parse(JSON.stringify(c)), locked: false };
+            const r = { id: 'PAB-'+Date.now(), date: fDate, time: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit',hour12:false}), courtNum: currentCourt, customerName: c.customerName || "Khách lẻ", timeRange: `${c.startTime || '00:00'} → ${c.endTime || '00:00'} (${mins} ph)`, courtFee: finalCourtFee, serviceFee: serv, totalBill: tot, profitGoods: serv - costGoods, cashReceived: c.cashUnits, bankReceived: b.bankUnits || 0, rawDetails: JSON.parse(JSON.stringify(c)), locked: false };
             
             window.fbPush('history', r); window.fbSet('inventory', globalInventory); 
             triggerToast("Đã xuất đơn thành công!"); resetCurrentCourt();
@@ -743,73 +741,90 @@ HTML
             document.getElementById('tab-content-inventory').style.display = t === 'inventory' ? 'block' : 'none';
         }
 
-        // CHỐT SỔ ĐÓNG BĂNG DỮ LIỆU & GHI CHI TIẾT SỐ LƯỢNG MÓN BÁN ĐƯỢC
+        // UPGRADE CHỐT SỔ THÔNG MINH V4.8.2: TỰ ĐỘNG GOM VÀ CHỐT HÀNG LOẠT NGÀY CHƯA CHỐT TRONG QUÁ KHỨ
         window.lockAndFreezeRevenue = function() {
             const fDate = document.getElementById('filter-date').value;
-            if(!fDate) { alert("⚠️ Vui lòng chọn một ngày cụ thể."); return; }
+            if(!fDate) { alert("⚠️ Vui lòng chọn một mốc ngày cụ thể cần chốt sổ."); return; }
             
-            const confirmPass = prompt(`⚠️ HỆ THỐNG KHÓA SỔ CHỐT DOANH THU THÁNG:\nNhập mật khẩu để CHỐT TIỀN cố định số liệu ngày ${fDate}:`);
+            const confirmPass = prompt(`⚠️ HỆ THỐNG QUÉT & CHỐT SỔ TOÀN BỘ NGÀY TRỐNG:\nHệ thống sẽ chốt toàn bộ các ngày chưa chốt từ trước đến ngày ${fDate}.\nNhập mật khẩu Admin để xác nhận lệnh:`);
             if (confirmPass !== MASTER_PASSWORD) { alert("⚠️ Mật khẩu quản trị không chính xác!"); return; }
 
             window.fbOnce('history').then((snapshot) => {
                 const snap = snapshot.val();
-                if(!snap) { alert("Không tìm thấy dữ liệu hóa đơn nào."); return; }
+                if(!snap) { alert("Không có dữ liệu hóa đơn."); return; }
                 
-                let updates = {};
-                let count = 0;
-                let dayCourt = 0, dayService = 0, dayCash = 0, dayBank = 0, dayExpense = 0;
-                let dayCompiledItems = {}; // Gom số lượng vật phẩm tiêu thụ trong ngày chốt
-
+                // Bước 1: Quét tìm tất cả các ngày duy nhất có đơn hàng tồn tại từ trước đến ngày được chọn
+                let uniqueDates = [];
                 Object.keys(snap).forEach(k => {
-                    if (snap[k].date === fDate) {
-                        if (!snap[k].locked) {
-                            updates[`history/${k}/locked`] = true;
-                            count++;
-                        }
-                        dayCourt += (snap[k].courtFee || 0);
-                        dayService += (snap[k].serviceFee || 0);
-                        dayCash += (snap[k].cashReceived || 0);
-                        dayBank += (snap[k].bankReceived || 0);
-
-                        // Đọc giỏ hàng của đơn này để tính số lượng gom vật phẩm bán được
-                        const itemsObj = snap[k].rawDetails ? snap[k].rawDetails.items : (snap[k].items || {});
-                        if(itemsObj) {
-                            Object.keys(itemsObj).forEach(prodId => {
-                                dayCompiledItems[prodId] = (dayCompiledItems[prodId] || 0) + itemsObj[prodId];
-                            });
-                        }
+                    const d = snap[k].date;
+                    if (d <= fDate && !uniqueDates.includes(d)) {
+                        uniqueDates.push(d);
                     }
                 });
+                uniqueDates.sort(); // Sắp xếp theo thứ tự thời gian tăng dần
 
-                expensesData.forEach(e => {
-                    if (e.date === fDate) dayExpense += (e.amount || 0);
-                });
-
-                if (count === 0 && freezeHistory.some(f => f.date === fDate)) {
-                    alert("Ngày này đã được khóa sổ dữ liệu từ trước rồi!");
+                if(uniqueDates.length === 0) {
+                    alert("Không tìm thấy ngày nào có dữ liệu cần chốt trong khoảng thời gian này.");
                     return;
                 }
 
-                const logKey = fDate.replace(/-/g, '_');
-                const freezeRecord = {
-                    date: fDate,
-                    freezeTime: new Date().toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'}) + ' ' + new Date().toLocaleDateString('vi-VN'),
-                    courtFrozen: dayCourt,
-                    serviceFrozen: dayService,
-                    cashFrozen: dayCash,
-                    bankFrozen: dayBank,
-                    expenseFrozen: dayExpense,
-                    netRevenue: (dayCash + dayBank) - dayExpense,
-                    itemsFrozen: dayCompiledItems, // Lưu danh sách đồ bán ra của ngày này
-                    commandCode: 'LOCK_OP_' + Date.now().toString().slice(-6)
-                };
+                let updates = {};
+                let totalChotDays = 0;
 
-                updates[`freeze_log/${logKey}`] = freezeRecord;
+                // Bước 2: Duyệt qua từng ngày tìm được để đóng băng và gom số liệu riêng biệt tự động
+                uniqueDates.forEach(currentDate => {
+                    let dayCourt = 0, dayService = 0, dayCash = 0, dayBank = 0, dayExpense = 0;
+                    let dayCompiledItems = {};
+                    let activeDayCount = 0;
 
-                window.fbUpdate('/', updates).then(() => {
-                    triggerToast(`Đã khóa sổ dòng tiền thành công ngày ${fDate}!`);
+                    Object.keys(snap).forEach(k => {
+                        if (snap[k].date === currentDate) {
+                            if (!snap[k].locked) {
+                                updates[`history/${k}/locked`] = true;
+                                activeDayCount++;
+                            }
+                            dayCourt += (snap[k].courtFee || 0);
+                            dayService += (snap[k].serviceFee || 0);
+                            dayCash += (snap[k].cashReceived || 0);
+                            dayBank += (snap[k].bankReceived || 0);
+
+                            const itemsObj = snap[k].rawDetails ? snap[k].rawDetails.items : (snap[k].items || {});
+                            if(itemsObj) {
+                                Object.keys(itemsObj).forEach(prodId => {
+                                    dayCompiledItems[prodId] = (dayCompiledItems[prodId] || 0) + itemsObj[prodId];
+                                });
+                            }
+                        }
+                    });
+
+                    expensesData.forEach(e => {
+                        if (e.date === currentDate) dayExpense += (e.amount || 0);
+                    });
+
+                    // Chỉ tạo bản ghi chốt sổ nếu ngày này chưa được tạo log chốt, hoặc có đơn hàng mới chốt thêm
+                    if (activeDayCount > 0 || !freezeHistory.some(f => f.date === currentDate)) {
+                        const logKey = currentDate.replace(/-/g, '_');
+                        updates[`freeze_log/${logKey}`] = {
+                            date: currentDate,
+                            freezeTime: new Date().toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'}) + ' ' + new Date().toLocaleDateString('vi-VN'),
+                            courtFrozen: dayCourt,
+                            serviceFrozen: dayService,
+                            cashFrozen: dayCash,
+                            bankFrozen: dayBank,
+                            expenseFrozen: dayExpense,
+                            netRevenue: (dayCash + dayBank) - dayExpense,
+                            itemsFrozen: dayCompiledItems,
+                            commandCode: 'AUTO_BATCH_' + Date.now().toString().slice(-4)
+                        };
+                        totalChotDays++;
+                    }
                 });
-            }).catch(err => alert("Lỗi hệ thống: " + err));
+
+                // Đồng bộ cập nhật đồng loạt lên Firebase Realtime Database
+                window.fbUpdate('/', updates).then(() => {
+                    triggerToast(`Hệ thống thông minh: Đã quét dồn & chốt thành công ${totalChotDays} ngày chưa chốt!`);
+                });
+            }).catch(err => alert("Lỗi quét chốt hàng loạt: " + err));
         }
 
         function renderHistory() {
@@ -830,8 +845,7 @@ HTML
                     dayTot += b.totalBill; dayCourt += (b.courtFee || 0); dayService += (b.serviceFee || 0);
                     cash += b.cashReceived; bank += b.bankReceived;
 
-                    const tr = document.createElement('tr'); 
-                    tr.className = "border-b border-slate-800/60 hover:bg-slate-800/30 font-semibold text-slate-300 transition text-[11px]";
+                    const tr = document.createElement('tr'); tr.className = "border-b border-slate-800/60 hover:bg-slate-800/30 font-semibold text-slate-300 transition text-[11px]";
                     
                     const lockStatusHtml = b.locked 
                         ? `<span class="text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-500/30 font-bold flex items-center justify-center gap-1">✔ Khóa sổ</span>`
@@ -888,30 +902,22 @@ HTML
             document.getElementById('stat-week-bank').innerText = `${formatNum(weekBank)}k`;
         }
 
-        // TÍNH TOÁN CỘNG DỒN TOÀN BỘ CÁC NGÀY ĐÃ CHỐT SỔ ĐỂ IN RA TAB 2
         function renderFreezeTable() {
             const tbody = document.getElementById('freeze-tbody'); if(!tbody) return;
-            
             if(freezeHistory.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-slate-500 italic">Chưa có dữ liệu chốt sổ nào được lưu...</td></tr>`;
                 document.getElementById('freeze-compiled-items').innerHTML = `<span class="text-slate-600 italic col-span-full">Chưa có dữ liệu vật phẩm tiêu thụ...</span>`;
                 return;
             }
 
-            // Khởi tạo biến gom tổng hợp tất cả các ngày
             let sumCourt = 0, sumService = 0, sumCash = 0, sumBank = 0, sumExpense = 0, sumNet = 0;
-            let masterCompiledItems = {}; // Object gom tổng số lượng hàng bán ra của toàn giai đoạn chốt
+            let masterCompiledItems = {};
 
-            // 1. Quét qua lịch sử chốt sổ từng ngày để cộng dồn
             tbody.innerHTML = freezeHistory.map(f => {
-                sumCourt += (f.courtFrozen || 0);
-                sumService += (f.serviceFrozen || 0);
-                sumCash += (f.cashFrozen || 0);
-                sumBank += (f.bankFrozen || 0);
-                sumExpense += (f.expenseFrozen || 0);
-                sumNet += (f.netRevenue || 0);
+                sumCourt += (f.courtFrozen || 0); sumService += (f.serviceFrozen || 0);
+                sumCash += (f.cashFrozen || 0); sumBank += (f.bankFrozen || 0);
+                sumExpense += (f.expenseFrozen || 0); sumNet += (f.netRevenue || 0);
 
-                // Cộng dồn giỏ hàng vật phẩm bán ra
                 if (f.itemsFrozen) {
                     Object.keys(f.itemsFrozen).forEach(pId => {
                         masterCompiledItems[pId] = (masterCompiledItems[pId] || 0) + f.itemsFrozen[pId];
@@ -933,17 +939,14 @@ HTML
                 `;
             }).join("");
 
-            // 2. Điền số liệu tổng cộng dồn lên các ô thống kê Gom ở tab 2
             document.getElementById('sum-freeze-court').innerText = `${formatNum(sumCourt)}k`;
             document.getElementById('sum-freeze-service').innerText = `${formatNum(sumService)}k`;
             document.getElementById('sum-freeze-cash').innerText = `${formatNum(sumCash)}k`;
             document.getElementById('sum-freeze-bank').innerText = `${formatNum(sumBank)}k`;
             document.getElementById('sum-freeze-net').innerText = `${formatNum(sumNet)}k`;
 
-            // 3. Render khối danh sách vật phẩm tiêu thụ gom toàn bộ giai đoạn
             const itemsContainer = document.getElementById('freeze-compiled-items');
             itemsContainer.innerHTML = "";
-            
             const soldKeys = Object.keys(masterCompiledItems);
             if (soldKeys.length === 0) {
                 itemsContainer.innerHTML = `<span class="text-slate-600 italic col-span-full">Không có vật phẩm nào tiêu thụ trong các ngày đã chốt.</span>`;
@@ -952,7 +955,6 @@ HTML
                     const prod = globalInventory.find(x => x.id === prodId);
                     const name = prod ? prod.name : prodId;
                     const count = masterCompiledItems[prodId];
-                    
                     const badge = document.createElement('div');
                     badge.className = "bg-slate-900 border border-slate-800 p-2 rounded-lg flex flex-col justify-between items-center text-center shadow-inner";
                     badge.innerHTML = `

@@ -4,7 +4,7 @@ HTML
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Phúc An Badminton - Premium Cloud POS v4.9.2</title>
+    <title>Phúc An Badminton - Premium Cloud POS v4.9.4</title>
     
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -77,7 +77,7 @@ HTML
                 </div>
                 <div>
                     <h1 class="text-base font-black tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500">PHÚC AN BADMINTON</h1>
-                    <p class="text-[10px] text-cyan-400 font-bold uppercase tracking-widest">Mobile Premium Cloud POS v4.9.2</p>
+                    <p class="text-[10px] text-cyan-400 font-bold uppercase tracking-widest">Mobile Premium Cloud POS v4.9.4</p>
                 </div>
             </div>
             
@@ -797,6 +797,7 @@ HTML
             setTimeout(() => { modal.classList.add('hidden'); }, 200);
         };
 
+        // FIX FIX VÁ LỖI LẬP TRÌNH KHÓA SỔ GỘP TOÀN GIAI ĐOẠN - TRỪ KHOẢN CHI CHUẨN XÁC
         window.lockAndFreezeRevenue = function() {
             const fDate = document.getElementById('filter-date').value;
             if(!fDate) { alert("⚠️ Vui lòng chọn một ngày mốc."); return; }
@@ -851,6 +852,7 @@ HTML
                 const dMaxStr = maxDate.split('-').reverse().slice(0,2).join('/');
                 const rangeLabel = (minDate === maxDate) ? dMaxStr : `${dMinStr} ➔ ${dMaxStr}`;
 
+                // SỬA DẤU PHÉP TÍNH: TIỀN MẶT CHỐT SỔ LƯU TRỮ = TỔNG THU TIỀN MẶT ĐƠN HÀNG TRỪ ĐI TIỀN CHI PHÍ
                 let finalMonthCashChot = monthCashTotalAtClick - monthExpAccumulate;
 
                 const logId = 'BATCH_' + Date.now();
@@ -928,7 +930,7 @@ HTML
                         <td class="p-2.5 text-slate-400">${b.timeRange}</td>
                         <td class="p-2.5 text-right font-bold text-cyan-400">${formatNum(b.courtFee)}k</td>
                         <td class="p-2.5 text-right text-amber-400">${formatNum(b.serviceFee)}k</td>
-                        <td class="p-2.5 text-right text-rose-400 font-bold">${formatNum(b.ownerDiscount || 0)}k</td>
+                        <td class="p-2.5 text-right text-rose-400 font-bold">-${formatNum(b.ownerDiscount || 0)}k</td>
                         <td class="p-2.5 text-left pl-4 max-w-[220px] truncate"><span class="text-slate-400 font-medium">${detailsList.join(', ') || 'Không có'}</span></td>
                         <td class="p-2.5 text-right text-emerald-400 font-bold">${formatNum(b.totalBill)}k</td>
                         <td class="p-2.5 text-rose-400">${formatNum(b.cashReceived)}k</td>
@@ -940,7 +942,6 @@ HTML
                 }
             });
             
-            // TÍNH TOÀN BỘ CHI PHÍ THÁNG ĐỘC LẬP
             expensesData.forEach(e => { if (e.date.startsWith(fMonth)) monthExpAccumulate += e.amount; });
 
             document.getElementById('expense-list-container').innerHTML = expensesData.filter(e => e.date === fDate).map(e => `<div class="flex justify-between bg-slate-900 p-2 rounded-lg border border-slate-800"><span>• ${e.reason}</span><span class="text-rose-400 font-bold">${e.amount}k</span></div>`).join("") || `<span class="text-slate-600 italic">Không có khoản chi...</span>`;
@@ -951,7 +952,6 @@ HTML
             document.getElementById('stat-day-cash').innerText = `${formatNum(cash)}k`; 
             document.getElementById('stat-day-bank').innerText = `${formatNum(bank)}k`; 
 
-            // FIX PHÉP TÍNH CHUẨN XÁC: CHỈ TRỪ TỔNG CHI PHÍ THÁNG MỘT LẦN DUY NHẤT Ở ĐÂY SAU KHI ĐÃ CỘNG XONG ĐƠN HÀNG
             document.getElementById('stat-month-bank-total').innerText = `${formatNum(monthBankAccumulate)}k`;
             document.getElementById('stat-month-cash-total').innerText = `${formatNum(monthCashAccumulate - monthExpAccumulate)}k`;
         }

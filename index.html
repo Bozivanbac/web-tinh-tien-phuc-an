@@ -116,7 +116,7 @@
                         Thời gian đặt sân
                     </h2>
                     <span id="live-status" class="text-[10px] text-cyan-400 font-bold bg-cyan-950/60 px-3 py-1 rounded-full border border-cyan-900/50 shadow-inner flex items-center gap-1.5">
-                        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span> Trống
+                        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span> Hoạt động
                     </span>
                 </div>
 
@@ -312,7 +312,7 @@
                                 <th class="p-2.5">Thời gian</th><th class="p-2.5">Sân</th><th class="p-2.5">Khách hàng</th><th class="p-2.5">Khung giờ chơi</th>
                                 <th class="p-2.5 text-right">Tiền Sân</th><th class="p-2.5 text-right">Dịch vụ</th>
                                 <th class="p-2.5 text-right text-rose-400">Giảm thêm</th>
-                                <th class="p-2.5 text-left text-amber-400 pl-4">Chi tiết vật phẩm/món nước (Bấm dòng để xem kỹ)</th>
+                                <th class="p-2.5 text-left text-amber-400 pl-4">Chi tiết vật phẩm/món nước</th>
                                 <th class="p-2.5 text-right text-emerald-400 font-bold">Tổng đơn</th>
                                 <th class="p-2.5 text-rose-400">Tiền mặt</th><th class="p-2.5 text-cyan-400">CK</th>
                                 <th class="p-2.5 text-center text-emerald-400">Trạng thái</th><th class="p-2.5 text-center">Xóa</th>
@@ -432,7 +432,7 @@
         let globalInventory = []; let currentCourt = 1; let courtsData = {}; let paymentHistory = []; let expensesData = []; let freezeHistory = [];
         let isSyncingFromFirebase = false;
 
-        function formatNum(num) { return (isNaN(num) || num === null) ? "0" : Number(Math.round(num * 100) / 100).toLocaleString('vi-VN'); }
+        function formatNum(num) { return (isNaN(num) || num === null) ? "0" : Number(Math.round(num)).toLocaleString('vi-VN'); }
 
         function parseTimeToMinutes(timeStr) {
             if (!timeStr) return 0;
@@ -611,9 +611,10 @@
             if (currentCourt === 'quick') {
                 let total = 0, html = "";
                 Object.keys(c.items).forEach(id => { const p = globalInventory.find(x => x.id === id); if(p){ total += (p.price * c.items[id]); html += `<div class="flex justify-between"><span>• ${p.name} (x${c.items[id]})</span><span>${p.price*c.items[id]}k</span></div>`; } });
-                c.cashUnits = Math.max(0, total - (c.bankUnits || 0));
+                c.bankUnits = Math.round(parseFloat(document.getElementById('quick-bank').value) || 0);
+                c.cashUnits = Math.max(0, Math.round(total) - c.bankUnits);
                 document.getElementById('quick-items-list').innerHTML = html || `<span class="text-slate-600 italic">Giỏ hàng trống...</span>`;
-                document.getElementById('quick-total-fee').innerText = `${total}k`; return;
+                document.getElementById('quick-total-fee').innerText = `${Math.round(total)}k`; return;
             }
 
             let mins = 0, fee = 0;
@@ -656,11 +657,17 @@
             document.getElementById('drinks-fee-display').innerText = `${dFee}k`; document.getElementById('drinks-list-note').innerHTML = dHtml || "Chưa gọi nước";
             document.getElementById('gear-fee-display').innerText = `${gFee}k`; document.getElementById('gear-list-note').innerHTML = gHtml || "Chưa có phụ kiện";
 
-            let grandTotal = Math.max(0, finalCourtFee + dFee + gFee - (c.ownerDiscount || 0));
+            c.ownerDiscount = Math.round(parseFloat(document.getElementById('owner-discount').value) || 0);
+            c.bankUnits = Math.round(parseFloat(document.getElementById('bank-units').value) || 0);
+
+            // LOGIC LÀM TRÒN SỐ CHẴN CHUẨN ĐÚNG THEO KHÁCH YÊU CẦU
+            let grandTotalRaw = finalCourtFee + dFee + gFee - c.ownerDiscount;
+            let grandTotal = Math.max(0, Math.round(grandTotalRaw));
+            
             document.getElementById('total-fee').innerText = `${formatNum(grandTotal)}k`;
-            c.cashUnits = Math.max(0, grandTotal - (c.bankUnits || 0));
+            c.cashUnits = Math.max(0, grandTotal - c.bankUnits);
             document.getElementById('text-cash-real').innerText = `${formatNum(c.cashUnits)}k`;
-            document.getElementById('text-bank-real').innerText = `${formatNum(c.bankUnits || 0)}k`;
+            document.getElementById('text-bank-real').innerText = `${formatNum(c.bankUnits)}k`;
         }
 
         function deductInv(cart) {
@@ -684,7 +691,12 @@
             const c = courtsData['quick']; if (!c || !c.items || Object.keys(c.items).length === 0) return;
             let serv = 0; Object.keys(c.items).forEach(id => { const p = globalInventory.find(x => x.id === id); if(p) serv += (p.price * c.items[id]); });
             let costGoods = deductInv(c.items);
-            const r = { id: 'PAB-Q-'+Date.now(), date: document.getElementById('filter-date').value, time: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit',hour12:false}), courtNum: "Lẻ", customerName: "Khách lẻ vãng lai", timeRange: "Bán lẻ", courtFee: 0, serviceFee: serv, totalBill: serv, profitGoods: serv - costGoods, cashReceived: c.cashUnits, bankReceived: c.bankUnits || 0, rawDetails: { items: c.items }, locked: false, ownerDiscount: 0 };
+            
+            const bankRec = Math.round(parseFloat(document.getElementById('quick-bank').value) || 0);
+            const totalBillRounded = Math.round(serv);
+            const cashRec = Math.max(0, totalBillRounded - bankRec);
+
+            const r = { id: 'PAB-Q-'+Date.now(), date: document.getElementById('filter-date').value, time: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit',hour12:false}), courtNum: "Lẻ", customerName: "Khách lẻ vãng lai", timeRange: "Bán lẻ", courtFee: 0, serviceFee: totalBillRounded, totalBill: totalBillRounded, profitGoods: totalBillRounded - costGoods, cashReceived: cashRec, bankReceived: bankRec, rawDetails: { items: c.items }, locked: false, ownerDiscount: 0 };
             
             window.fbPush('history', r); window.fbSet('inventory', globalInventory); 
             c.items = {}; document.getElementById('quick-bank').value = ""; window.fbSet('courts_draft', courtsData);
@@ -717,9 +729,14 @@
             let finalCourtFee = c.discountType === "fixed" ? fee * 0.85 : fee;
             let serv = 0; if(c.items) { Object.keys(c.items).forEach(id => { const p = globalInventory.find(x => x.id === id); if(p) serv += (p.price * c.items[id]); }); }
             let costGoods = deductInv(c.items);
-            let tot = Math.max(0, finalCourtFee + serv - (c.ownerDiscount || 0));
+            
+            // XUẤT ĐƠN VỚI GIÁ TRỊ LÀM TRÒN TOÀN DIỆN
+            let totRaw = finalCourtFee + serv - (c.ownerDiscount || 0);
+            let tot = Math.max(0, Math.round(totRaw));
+            let bankRec = Math.round(c.bankUnits || 0);
+            let cashRec = Math.max(0, tot - bankRec);
 
-            const r = { id: 'PAB-'+Date.now(), date: fDate, time: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit',hour12:false}), courtNum: currentCourt, customerName: c.customerName || "Khách lẻ", timeRange: `${c.startTime || '00:00'} → ${c.endTime || '00:00'} (${mins} ph)`, courtFee: finalCourtFee, serviceFee: serv, totalBill: tot, profitGoods: serv - costGoods, cashReceived: c.cashUnits, bankReceived: c.bankUnits || 0, rawDetails: JSON.parse(JSON.stringify(c)), locked: false, ownerDiscount: c.ownerDiscount || 0 };
+            const r = { id: 'PAB-'+Date.now(), date: fDate, time: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit',hour12:false}), courtNum: currentCourt, customerName: c.customerName || "Khách lẻ", timeRange: `${c.startTime || '00:00'} → ${c.endTime || '00:00'} (${mins} ph)`, courtFee: Math.round(finalCourtFee), serviceFee: Math.round(serv), totalBill: tot, profitGoods: serv - costGoods, cashReceived: cashRec, bankReceived: bankRec, rawDetails: JSON.parse(JSON.stringify(c)), locked: false, ownerDiscount: c.ownerDiscount || 0 };
             
             window.fbPush('history', r); window.fbSet('inventory', globalInventory); 
             triggerToast("Đã xuất đơn thành công!"); resetCurrentCourt();
@@ -809,7 +826,6 @@
             setTimeout(() => { modal.classList.add('hidden'); }, 200);
         };
 
-        // CHỐT SỔ GỘP THEO NGÀY ĐANG CHỌN BIỆT LẬP TUYỆT ĐỐI
         window.lockAndFreezeRevenue = function() {
             const fDate = document.getElementById('filter-date').value;
             if(!fDate) { alert("⚠️ Vui lòng chọn ngày cần khóa sổ."); return; }
@@ -853,21 +869,22 @@
                     dateRange: fDate.split('-').reverse().slice(0,2).join('/'), 
                     timestamp: Date.now(),
                     freezeTime: new Date().toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'}) + ' ' + new Date().toLocaleDateString('vi-VN'),
-                    courtFrozen: totalCourt, 
-                    serviceFrozen: totalService, 
-                    cashFrozen: totalCash, 
-                    bankFrozen: totalBank, 
-                    expenseFrozen: totalExpense,
-                    netRevenue: (totalCourt + totalService), 
+                    courtFrozen: Math.round(totalCourt), 
+                    serviceFrozen: Math.round(totalService), 
+                    cashFrozen: Math.round(totalCash), 
+                    bankFrozen: Math.round(totalBank), 
+                    expenseFrozen: Math.round(totalExpense),
+                    netRevenue: Math.round(totalCourt + totalService), 
                     itemsFrozen: masterCompiledItems,
-                    monthCashSnapshot: finalCashSnapshot,
-                    monthBankSnapshot: totalBank
+                    monthCashSnapshot: Math.round(finalCashSnapshot),
+                    monthBankSnapshot: Math.round(totalBank)
                 };
 
                 window.fbUpdate('/', updates).then(() => { triggerToast(`Đã chốt sổ gộp ngày thành công!`); });
             }).catch(err => alert("Lỗi hệ thống: " + err));
         }
 
+        // CHỈ RESET KHI ADMIN CHỦ ĐỘNG BẤM, KHÔNG TỰ ĐỘNG CHẠY KHI TẢI CODE
         window.clearAllFreezeLogs = function() {
             if (prompt("🔐 XÁC NHẬN ADMIN: Nhập mật khẩu để XÓA TOÀN BỘ lịch sử chốt sổ:") !== MASTER_PASSWORD) {
                 alert("❌ Mật khẩu sai!"); return;
@@ -886,19 +903,16 @@
             const tbody = document.getElementById('history-tbody'); tbody.innerHTML = "";
             let dayTot = 0, dayCourt = 0, dayService = 0, cash = 0, bank = 0, dayExpense = 0;
             
-            // Khai báo biến gom lũy kế tất cả các ngày chưa chốt
             let globalUnchotedCash = 0;
             let globalUnchotedBank = 0;
             let globalUnchotedExpense = 0;
 
             paymentHistory.forEach((b) => {
-                // TÍNH LŨY KẾ CÁC NGÀY CHƯA CHỐT TOÀN HỆ THỐNG
                 if (!b.locked) {
                     globalUnchotedCash += (b.cashReceived || 0);
                     globalUnchotedBank += (b.bankReceived || 0);
                 }
 
-                // TÍNH ĐỘC LẬP RIÊNG THEO NGÀY ĐANG CHỌN
                 if (b.date === fDate) {
                     dayTot += b.totalBill; dayCourt += (b.courtFee || 0); dayService += (b.serviceFee || 0);
                     cash += b.cashReceived; bank += b.bankReceived;
@@ -920,7 +934,7 @@
 
                     tr.innerHTML = `
                         <td class="p-2.5 text-slate-500">${b.time}</td>
-                        <td class="p-2.5 font-bold ${b.courtNum==='Lẻ'?'text-rose-400':'text-cyan-400'}">${b.courtNum==='Lẻ'?'Bán lẻ':'Sân '+b.courtNum}</td>
+                        <td class="p-2.5 font-bold ${b.courtNum=='Lẻ'?'text-rose-400':'text-cyan-400'}">${b.courtNum=='Lẻ'?'Bán lẻ':'Sân '+b.courtNum}</td>
                         <td class="p-2.5 max-w-[100px] truncate text-white">${b.customerName}</td>
                         <td class="p-2.5 text-slate-400">${b.timeRange}</td>
                         <td class="p-2.5 text-right font-bold text-cyan-400">${formatNum(b.courtFee)}k</td>
@@ -937,35 +951,26 @@
                 }
             });
             
-            // XỬ LÝ CHI PHÍ PHÁT SÌNH
-            expensesData.forEach(e => { 
-                if (e.date === fDate) dayExpense += e.amount; // Chi riêng ngày đang chọn
-                
-                // Gom chi phí chưa chốt dựa trên trạng thái (Khoản chi chưa nằm trong freeze log nào)
-                // Ở đây để tối ưu, ta tính các khoản chi của các ngày có đơn hàng chưa chốt
-                // Hoặc đơn giản là gom chi của các ngày có đơn chưa chốt. 
-                // Tuy nhiên chuẩn nhất: chỉ gom chi của những ngày mà đơn hàng ở trạng thái mở.
-            });
-
-            // Lấy danh sách các ngày chưa chốt từ đơn hàng để lọc tiền chi chưa chốt tương ứng
             let unchotedDates = [...new Set(paymentHistory.filter(b => !b.locked).map(b => b.date))];
-            expensesData.forEach(e => {
-                if (unchotedDates.includes(e.date)) globalUnchotedExpense += e.amount;
+            expensesData.forEach(e => { 
+                if (e.date === fDate) {
+                    dayExpense += e.amount; 
+                }
+                if (unchotedDates.includes(e.date)) {
+                    globalUnchotedExpense += e.amount;
+                }
             });
 
             document.getElementById('expense-list-container').innerHTML = expensesData.filter(e => e.date === fDate).map(e => `<div class="flex justify-between bg-slate-900 p-2 rounded-lg border border-slate-800"><span>• ${e.reason}</span><span class="text-rose-400 font-bold">${e.amount}k</span></div>`).join("") || `<span class="text-slate-600 italic">Không có khoản chi...</span>`;
             
-            // Đổ số liệu biệt lập ngày
             document.getElementById('stat-day-total').innerText = `${formatNum(dayTot)}k`; 
             document.getElementById('stat-day-court').innerText = `${formatNum(dayCourt)}k`; 
             document.getElementById('stat-day-service').innerText = `${formatNum(dayService)}k`; 
             document.getElementById('stat-day-cash').innerText = `${formatNum(cash)}k`; 
             document.getElementById('stat-day-bank').innerText = `${formatNum(bank)}k`; 
 
-            // CÔNG THỨC NGÀY BIỆT LẬP: THU TRONG NGÀY TRỪ CHI TRONG NGÀY
             document.getElementById('stat-day-cash-final').innerText = `${formatNum(cash - dayExpense)}k`;
 
-            // ĐỔ SỐ LIỆU TỔNG LŨY KẾ MẤY NGÀY CHƯA CHỐT (CỦA CẢ THÁNG/CHU KỲ)
             document.getElementById('stat-accumulate-bank-unchoted').innerText = `${formatNum(globalUnchotedBank)}k`;
             document.getElementById('stat-accumulate-cash-unchoted').innerText = `${formatNum(globalUnchotedCash - globalUnchotedExpense)}k`;
         }

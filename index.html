@@ -359,53 +359,49 @@
                                     <th class="p-3 text-right text-cyan-300 bg-cyan-950/40">🔒 Chốt CK</th>
                                     <th class="p-3 text-right text-rose-300 bg-rose-950/40">🔒 Chốt Mặt</th>
                                 </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-content-inventory" class="p-3 block-state-control hidden">
+                    <div class="bg-slate-950/80 p-3 rounded-lg border border-emerald-900/40 mb-3">
+                        <h3 class="text-[10px] font-bold text-emerald-400 uppercase mb-2 flex items-center gap-1.5">➕ THÊM HÀNG MỚI / NHẬP KHO</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-7 gap-2">
+                            <input id="new-prod-id" type="text" placeholder="Mã (vd: revive)" class="col-span-2 md:col-span-1 bg-slate-900 border border-slate-700 rounded-md px-2 py-1.5 text-xs text-white focus:outline-none">
+                            <input id="new-prod-name" type="text" placeholder="Tên sản phẩm" class="col-span-2 md:col-span-2 bg-slate-900 border border-slate-700 rounded-md px-2 py-1.5 text-xs text-white focus:outline-none">
+                            <select id="new-prod-type" class="bg-slate-900 border border-slate-700 rounded-md px-2 py-1.5 text-xs text-white focus:outline-none">
+                                <option value="drinks">Đồ uống / Món ăn</option>
+                                <option value="gear">Phụ kiện thể thao</option>
+                            </select>
+                            <input id="new-prod-qty" type="number" placeholder="Số lượng" class="bg-slate-900 border border-slate-700 rounded-md px-2 py-1.5 text-xs text-white focus:outline-none">
+                            <input id="new-prod-cost" type="number" placeholder="Giá vốn (k)" class="bg-slate-900 border border-slate-700 rounded-md px-2 py-1.5 text-xs text-white focus:outline-none">
+                            <input id="new-prod-price" type="number" placeholder="Giá bán (k)" class="bg-slate-900 border border-slate-700 rounded-md px-2 py-1.5 text-xs text-white focus:outline-none">
+                        </div>
+                        <div class="mt-2 text-right">
+                            <button onclick="addNewProduct()" class="bg-emerald-600 text-white font-bold px-4 py-1.5 rounded-md text-xs shadow-md">Thêm vào kho</button>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto border border-slate-800 rounded-xl">
+                        <table class="w-full text-left text-xs text-slate-300 font-medium">
+                            <thead class="bg-slate-950 text-slate-400 font-bold border-b border-slate-800 uppercase tracking-wider text-[10px]">
+                                <tr>
+                                    <th class="p-3 pl-4 w-1/4">Tên hàng hóa</th>
+                                    <th class="p-3 text-center">Số tồn gốc</th>
+                                    <th class="p-3 text-center">Quy đổi Ống/Quả</th>
+                                    <th class="p-3 text-center">Giá vốn</th>
+                                    <th class="p-3 text-center">Giá bán</th>
+                                    <th class="p-3 text-right text-emerald-400">Chênh lệch</th>
+                                    <th class="p-3 text-center text-rose-400">Xóa</th>
+                                </tr>
                             </thead>
-                            <tbody id="freeze-tbody" class="divide-y divide-slate-800/60 bg-slate-900/10">
-                                <tr><td colspan="11" class="p-4 text-center text-slate-500 italic">Chưa có bản ghi khóa sổ gộp nào được tạo...</td></tr>
-                            </tbody>
+                            <tbody id="inventory-tbody" class="divide-y divide-slate-800/60 bg-slate-900/40"></tbody>
                         </table>
                     </div>
                 </div>
             </div>
-
-            <div id="tab-content-inventory" class="p-3 block-state-control hidden">
-                <div class="bg-slate-950/80 p-3 rounded-lg border border-emerald-900/40 mb-3">
-                    <h3 class="text-[10px] font-bold text-emerald-400 uppercase mb-2 flex items-center gap-1.5">➕ THÊM HÀNG MỚI / NHẬP KHO</h3>
-                    <div class="grid grid-cols-2 md:grid-cols-7 gap-2">
-                        <input id="new-prod-id" type="text" placeholder="Mã (vd: revive)" class="col-span-2 md:col-span-1 bg-slate-900 border border-slate-700 rounded-md px-2 py-1.5 text-xs text-white focus:outline-none">
-                        <input id="new-prod-name" type="text" placeholder="Tên sản phẩm" class="col-span-2 md:col-span-2 bg-slate-900 border border-slate-700 rounded-md px-2 py-1.5 text-xs text-white focus:outline-none">
-                        <select id="new-prod-type" class="bg-slate-900 border border-slate-700 rounded-md px-2 py-1.5 text-xs text-white focus:outline-none">
-                            <option value="drinks">Đồ uống / Món ăn</option>
-                            <option value="gear">Phụ kiện thể thao</option>
-                        </select>
-                        <input id="new-prod-qty" type="number" placeholder="Số lượng" class="bg-slate-900 border border-slate-700 rounded-md px-2 py-1.5 text-xs text-white focus:outline-none">
-                        <input id="new-prod-cost" type="number" placeholder="Giá vốn (k)" class="bg-slate-900 border border-slate-700 rounded-md px-2 py-1.5 text-xs text-white focus:outline-none">
-                        <input id="new-prod-price" type="number" placeholder="Giá bán (k)" class="bg-slate-900 border border-slate-700 rounded-md px-2 py-1.5 text-xs text-white focus:outline-none">
-                    </div>
-                    <div class="mt-2 text-right">
-                        <button onclick="addNewProduct()" class="bg-emerald-600 text-white font-bold px-4 py-1.5 rounded-md text-xs shadow-md">Thêm vào kho</button>
-                    </div>
-                </div>
-
-                <div class="overflow-x-auto border border-slate-800 rounded-xl">
-                    <table class="w-full text-left text-xs text-slate-300 font-medium">
-                        <thead class="bg-slate-950 text-slate-400 font-bold border-b border-slate-800 uppercase tracking-wider text-[10px]">
-                            <tr>
-                                <th class="p-3 pl-4 w-1/4">Tên hàng hóa</th>
-                                <th class="p-3 text-center">Số tồn gốc</th>
-                                <th class="p-3 text-center">Quy đổi Ống/Quả</th>
-                                <th class="p-3 text-center">Giá vốn</th>
-                                <th class="p-3 text-center">Giá bán</th>
-                                <th class="p-3 text-right text-emerald-400">Chênh lệch</th>
-                                <th class="p-3 text-center text-rose-400">Xóa</th>
-                            </tr>
-                        </thead>
-                        <tbody id="inventory-tbody" class="divide-y divide-slate-800/60 bg-slate-900/40"></tbody>
-                    </table>
-                </div>
-            </div>
         </div>
-    </div>
 
     <script>
         const MASTER_PASSWORD = "PhucAn2026$";
@@ -660,7 +656,6 @@
             c.ownerDiscount = Math.round(parseFloat(document.getElementById('owner-discount').value) || 0);
             c.bankUnits = Math.round(parseFloat(document.getElementById('bank-units').value) || 0);
 
-            // LOGIC LÀM TRÒN SỐ CHẴN CHUẨN ĐÚNG THEO KHÁCH YÊU CẦU
             let grandTotalRaw = finalCourtFee + dFee + gFee - c.ownerDiscount;
             let grandTotal = Math.max(0, Math.round(grandTotalRaw));
             
@@ -730,7 +725,6 @@
             let serv = 0; if(c.items) { Object.keys(c.items).forEach(id => { const p = globalInventory.find(x => x.id === id); if(p) serv += (p.price * c.items[id]); }); }
             let costGoods = deductInv(c.items);
             
-            // XUẤT ĐƠN VỚI GIÁ TRỊ LÀM TRÒN TOÀN DIỆN
             let totRaw = finalCourtFee + serv - (c.ownerDiscount || 0);
             let tot = Math.max(0, Math.round(totRaw));
             let bankRec = Math.round(c.bankUnits || 0);
@@ -826,11 +820,12 @@
             setTimeout(() => { modal.classList.add('hidden'); }, 200);
         };
 
+        // CHỈNH SỬA LOGIC KHÓA SỔ: TỰ ĐỘNG TỔNG KẾT TẤT CẢ LỆNH ĐANG MỞ KỂ TỪ NGÀY ĐƯỢC CHỌN TRỞ ĐI
         window.lockAndFreezeRevenue = function() {
             const fDate = document.getElementById('filter-date').value;
             if(!fDate) { alert("⚠️ Vui lòng chọn ngày cần khóa sổ."); return; }
             
-            const confirmPass = prompt(`⚠️ LỆNH KHÓA SỔ GỘP GIAI ĐOẠN (NGÀY ${fDate.split('-').reverse().join('/')}):\nHệ thống sẽ đóng băng toàn bộ đơn hàng và khoản chi của ngày này để đồng bộ.\nNhập mật khẩu Admin:`);
+            const confirmPass = prompt(`⚠️ LỆNH KHÓA SỔ GỘP GIAI ĐOẠN KỂ TỪ NGÀY ${fDate.split('-').reverse().join('/')}:\nHệ thống sẽ đóng băng TOÀN BỘ đơn hàng và khoản chi ĐANG MỞ từ ngày này trở về sau để đồng bộ.\nNhập mật khẩu Admin:`);
             if (confirmPass !== MASTER_PASSWORD) { alert("⚠️ Mật khẩu quản trị không chính xác!"); return; }
 
             window.fbOnce('history').then((snapshot) => {
@@ -841,8 +836,9 @@
                 let totalCourt = 0, totalService = 0, totalCash = 0, totalBank = 0, totalExpense = 0;
                 let masterCompiledItems = {};
 
+                // Duyệt qua tất cả đơn hàng, kiểm tra đơn nào có ngày lớn hơn hoặc bằng ngày chốt và đang mở (locked != true)
                 Object.keys(snap).forEach(k => {
-                    if (snap[k].date === fDate && !snap[k].locked) {
+                    if (snap[k].date >= fDate && !snap[k].locked) {
                         updates[`history/${k}/locked`] = true; countUnchoted++;
                         totalCourt += (snap[k].courtFee || 0); totalService += (snap[k].serviceFee || 0);
                         totalCash += (snap[k].cashReceived || 0); totalBank += (snap[k].bankReceived || 0);
@@ -856,17 +852,22 @@
                     }
                 });
 
+                // Tổng kết tất cả các khoản chi kể từ ngày được chọn trở đi
                 expensesData.forEach(e => { 
-                    if (e.date === fDate) totalExpense += (e.amount || 0); 
+                    if (e.date >= fDate) totalExpense += (e.amount || 0); 
                 });
                 
-                if (countUnchoted === 0) { alert("Ngày này không có đơn hàng nào mở hoặc đã được chốt hết trước đó!"); return; }
+                if (countUnchoted === 0) { alert("Không có đơn hàng nào đang mở kể từ ngày được chọn!"); return; }
 
                 let finalCashSnapshot = totalCash - totalExpense;
                 const logId = 'BATCH_' + Date.now();
+                
+                // Hiển thị định dạng khoảng ngày trên bảng khóa sổ (Ví dụ: 01/07+)
+                let displayDateRange = fDate.split('-').reverse().slice(0,2).join('/') + ' → Nay';
+
                 updates[`freeze_log/${logId}`] = {
                     id: logId, 
-                    dateRange: fDate.split('-').reverse().slice(0,2).join('/'), 
+                    dateRange: displayDateRange, 
                     timestamp: Date.now(),
                     freezeTime: new Date().toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'}) + ' ' + new Date().toLocaleDateString('vi-VN'),
                     courtFrozen: Math.round(totalCourt), 
@@ -880,11 +881,10 @@
                     monthBankSnapshot: Math.round(totalBank)
                 };
 
-                window.fbUpdate('/', updates).then(() => { triggerToast(`Đã chốt sổ gộp ngày thành công!`); });
+                window.fbUpdate('/', updates).then(() => { triggerToast(`Đã khóa sổ toàn bộ đơn mở kể từ ngày chốt!`); });
             }).catch(err => alert("Lỗi hệ thống: " + err));
         }
 
-        // CHỈ RESET KHI ADMIN CHỦ ĐỘNG BẤM, KHÔNG TỰ ĐỘNG CHẠY KHI TẢI CODE
         window.clearAllFreezeLogs = function() {
             if (prompt("🔐 XÁC NHẬN ADMIN: Nhập mật khẩu để XÓA TOÀN BỘ lịch sử chốt sổ:") !== MASTER_PASSWORD) {
                 alert("❌ Mật khẩu sai!"); return;

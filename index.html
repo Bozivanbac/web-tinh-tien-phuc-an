@@ -94,6 +94,7 @@
         <span id="toast-msg">Thành công!</span>
     </div>
 
+    <!-- MODAL XEM CHI TIẾT ĐƠN HÀNG LẺ -->
     <div id="invoice-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-200">
         <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-200">
             <div class="bg-slate-950 px-4 py-3 border-b border-slate-800 flex justify-between items-center">
@@ -103,6 +104,23 @@
             <div class="p-4 space-y-3 text-xs" id="invoice-modal-body"></div>
             <div class="bg-slate-950 px-4 py-2.5 border-t border-slate-800 text-right">
                 <button onclick="closeInvoiceModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-4 py-1.5 rounded-lg transition">Đóng lại</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL XEM CHI TIẾT TỪNG NGÀY TRONG ĐỢT KHÓA SỔ -->
+    <div id="freeze-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-200">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-3xl rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-200">
+            <div class="bg-slate-950 px-4 py-3 border-b border-slate-800 flex justify-between items-center">
+                <h3 class="text-xs font-black tracking-wider text-emerald-400 uppercase flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16.01H9"></path></svg>
+                    📋 CHI TIẾT DOANH THU & THU CHI THEO TỪNG NGÀY TRONG ĐỢT CHỐT
+                </h3>
+                <button onclick="closeFreezeModal()" class="text-slate-400 hover:text-white font-bold text-base">&times;</button>
+            </div>
+            <div class="p-4 space-y-3 text-xs max-h-[70vh] overflow-y-auto" id="freeze-modal-body"></div>
+            <div class="bg-slate-950 px-4 py-2.5 border-t border-slate-800 text-right">
+                <button onclick="closeFreezeModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-4 py-1.5 rounded-lg transition">Đóng lại</button>
             </div>
         </div>
     </div>
@@ -341,7 +359,7 @@
             <div id="tab-content-freeze" class="p-3 space-y-4 block-state-control hidden">
                 <div class="bg-slate-950/40 border border-slate-800 p-3 rounded-xl">
                     <div class="flex justify-between items-center mb-3 border-b border-slate-800 pb-2">
-                        <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-400">📜 NHẬT KÝ CHI TIẾT CÁC LẦN KHÓA SỔ GOM ĐỒNG BỘ ĐÚNG 1 DÒNG</span>
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-400">📜 NHẬT KÝ CHI TIẾT CÁC LẦN KHÓA SỔ GOM ĐỒNG BỘ ĐÚNG 1 DÒNG (Bấm vào dòng để xem chi tiết từng ngày)</span>
                         <button onclick="clearAllFreezeLogs()" class="text-[10px] bg-red-950 text-red-400 font-bold px-2 py-1 rounded border border-red-900/40 hover:bg-red-900 hover:text-white transition">⚙ LÀM LẠI HẾT LỊCH SỬ CHỐT SỔ</button>
                     </div>
                     <div class="overflow-x-auto border border-slate-800 rounded-xl">
@@ -487,7 +505,6 @@
                 renderHistory(); if(freezeHistory.length > 0) renderFreezeTable();
             });
 
-            // ĐỒNG BỘ THÊM ID KHÓA CHO KHOẢN CHI
             window.fbListen('expenses', (data) => { 
                 expensesData = data ? Object.keys(data).map(key => ({ ...data[key], _fbKey: key })) : []; 
                 renderHistory(); 
@@ -691,7 +708,6 @@
             return cost;
         }
 
-        // FIX LỖI KHÁCH LẺ DÍNH TIỀN CK ĐƠN SAU
         function checkoutQuickSale() {
             const c = courtsData['quick']; if (!c || !c.items || Object.keys(c.items).length === 0) return;
             let serv = 0; Object.keys(c.items).forEach(id => { const p = globalInventory.find(x => x.id === id); if(p) serv += (p.price * c.items[id]); });
@@ -701,11 +717,10 @@
             const totalBillRounded = Math.round(serv);
             const cashRec = Math.max(0, totalBillRounded - bankRec);
 
-            const r = { id: 'PAB-Q-'+Date.now(), date: document.getElementById('filter-date').value, time: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit',hour12:false}), courtNum: "Lẻ", customerName: "Khách lẻ vãng lai", timeRange: "Bán lẻ", courtFee: 0, serviceFee: totalBillRounded, totalBill: totalBillRounded, profitGoods: totalBillRounded - costGoods, cashReceived: cashRec, bankReceived: bankRec, rawDetails: { items: c.items }, locked: false, ownerDiscount: 0 };
+            const r = r = { id: 'PAB-Q-'+Date.now(), date: document.getElementById('filter-date').value, time: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit',hour12:false}), courtNum: "Lẻ", customerName: "Khách lẻ vãng lai", timeRange: "Bán lẻ", courtFee: 0, serviceFee: totalBillRounded, totalBill: totalBillRounded, profitGoods: totalBillRounded - costGoods, cashReceived: cashRec, bankReceived: bankRec, rawDetails: { items: c.items }, locked: false, ownerDiscount: 0 };
             
             window.fbPush('history', r); window.fbSet('inventory', globalInventory); 
             
-            // Xóa sạch giỏ hàng + Tiền CK trên cloud để không dính sang bill tiếp theo
             c.items = {}; 
             c.bankUnits = 0;
             c.cashUnits = 0;
@@ -847,7 +862,124 @@
             setTimeout(() => { modal.classList.add('hidden'); }, 200);
         };
 
-        // FIX CHUẨN KÈM ĐÓNG BĂNG KHOẢN CHI ĐỂ TRÁNH TRỪ TRÙNG LẶP TIỀN MẶT KHI KHÓA SỔ GỘP
+        // KÍCH HOẠT VÀ HIỂN THỊ CHI TIẾT TỪNG NGÀY TRONG ĐỢT CHỐT SỔ (TRANSPARENT BREAKDOWN)
+        window.openFreezeDetails = function(batchId) {
+            const targetBatch = freezeHistory.find(x => x.id === batchId);
+            if (!targetBatch) return;
+
+            // Xác định điều kiện lọc đơn hàng thuộc đợt chốt này
+            let matchedBills = [];
+            let matchedExpenses = [];
+
+            // Thuật toán quét ngược thông minh bảo toàn dữ liệu cũ/mới
+            if (targetBatch.maxDate) {
+                // Đối với dữ liệu mới đã có nhãn stamp
+                matchedBills = paymentHistory.filter(b => b.batchId === batchId);
+                matchedExpenses = expensesData.filter(e => e.batchId === batchId);
+                
+                // Dự phòng trường hợp dữ liệu cũ chưa đóng nhãn stamp lúc chốt: sử dụng bounds ngày
+                if (matchedBills.length === 0) {
+                    const sortedBatches = [...freezeHistory].sort((a,b) => a.timestamp - b.timestamp);
+                    const idx = sortedBatches.findIndex(x => x.id === batchId);
+                    const prevMaxDate = idx > 0 ? sortedBatches[idx-1].maxDate : null;
+                    
+                    matchedBills = paymentHistory.filter(b => b.locked && b.date <= targetBatch.maxDate && (!prevMaxDate || b.date > prevMaxDate));
+                    matchedExpenses = expensesData.filter(e => e.locked && e.date <= targetBatch.maxDate && (!prevMaxDate || e.date > prevMaxDate));
+                }
+            } else {
+                // Fallback dữ liệu cũ sơ khai nhất
+                matchedBills = paymentHistory.filter(b => b.locked && b.date <= '2026-07-01');
+                matchedExpenses = expensesData.filter(e => e.locked && e.date <= '2026-07-01');
+            }
+
+            // Gom nhóm báo cáo theo ngày cụ thể
+            let dailyReport = {};
+            matchedBills.forEach(b => {
+                if (!dailyReport[b.date]) dailyReport[b.date] = { date: b.date, court: 0, service: 0, cash: 0, bank: 0, exp: 0, billCount: 0 };
+                dailyReport[b.date].court += (b.courtFee || 0);
+                dailyReport[b.date].service += (b.serviceFee || 0);
+                dailyReport[b.date].cash += (b.cashReceived || 0);
+                dailyReport[b.date].bank += (b.bankReceived || 0);
+                dailyReport[b.date].billCount++;
+            });
+
+            matchedExpenses.forEach(e => {
+                if (!dailyReport[e.date]) dailyReport[e.date] = { date: e.date, court: 0, service: 0, cash: 0, bank: 0, exp: 0, billCount: 0 };
+                dailyReport[e.date].exp += (e.amount || 0);
+            });
+
+            // Sắp xếp ngày mới nhất lên đầu bảng chi tiết
+            const sortedReportDays = Object.values(dailyReport).sort((a,b) => b.date.localeCompare(a.date));
+
+            let html = `
+                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-slate-400 leading-relaxed mb-2">
+                    Mốc giai đoạn chốt sổ gộp: <strong class="text-emerald-400">${targetBatch.dateRange}</strong><br>
+                    Thời gian bấm chốt đồng bộ: <span class="text-white">${targetBatch.freezeTime}</span>
+                </div>
+                <div class="overflow-x-auto border border-slate-800 rounded-xl bg-slate-950">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-900 text-[10px] font-black text-slate-400 border-b border-slate-800 uppercase tracking-widest">
+                            <tr>
+                                <th class="p-3">Ngày</th>
+                                <th class="p-3 text-center">Số đơn</th>
+                                <th class="p-3 text-right text-cyan-400">🏟️ Tiền Sân</th>
+                                <th class="p-3 text-right text-amber-400">🥤 Tiền Dịch Vụ</th>
+                                <th class="p-3 text-right text-rose-400">💵 Tiền Mặt</th>
+                                <th class="p-3 text-right text-cyan-400">💳 Chuyển Khoản</th>
+                                <th class="p-3 text-right text-orange-400">💸 Khoản Chi</th>
+                                <th class="p-3 text-right text-emerald-400 font-extrabold">💰 Tổng Thu</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800/60 font-semibold text-slate-300">
+            `;
+
+            sortedReportDays.forEach(day => {
+                let displayDate = day.date.split('-').reverse().join('/');
+                let dayNetTotal = day.court + day.service;
+                html += `
+                    <tr class="hover:bg-slate-900/60 transition">
+                        <td class="p-3 font-bold text-white">${displayDate}</td>
+                        <td class="p-3 text-center text-slate-500">${day.billCount} đơn</td>
+                        <td class="p-3 text-right text-cyan-400">${formatNum(day.court)}k</td>
+                        <td class="p-3 text-right text-amber-400">${formatNum(day.service)}k</td>
+                        <td class="p-3 text-right text-rose-400">${formatNum(day.cash)}k</td>
+                        <td class="p-3 text-right text-cyan-400">${formatNum(day.bank)}k</td>
+                        <td class="p-3 text-right text-orange-400">-${formatNum(day.exp)}k</td>
+                        <td class="p-3 text-right text-emerald-400 font-bold bg-slate-900/30">${formatNum(dayNetTotal)}k</td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                        </tbody>
+                        <tfoot class="bg-slate-900/80 border-t border-slate-800 text-[11px] font-black text-white">
+                            <tr>
+                                <td class="p-3">TỔNG GỘP</td>
+                                <td class="p-3 text-center">-</td>
+                                <td class="p-3 text-right text-cyan-400">${formatNum(targetBatch.courtFrozen)}k</td>
+                                <td class="p-3 text-right text-amber-400">${formatNum(targetBatch.serviceFrozen)}k</td>
+                                <td class="p-3 text-right text-rose-400">${formatNum(targetBatch.cashFrozen)}k</td>
+                                <td class="p-3 text-right text-cyan-400">${formatNum(targetBatch.bankFrozen)}k</td>
+                                <td class="p-3 text-right text-orange-400">-${formatNum(targetBatch.expenseFrozen)}k</td>
+                                <td class="p-3 text-right text-emerald-400 font-black bg-slate-950">${formatNum(targetBatch.netRevenue)}k</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            `;
+
+            document.getElementById('freeze-modal-body').innerHTML = html;
+            const modal = document.getElementById('freeze-modal');
+            modal.classList.remove('hidden');
+            setTimeout(() => { modal.classList.remove('opacity-0'); modal.querySelector('.transform').classList.remove('scale-95'); }, 10);
+        }
+
+        window.closeFreezeModal = function() {
+            const modal = document.getElementById('freeze-modal');
+            modal.classList.add('opacity-0'); modal.querySelector('.transform').classList.add('scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); }, 200);
+        };
+
         window.lockAndFreezeRevenue = function() {
             const fDate = document.getElementById('filter-date').value;
             if(!fDate) { alert("⚠️ Vui lòng chọn ngày mốc cần khóa sổ."); return; }
@@ -862,10 +994,13 @@
                 let updates = {}; let countUnchoted = 0;
                 let totalCourt = 0, totalService = 0, totalCash = 0, totalBank = 0, totalExpense = 0;
                 let masterCompiledItems = {};
+                const logId = 'BATCH_' + Date.now();
 
                 Object.keys(snap).forEach(k => {
                     if (snap[k].date <= fDate && !snap[k].locked) {
-                        updates[`history/${k}/locked`] = true; countUnchoted++;
+                        updates[`history/${k}/locked`] = true; 
+                        updates[`history/${k}/batchId`] = logId; // Đóng nhãn stamp kết nối minh bạch
+                        countUnchoted++;
                         totalCourt += (snap[k].courtFee || 0); totalService += (snap[k].serviceFee || 0);
                         totalCash += (snap[k].cashReceived || 0); totalBank += (snap[k].bankReceived || 0);
 
@@ -878,10 +1013,10 @@
                     }
                 });
 
-                // CẬP NHẬT: Khóa luôn cả chi phí chưa khóa để lần sau không bị trừ lặp lại vào tiền mặt
                 expensesData.forEach(e => { 
                     if (e.date <= fDate && !e.locked) {
                         updates[`expenses/${e._fbKey}/locked`] = true;
+                        updates[`expenses/${e._fbKey}/batchId`] = logId; // Đóng nhãn stamp khoản chi
                         totalExpense += (e.amount || 0); 
                     }
                 });
@@ -889,12 +1024,12 @@
                 if (countUnchoted === 0 && totalExpense === 0) { alert("Không có đơn hàng hoặc khoản chi nào đang mở từ ngày chọn trở về trước!"); return; }
 
                 let finalCashSnapshot = totalCash - totalExpense;
-                const logId = 'BATCH_' + Date.now();
                 let displayDateRange = '← Đến ' + fDate.split('-').reverse().slice(0,2).join('/');
 
                 updates[`freeze_log/${logId}`] = {
                     id: logId, 
                     dateRange: displayDateRange, 
+                    maxDate: fDate, // Lưu mốc ngày để bóc tách minh bạch
                     timestamp: Date.now(),
                     freezeTime: new Date().toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'}) + ' ' + new Date().toLocaleDateString('vi-VN'),
                     courtFrozen: Math.round(totalCourt), 
@@ -920,14 +1055,13 @@
                 const snap = histSnap.val();
                 const esnap = expSnap.val();
                 let updates = {};
-                if(snap) { Object.keys(snap).forEach(k => { updates[`history/${k}/locked`] = false; }); } 
-                if(esnap) { Object.keys(esnap).forEach(k => { updates[`expenses/${k}/locked`] = false; }); } 
+                if(snap) { Object.keys(snap).forEach(k => { updates[`history/${k}/locked`] = false; updates[`history/${k}/batchId`] = null; }); } 
+                if(esnap) { Object.keys(esnap).forEach(k => { updates[`expenses/${k}/locked`] = false; updates[`expenses/${k}/batchId`] = null; }); } 
                 updates['freeze_log'] = null; 
                 window.fbUpdate('/', updates).then(() => { triggerToast("Đã reset lịch sử chốt sổ!"); });
             });
         }
 
-        // TÍNH NĂNG BÍ MẬT: BẤM 5 LẦN VÀ O DÒNG VERSION TRÊN HEADER ĐỂ KHÔI PHỤC ĐƠN TỪ NGÀY CHỌN ĐẾN HIỆN TẠI
         let secretClicks = 0;
         let secretTimer;
         window.triggerSecretUnlock = function() {
@@ -952,6 +1086,7 @@
                         Object.keys(snap).forEach(k => {
                             if (snap[k].date >= dateStr && snap[k].locked) {
                                 updates[`history/${k}/locked`] = false;
+                                updates[`history/${k}/batchId`] = null;
                                 count++;
                             }
                         });
@@ -960,6 +1095,7 @@
                         Object.keys(esnap).forEach(k => {
                             if (esnap[k].date >= dateStr && esnap[k].locked) {
                                 updates[`expenses/${k}/locked`] = false;
+                                updates[`expenses/${k}/batchId`] = null;
                             }
                         });
                     }
@@ -1066,8 +1202,9 @@
                     });
                 }
 
+                // tr bổ sung class cursor-pointer và onclick để xem danh sách chi tiết minh bạch của đợt chốt đó
                 return `
-                    <tr class="border-b border-slate-800/60 bg-slate-950/20 hover:bg-slate-900/40 text-[11px] font-semibold transition">
+                    <tr onclick="openFreezeDetails('${f.id}')" class="border-b border-slate-800/60 bg-slate-950/20 hover:bg-slate-900/40 text-[11px] font-semibold transition cursor-pointer">
                         <td class="p-3 text-emerald-400 font-extrabold text-xs">${f.dateRange}</td>
                         <td class="p-3 text-slate-400">${f.freezeTime}</td>
                         <td class="p-3 text-right text-cyan-400 font-bold">${formatNum(f.courtFrozen)}k</td>
@@ -1105,7 +1242,7 @@
                     time: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit',hour12:false}), 
                     reason: r, 
                     amount: a,
-                    locked: false // Mặc định chi phí mới tạo ở trạng thái Mở
+                    locked: false 
                 }).then(() => {
                     document.getElementById('exp-add-reason').value=""; 
                     document.getElementById('exp-add-amount').value="";

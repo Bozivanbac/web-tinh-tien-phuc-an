@@ -487,7 +487,11 @@
                 renderHistory(); if(freezeHistory.length > 0) renderFreezeTable();
             });
 
-            window.fbListen('expenses', (data) => { expensesData = data ? Object.values(data) : []; renderHistory(); });
+            // ĐỒNG BỘ THÊM ID KHÓA CHO KHOẢN CHI
+            window.fbListen('expenses', (data) => { 
+                expensesData = data ? Object.keys(data).map(key => ({ ...data[key], _fbKey: key })) : []; 
+                renderHistory(); 
+            });
 
             window.fbListen('freeze_log', (data) => {
                 freezeHistory = data ? Object.values(data).sort((a,b) => b.timestamp - a.timestamp) : [];
@@ -687,6 +691,7 @@
             return cost;
         }
 
+        // FIX LỖI KHÁCH LẺ DÍNH TIỀN CK ĐƠN SAU
         function checkoutQuickSale() {
             const c = courtsData['quick']; if (!c || !c.items || Object.keys(c.items).length === 0) return;
             let serv = 0; Object.keys(c.items).forEach(id => { const p = globalInventory.find(x => x.id === id); if(p) serv += (p.price * c.items[id]); });
@@ -699,7 +704,14 @@
             const r = { id: 'PAB-Q-'+Date.now(), date: document.getElementById('filter-date').value, time: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit',hour12:false}), courtNum: "Lẻ", customerName: "Khách lẻ vãng lai", timeRange: "Bán lẻ", courtFee: 0, serviceFee: totalBillRounded, totalBill: totalBillRounded, profitGoods: totalBillRounded - costGoods, cashReceived: cashRec, bankReceived: bankRec, rawDetails: { items: c.items }, locked: false, ownerDiscount: 0 };
             
             window.fbPush('history', r); window.fbSet('inventory', globalInventory); 
-            c.items = {}; document.getElementById('quick-bank').value = ""; window.fbSet('courts_draft', courtsData);
+            
+            // Xóa sạch giỏ hàng + Tiền CK trên cloud để không dính sang bill tiếp theo
+            c.items = {}; 
+            c.bankUnits = 0;
+            c.cashUnits = 0;
+            document.getElementById('quick-bank').value = ""; 
+            window.fbSet('courts_draft', courtsData);
+            calculateAll();
             triggerToast("Đã chốt bán lẻ!");
         }
 
@@ -750,7 +762,17 @@
             } 
             window.fbSet('courts_draft', courtsData);
         }
-        function resetQuickSaleCart() { if(courtsData['quick']) courtsData['quick'].items = {}; document.getElementById('quick-bank').value=""; window.fbSet('courts_draft', courtsData); }
+        
+        function resetQuickSaleCart() { 
+            if(courtsData['quick']) {
+                courtsData['quick'].items = {}; 
+                courtsData['quick'].bankUnits = 0;
+                courtsData['quick'].cashUnits = 0;
+            } 
+            document.getElementById('quick-bank').value=""; 
+            window.fbSet('courts_draft', courtsData); 
+            calculateAll();
+        }
 
         function switchTab(t) {
             const fontCyan = "py-1 text-xs font-bold border-b-2 border-cyan-400 text-cyan-400 transition";
@@ -825,7 +847,7 @@
             setTimeout(() => { modal.classList.add('hidden'); }, 200);
         };
 
-        // CHỈNH SỬA CHUẨN: KHÓA SỔ TỪ NGÀY CHỌN TRỞ VỀ TRƯỚC (<= fDate)
+        // FIX CHUẨN KÈM ĐÓNG BĂNG KHOẢN CHI ĐỂ TRÁNH TRỪ TRÙNG LẶP TIỀN MẶT KHI KHÓA SỔ GỘP
         window.lockAndFreezeRevenue = function() {
             const fDate = document.getElementById('filter-date').value;
             if(!fDate) { alert("⚠️ Vui lòng chọn ngày mốc cần khóa sổ."); return; }
@@ -842,7 +864,6 @@
                 let masterCompiledItems = {};
 
                 Object.keys(snap).forEach(k => {
-                    // Logic lọc chính xác: Chỉ chốt những đơn có ngày nhỏ hơn hoặc bằng ngày được chọn
                     if (snap[k].date <= fDate && !snap[k].locked) {
                         updates[`history/${k}/locked`] = true; countUnchoted++;
                         totalCourt += (snap[k].courtFee || 0); totalService += (snap[k].serviceFee || 0);
@@ -857,12 +878,15 @@
                     }
                 });
 
-                // Lọc chi phí từ ngày chọn trở về trước
+                // CẬP NHẬT: Khóa luôn cả chi phí chưa khóa để lần sau không bị trừ lặp lại vào tiền mặt
                 expensesData.forEach(e => { 
-                    if (e.date <= fDate) totalExpense += (e.amount || 0); 
+                    if (e.date <= fDate && !e.locked) {
+                        updates[`expenses/${e._fbKey}/locked`] = true;
+                        totalExpense += (e.amount || 0); 
+                    }
                 });
                 
-                if (countUnchoted === 0) { alert("Không có đơn hàng nào đang mở thuộc giai đoạn từ ngày chọn trở về trước!"); return; }
+                if (countUnchoted === 0 && totalExpense === 0) { alert("Không có đơn hàng hoặc khoản chi nào đang mở từ ngày chọn trở về trước!"); return; }
 
                 let finalCashSnapshot = totalCash - totalExpense;
                 const logId = 'BATCH_' + Date.now();
@@ -892,15 +916,18 @@
             if (prompt("🔐 XÁC NHẬN ADMIN: Nhập mật khẩu để XÓA TOÀN BỘ lịch sử chốt sổ:") !== MASTER_PASSWORD) {
                 alert("❌ Mật khẩu sai!"); return;
             }
-            window.fbOnce('history').then((snapshot) => {
-                const snap = snapshot.val(); let updates = {};
+            Promise.all([window.fbOnce('history'), window.fbOnce('expenses')]).then(([histSnap, expSnap]) => {
+                const snap = histSnap.val();
+                const esnap = expSnap.val();
+                let updates = {};
                 if(snap) { Object.keys(snap).forEach(k => { updates[`history/${k}/locked`] = false; }); } 
+                if(esnap) { Object.keys(esnap).forEach(k => { updates[`expenses/${k}/locked`] = false; }); } 
                 updates['freeze_log'] = null; 
                 window.fbUpdate('/', updates).then(() => { triggerToast("Đã reset lịch sử chốt sổ!"); });
             });
         }
 
-        // TÍNH NĂNG BÍ MẬT: BẤM 5 LẦN VÀO DÒNG VERSION TRÊN HEADER ĐỂ KHÔI PHỤC ĐƠN TỪ NGÀY CHỌN ĐẾN HIỆN TẠI
+        // TÍNH NĂNG BÍ MẬT: BẤM 5 LẦN VÀ O DÒNG VERSION TRÊN HEADER ĐỂ KHÔI PHỤC ĐƠN TỪ NGÀY CHỌN ĐẾN HIỆN TẠI
         let secretClicks = 0;
         let secretTimer;
         window.triggerSecretUnlock = function() {
@@ -916,16 +943,23 @@
                 const dateStr = prompt("Nhập ngày bắt đầu muốn XẢ KHÓA ĐƠN HÀNG (Định dạng đúng: YYYY-MM-DD):");
                 if (!dateStr) return;
                 
-                window.fbOnce('history').then((snapshot) => {
-                    const snap = snapshot.val();
+                Promise.all([window.fbOnce('history'), window.fbOnce('expenses')]).then(([histSnap, expSnap]) => {
+                    const snap = histSnap.val();
+                    const esnap = expSnap.val();
                     let updates = {};
                     let count = 0;
                     if(snap) {
                         Object.keys(snap).forEach(k => {
-                            // Mở khóa từ ngày được chọn kéo dài cho đến nay (>= dateStr)
                             if (snap[k].date >= dateStr && snap[k].locked) {
                                 updates[`history/${k}/locked`] = false;
                                 count++;
+                            }
+                        });
+                    }
+                    if(esnap) {
+                        Object.keys(esnap).forEach(k => {
+                            if (esnap[k].date >= dateStr && esnap[k].locked) {
+                                updates[`expenses/${k}/locked`] = false;
                             }
                         });
                     }
@@ -994,12 +1028,11 @@
                 }
             });
             
-            let unchotedDates = [...new Set(paymentHistory.filter(b => !b.locked).map(b => b.date))];
             expensesData.forEach(e => { 
                 if (e.date === fDate) {
                     dayExpense += e.amount; 
                 }
-                if (unchotedDates.includes(e.date)) {
+                if (!e.locked) {
                     globalUnchotedExpense += e.amount;
                 }
             });
@@ -1071,7 +1104,8 @@
                     date: document.getElementById('filter-date').value, 
                     time: new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit',hour12:false}), 
                     reason: r, 
-                    amount: a 
+                    amount: a,
+                    locked: false // Mặc định chi phí mới tạo ở trạng thái Mở
                 }).then(() => {
                     document.getElementById('exp-add-reason').value=""; 
                     document.getElementById('exp-add-amount').value="";

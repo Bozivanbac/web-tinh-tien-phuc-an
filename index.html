@@ -76,6 +76,7 @@
                 </div>
                 <div>
                     <h1 class="text-base font-black tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500">PHÚC AN BADMINTON</h1>
+                    <!-- KÍCH HOẠT ẨN: Bấm liên tục 5 lần vào dòng chữ version bên dưới để mở lại sổ -->
                     <p onclick="triggerSecretUnlock()" class="text-[10px] text-cyan-400 font-bold uppercase tracking-widest cursor-default select-none">Mobile Premium Cloud POS v4.9.7</p>
                 </div>
             </div>
@@ -824,11 +825,12 @@
             setTimeout(() => { modal.classList.add('hidden'); }, 200);
         };
 
+        // CHỈNH SỬA CHUẨN: KHÓA SỔ TỪ NGÀY CHỌN TRỞ VỀ TRƯỚC (<= fDate)
         window.lockAndFreezeRevenue = function() {
             const fDate = document.getElementById('filter-date').value;
-            if(!fDate) { alert("⚠️ Vui lòng chọn ngày cần khóa sổ."); return; }
+            if(!fDate) { alert("⚠️ Vui lòng chọn ngày mốc cần khóa sổ."); return; }
             
-            const confirmPass = prompt(`⚠️ LỆNH KHÓA SỔ GỘP GIAI ĐOẠN KỂ TỪ NGÀY ${fDate.split('-').reverse().join('/')}:\nHệ thống sẽ đóng băng TOÀN BỘ đơn hàng và khoản chi ĐANG MỞ từ ngày này trở về sau để đồng bộ.\nNhập mật khẩu Admin:`);
+            const confirmPass = prompt(`⚠️ LỆNH KHÓA SỔ GỘP GIAI ĐOẠN (HẾT NGÀY ${fDate.split('-').reverse().join('/')} TRỞ VỀ TRƯỚC):\nHệ thống sẽ đóng băng TOÀN BỘ đơn mở từ ngày này trở về trước.\nNhập mật khẩu Admin:`);
             if (confirmPass !== MASTER_PASSWORD) { alert("⚠️ Mật khẩu quản trị không chính xác!"); return; }
 
             window.fbOnce('history').then((snapshot) => {
@@ -840,7 +842,8 @@
                 let masterCompiledItems = {};
 
                 Object.keys(snap).forEach(k => {
-                    if (snap[k].date >= fDate && !snap[k].locked) {
+                    // Logic lọc chính xác: Chỉ chốt những đơn có ngày nhỏ hơn hoặc bằng ngày được chọn
+                    if (snap[k].date <= fDate && !snap[k].locked) {
                         updates[`history/${k}/locked`] = true; countUnchoted++;
                         totalCourt += (snap[k].courtFee || 0); totalService += (snap[k].serviceFee || 0);
                         totalCash += (snap[k].cashReceived || 0); totalBank += (snap[k].bankReceived || 0);
@@ -854,15 +857,16 @@
                     }
                 });
 
+                // Lọc chi phí từ ngày chọn trở về trước
                 expensesData.forEach(e => { 
-                    if (e.date >= fDate) totalExpense += (e.amount || 0); 
+                    if (e.date <= fDate) totalExpense += (e.amount || 0); 
                 });
                 
-                if (countUnchoted === 0) { alert("Không có đơn hàng nào đang mở kể từ ngày được chọn!"); return; }
+                if (countUnchoted === 0) { alert("Không có đơn hàng nào đang mở thuộc giai đoạn từ ngày chọn trở về trước!"); return; }
 
                 let finalCashSnapshot = totalCash - totalExpense;
                 const logId = 'BATCH_' + Date.now();
-                let displayDateRange = fDate.split('-').reverse().slice(0,2).join('/') + ' → Nay';
+                let displayDateRange = '← Đến ' + fDate.split('-').reverse().slice(0,2).join('/');
 
                 updates[`freeze_log/${logId}`] = {
                     id: logId, 
@@ -880,7 +884,7 @@
                     monthBankSnapshot: Math.round(totalBank)
                 };
 
-                window.fbUpdate('/', updates).then(() => { triggerToast(`Đã khóa sổ toàn bộ đơn mở kể từ ngày chốt!`); });
+                window.fbUpdate('/', updates).then(() => { triggerToast(`Đã khóa sổ toàn bộ đơn mở từ ngày chọn trở về trước!`); });
             }).catch(err => alert("Lỗi hệ thống: " + err));
         }
 
@@ -896,13 +900,13 @@
             });
         }
 
-        // TÍNH NĂNG BÍ MẬT HOÀN TOÀN: BẤM NHANH 5 LẦN VÀO DÒNG VERSION TRÊN HEADER ĐỂ KHÔI PHỤC ĐƠN ĐÃ KHÓA
+        // TÍNH NĂNG BÍ MẬT: BẤM 5 LẦN VÀO DÒNG VERSION TRÊN HEADER ĐỂ KHÔI PHỤC ĐƠN TỪ NGÀY CHỌN ĐẾN HIỆN TẠI
         let secretClicks = 0;
         let secretTimer;
         window.triggerSecretUnlock = function() {
             secretClicks++;
             clearTimeout(secretTimer);
-            secretTimer = setTimeout(() => { secretClicks = 0; }, 2500); // Reset số lần bấm nếu dừng quá 2.5 giây
+            secretTimer = setTimeout(() => { secretClicks = 0; }, 2500);
             
             if (secretClicks >= 5) {
                 secretClicks = 0;
@@ -918,6 +922,7 @@
                     let count = 0;
                     if(snap) {
                         Object.keys(snap).forEach(k => {
+                            // Mở khóa từ ngày được chọn kéo dài cho đến nay (>= dateStr)
                             if (snap[k].date >= dateStr && snap[k].locked) {
                                 updates[`history/${k}/locked`] = false;
                                 count++;
@@ -925,7 +930,7 @@
                         });
                     }
                     if(count === 0) {
-                        alert("Không tìm thấy lệnh nào đang khóa kể từ ngày bạn chọn.");
+                        alert("Không tìm thấy lệnh nào đang khóa trong khoảng từ ngày bạn chọn đến nay.");
                         return;
                     }
                     window.fbUpdate('/', updates).then(() => {
@@ -1030,7 +1035,7 @@
 
                 return `
                     <tr class="border-b border-slate-800/60 bg-slate-950/20 hover:bg-slate-900/40 text-[11px] font-semibold transition">
-                        <td class="p-3 text-emerald-400 font-extrabold text-xs">Ngày ${f.dateRange}</td>
+                        <td class="p-3 text-emerald-400 font-extrabold text-xs">${f.dateRange}</td>
                         <td class="p-3 text-slate-400">${f.freezeTime}</td>
                         <td class="p-3 text-right text-cyan-400 font-bold">${formatNum(f.courtFrozen)}k</td>
                         <td class="p-3 text-right text-amber-400 font-bold">${formatNum(f.serviceFrozen)}k</td>
